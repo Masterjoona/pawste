@@ -1,0 +1,26 @@
+.submit-button,
+.attach-button,
+.remove-button {
+    font-family: "Short Stack", cursive;
+    background-color: #788db5;
+    color: #292828;
+    border: none;
+    padding: 10px 20px;
+    margin: 10px;
+    border-radius: 7px;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+}
+
+.submit-button:hover,
+.attach-button:hover,
+.remove-button:hover {
+    background-color: #a3b9d1;
+}
+
+.buttons {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 10px;
+}

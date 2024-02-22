@@ -1,0 +1,32 @@
+{{define "buttons"}}
+<link rel="stylesheet" type="text/css" href="/css/buttons.css" />
+<script type="module" src="/js/submit.js"></script>
+<script src="/js/attach_file.js"></script>
+<script type="module" src="/js/preview.js"></script>
+<div class="buttons">
+    <button
+        class="attach-button"
+        id="attach-button"
+        onclick="document.getElementById('file-input').click()"
+    >
+        attach file
+    </button>
+    <button
+        class="remove-button"
+        id="remove-button"
+        onclick="removeFiles()"
+        style="display: none"
+    >
+        remove file
+    </button>
+    <input
+        type="file"
+        id="file-input"
+        multiple
+        onchange="handleFiles(this.files)"
+        style="display: none"
+    />
+    <button class="preview-button" id="preview-button">preview</button>
+    <button class="submit-button">submit</button>
+</div>
+{{end}}

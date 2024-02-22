@@ -1,0 +1,48 @@
+.options {
+    display: flex;
+    flex-direction: row;
+    justify-content: center;
+    margin-top: 10px; /* Adjust margin from the top */
+}
+
+.option-group {
+    margin-bottom: 20px; /* Adjust spacing between option groups */
+    margin: 0 20px; /* Adjust margin between option groups */
+}
+
+.options-label {
+    font-family: "Short Stack", cursive;
+    display: block;
+    color: #a3b9d1; /* Match text color */
+    margin-bottom: 5px;
+}
+
+.options select,
+.options input[type="password"] {
+    background-color: #2a2a30; /* Match background color */
+    color: aliceblue; /* Match text color */
+    border: 2px solid #788db5; /* Match border color */
+    border-radius: 7px;
+    padding: 8px; /* Adjust padding */
+    font-size: 16px; /* Adjust font size */
+}
+
+body > div.options > div:nth-child(5) {
+    /* password / label */
+    display: none;
+}
+
+body > div.options > div:nth-child(6) {
+    /* theme / label */
+    display: none;
+}
+
+/*  both are dynamically shown */
+
+.options select {
+    width: 160px; /* Adjust width */
+}
+
+.options input[type="password"] {
+    width: 160px; /* Adjust width */
+}

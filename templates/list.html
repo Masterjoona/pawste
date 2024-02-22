@@ -1,0 +1,17 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <title>pawste</title>
+    </head>
+    <body>
+        <h1>this is the list of pastes</h1>
+        <ul>
+            {{range .Pastes}}
+            <li>
+                <a href="/p/{{.PasteName}}">{{.PasteName}}</a>
+                <p>and i expire at {{.Expire}}</p>
+            </li>
+            {{end}}
+        </ul>
+    </body>
+</html>

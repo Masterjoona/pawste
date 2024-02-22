@@ -1,0 +1,96 @@
+{{define "options"}}
+<link rel="stylesheet" type="text/css" href="/css/options.css" />
+<link rel="stylesheet" href="/css/themes/atom-dark.css" id="theme-stylesheet" />
+<script type="module" src="/js/themechange.js"></script>
+<script type="module" src="/js/password.js"></script>
+<div class="options">
+    <div class="option-group">
+        <label for="expiration" class="options-label">Expiration:</label>
+        <select id="expiration" name="expiration" class="options">
+            <option value="never">Never</option>
+            <option value="1min">1 min</option>
+            <option value="10min">10 min</option>
+            <option value="1h">1 Hours</option>
+            <option value="6h">6 Hours</option>
+            <option value="24h">1 Day</option>
+            <option value="72h">3 Days</option>
+            <option value="1w">1 Week</option>
+        </select>
+    </div>
+    <div class="option-group">
+        <label for="burn" class="options-label">Burn after:</label>
+        <select id="burn" name="burn" class="options">
+            <option value="-1">Never</option>
+            <option value="5">5 Views</option>
+            <option value="10">10 Views</option>
+            <option value="20">100 Views</option>
+        </select>
+    </div>
+    <div class="option-group">
+        <label for="syntax" class="options-label">Syntax:</label>
+        <select id="syntax" name="syntax" class="options">
+            <option value="auto">Auto</option>
+            <option value="none">None</option>
+            <option value="asm">ASM</option>
+            <option value="bash">Bash</option>
+            <option value="bf">Brainfuck</option>
+            <option value="c">C</option>
+            <option value="csv">CSV</option>
+            <option value="diff">Diff</option>
+            <option value="docker">Docker</option>
+            <option value="git">Git</option>
+            <option value="go">Go</option>
+            <option value="html">HTML</option>
+            <option value="http">HTTP</option>
+            <option value="ini">INI</option>
+            <option value="java">Java</option>
+            <option value="js">JavaScript</option>
+            <option value="jsdoc">JSDoc</option>
+            <option value="json">JSON</option>
+            <option value="leanpub-md">Leanpub Markdown</option>
+            <option value="log">Log</option>
+            <option value="lua">Lua</option>
+            <option value="make">Make</option>
+            <option value="md">Markdown</option>
+            <option value="pl">Perl</option>
+            <option value="plain">Plain text</option>
+            <option value="py">Python</option>
+            <option value="regex">Regex</option>
+            <option value="rs">Rust</option>
+            <option value="sql">SQL</option>
+            <option value="todo">Todo</option>
+            <option value="toml">TOML</option>
+            <option value="ts">TypeScript</option>
+            <option value="uri">URI</option>
+            <option value="xml">XML</option>
+            <option value="yaml">YAML</option>
+        </select>
+    </div>
+    <div class="option-group">
+        <label for="privacy" class="options-label">Privacy:</label>
+        <select id="privacy" name="privacy" class="options">
+            <option value="public">Public</option>
+            <option value="unlisted">Unlisted</option>
+            <option value="readonly">Read-only</option>
+            <option value="private">Private</option>
+            <option value="secret">Secret</option>
+        </select>
+    </div>
+    <div class="option-group">
+        <label for="password" class="options-label">Password:</label>
+        <input type="password" id="password" name="password" class="options" />
+    </div>
+    <div class="option-group">
+        <label for="theme" class="options-label">Paste theme:</label>
+        <select id="theme" name="theme" class="options">
+            <option value="atom-dark">Atom Dark</option>
+            <option value="dark">Dark</option>
+            <option value="default">Default</option>
+            <option value="github-dark">GitHub Dark</option>
+            <option value="github-dim">GitHub Dim</option>
+            <option value="github-light">GitHub Light</option>
+            <option value="visual-studio-dark">Visual Studio Dark</option>
+        </select>
+    </div>
+</div>
+{{end}}

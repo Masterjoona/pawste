@@ -1,0 +1,45 @@
+/* hide list bullets */
+ul {
+    list-style-type: none;
+}
+
+.guide-list {
+    font-family: "Short Stack", cursive;
+    color: #a3b9d1;
+    margin: 20px;
+    position: relative;
+}
+.guide-list strong {
+    color: #7aa8ff;
+    position: relative;
+}
+
+.guide-list:hover {
+    transform: scale(1.1); /* Increase size by 10% on hover */
+    transition: transform 0.3s ease;
+}
+
+.guide-list ul {
+    margin-top: 5px;
+    margin-bottom: 10px;
+}
+
+.guide-list li {
+    margin-bottom: 30px;
+}
+
+.guide {
+    /* Your existing styles for the .guide container */
+    position: relative; /* Ensure relative positioning for absolute positioning within */
+}
+
+.image-container {
+    position: absolute;
+    bottom: 10px; /* Adjust this value to position the image vertically */
+    right: 10px; /* Adjust this value to position the image horizontally */
+}
+
+.image-container img {
+    width: 40vh; /* Adjust image width as needed */
+    height: auto; /* Maintain aspect ratio */
+}

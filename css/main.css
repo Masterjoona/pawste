@@ -1,0 +1,8 @@
+@font-face {
+    font-family: "Short Stack";
+    src: url("../fonts/ShortStack-Regular.ttf");
+}
+body {
+    background-color: #292828;
+    text-align: center;
+}
