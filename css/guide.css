@@ -14,11 +14,6 @@ ul {
     position: relative;
 }
 
-.guide-list:hover {
-    transform: scale(1.1); /* Increase size by 10% on hover */
-    transition: transform 0.3s ease;
-}
-
 .guide-list ul {
     margin-top: 5px;
     margin-bottom: 10px;
@@ -26,11 +21,6 @@ ul {
 
 .guide-list li {
     margin-bottom: 30px;
-}
-
-.guide {
-    /* Your existing styles for the .guide container */
-    position: relative; /* Ensure relative positioning for absolute positioning within */
 }
 
 .image-container {

@@ -2,7 +2,7 @@ export function waitForElementToDisplay(
     selector,
     callback,
     checkFrequencyInMs,
-    timeoutInMs
+    timeoutInMs,
 ) {
     const startTimeInMs = Date.now();
     (function loopSearch() {

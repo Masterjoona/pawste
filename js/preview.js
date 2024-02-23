@@ -18,7 +18,7 @@ function togglePreview() {
     const previewTextArea = document.getElementById("preview");
     const textarea = document.getElementById("text-input");
     const themeBox = document.querySelector(
-        "body > div.options > div:nth-child(6)"
+        "body > div.options > div:nth-child(6)",
     );
 
     if (textarea.style.display === "none") {
@@ -47,5 +47,5 @@ waitForElementToDisplay(
             .addEventListener("click", togglePreview);
     },
     500,
-    5000
+    5000,
 );

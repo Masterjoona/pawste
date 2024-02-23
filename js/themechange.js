@@ -8,7 +8,7 @@ function changeTheme() {
     if (previewButton.textContent === "preview") {
         showToast(
             "warning",
-            "You need to preview the text to see the theme change"
+            "You need to preview the text to see the theme change",
         );
         return;
     }
@@ -24,7 +24,7 @@ waitForElementToDisplay(
             .addEventListener("change", changeTheme);
     },
     500,
-    5000
+    5000,
 );
 
 document.getElementById("theme").addEventListener("change", changeTheme);

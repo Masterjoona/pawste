@@ -10,7 +10,7 @@ async function HashPassword(password) {
         // Generate a cryptographic hash using the SHA-256 algorithm
         const hashBuffer = await crypto.subtle.digest(
             "SHA-256",
-            passwordBuffer
+            passwordBuffer,
         );
 
         // Convert the hash buffer to a hexadecimal string
@@ -34,7 +34,7 @@ HashPassword(password).then((hash) => {
 
 function togglePasswordBoxVisibility() {
     const privacy = document.querySelector(
-        "body > div.options > div:nth-child(5)"
+        "body > div.options > div:nth-child(5)",
     );
     const privacySelect = document.getElementById("privacy");
     if (privacySelect.value === "private" || privacySelect.value === "secret") {
@@ -52,5 +52,5 @@ waitForElementToDisplay(
             .addEventListener("change", togglePasswordBoxVisibility);
     },
     500,
-    5000
+    5000,
 );

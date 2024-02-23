@@ -23,6 +23,7 @@ var PasteDB *sql.DB
 func main() {
 	InitConfig()
 	PasteDB = CreateOrLoadDatabase(false)
+
 	r := gin.Default()
 
 	r.LoadHTMLGlob("templates/*")
@@ -38,8 +39,17 @@ func main() {
 		c.HTML(http.StatusOK, "main.html", nil)
 	})
 
-	r.POST("/submit", HandleSubmit)
 	r.GET("/p/:pasteName", HandlePastePage)
+	r.GET("/p", func(c *gin.Context) {
+		c.HTML(http.StatusNotFound, "404.html", nil)
+	})
+
+	r.GET("/u/:pasteName", Redirect)
+	r.GET("/u", func(c *gin.Context) {
+		c.HTML(http.StatusNotFound, "404.html", nil)
+	})
+
+	r.POST("/submit", HandleSubmit)
 	r.GET("/list", HandleListPage)
 	r.GET("/guide", HandleGuidePage)
 

@@ -3,6 +3,8 @@ package main
 import (
 	"fmt"
 	"time"
+
+	"github.com/gin-gonic/gin"
 )
 
 func SubmitToPaste(submit Submit, pasteName string, hashedPassword string) Paste {
@@ -40,4 +42,13 @@ func HumanTimeToSQLTime(humanTime string) string {
 		duration = 7 * 24 * time.Hour
 	}
 	return fmt.Sprintf("%d", time.Now().Add(duration).Unix())
+}
+
+func ErrorOnInvalidParam(c *gin.Context, paramName string) bool {
+	_, exists := c.Params.Get(paramName)
+	if !exists {
+		c.HTML(400, "400.html", nil)
+		return true
+	}
+	return false
 }

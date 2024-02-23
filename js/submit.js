@@ -8,7 +8,7 @@ function submitFormData(formData) {
         .then((response) => {
             if (!response.ok) {
                 throw new Error(
-                    `Error ${response.status}: ${response.statusText}`
+                    `Error ${response.status}: ${response.statusText}`,
                 );
             }
             return response.json();
@@ -84,5 +84,5 @@ waitForElementToDisplay(
             .addEventListener("click", submit);
     },
     500,
-    5000
+    5000,
 );
