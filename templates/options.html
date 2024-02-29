@@ -81,25 +81,19 @@
             </select>
         </div>
         <div class="option-group">
-            <label for="password" class="options-label">Password:</label>
-            <input
-                type="password"
-                id="password"
-                name="password"
-                class="options"
-            />
+            <form id="password-form" class="password-form">
+                <label for="password" class="options-label">Password:</label>
+                <input
+                    type="password"
+                    id="password"
+                    name="password"
+                    class="options"
+                />
+            </form>
         </div>
         <div class="option-group">
-            <label for="theme" class="options-label">Paste theme:</label>
-            <select id="theme" name="theme" class="options">
-                <option value="atom-dark">Atom Dark</option>
-                <option value="dark">Dark</option>
-                <option value="default">Default</option>
-                <option value="github-dark">GitHub Dark</option>
-                <option value="github-dim">GitHub Dim</option>
-                <option value="github-light">GitHub Light</option>
-                <option value="visual-studio-dark">Visual Studio Dark</option>
-            </select>
+            <label for="theme" class="options-label">Paste syntax theme:</label>
+            <select id="theme" name="theme" class="options"></select>
         </div>
     </div>
 {{ end }}

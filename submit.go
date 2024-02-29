@@ -7,14 +7,18 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
+type FileMultiPart struct {
+	File *multipart.FileHeader
+}
+
 type Submit struct {
-	Text       string                `form:"text" binding:"required"`
-	Expiration string                `form:"expiration,omitempty"`
-	BurnAfter  int                   `form:"burn,omitempty"`
-	Password   string                `form:"password,omitempty"`
-	Syntax     string                `form:"syntax,omitempty"`
-	Privacy    string                `form:"privacy,omitempty"`
-	File       *multipart.FileHeader `form:"file,omitempty"`
+	Text       string                  `form:"text,omitempty"`
+	Expiration string                  `form:"expiration,omitempty"`
+	BurnAfter  int                     `form:"burn,omitempty"`
+	Password   string                  `form:"password,omitempty"`
+	Syntax     string                  `form:"syntax,omitempty"`
+	Privacy    string                  `form:"privacy,omitempty"`
+	Files      []*multipart.FileHeader `form:"file,omitempty"`
 }
 
 func HandleSubmit(c *gin.Context) {
@@ -24,8 +28,8 @@ func HandleSubmit(c *gin.Context) {
 		return
 	}
 
-	if submit.Text == "" {
-		c.JSON(http.StatusBadRequest, gin.H{"error": "text is required"})
+	if submit.Text == "" || submit.Files[0] == nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "text or file is required"})
 		return
 	}
 	pasteName := CreatePasteName()
@@ -37,10 +41,11 @@ func HandleSubmit(c *gin.Context) {
 		"password":   hashedPassword,
 		"syntax":     submit.Syntax,
 		"privacy":    submit.Privacy,
-		"file":       submit.File,
+		"file":       "file",
 		"pasteUrl":   pasteName,
 	})
 
 	paste := SubmitToPaste(submit, pasteName, hashedPassword)
-	CreatePaste(paste)
+	CreatePaste(paste, submit.Password)
+	// i feel like im doing something wrong here
 }

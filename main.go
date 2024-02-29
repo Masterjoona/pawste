@@ -2,27 +2,38 @@ package main
 
 import (
 	"database/sql"
-	"net/http"
 
 	"github.com/gin-gonic/gin"
 )
 
+type File struct {
+	FileName string
+	FileSize int
+	FileBlob []byte
+}
+
 type Paste struct {
 	ID             int
 	PasteName      string
-	Content        string
 	Expire         string
-	BurnAfter      int
 	Privacy        string
+	ReadCount      int
+	ReadLast       string
+	BurnAfter      int
+	Content        string
+	UrlRedirect    int
 	Syntax         string
 	HashedPassword string
+	Files          []File
+	CreatedAt      string
+	UpdatedAt      string
 }
 
 var PasteDB *sql.DB
 
 func main() {
 	InitConfig()
-	PasteDB = CreateOrLoadDatabase(false)
+	PasteDB = CreateOrLoadDatabase(true)
 
 	r := gin.Default()
 
@@ -35,23 +46,23 @@ func main() {
 	r.StaticFile("/favicon.ico", "./static/favicon.ico")
 	r.StaticFile("/static/suzume.png", "./static/suzume.png")
 
-	r.GET("/", func(c *gin.Context) {
-		c.HTML(http.StatusOK, "main.html", nil)
-	})
+	r.GET("/", HandlePage(gin.H{}, nil, ""))
 
-	r.GET("/p/:pasteName", HandlePastePage)
-	r.GET("/p", func(c *gin.Context) {
-		c.HTML(http.StatusNotFound, "404.html", nil)
-	})
+	r.GET("/p/:pasteName", HandlePage(gin.H{}, nil, ""))
+	r.GET("/p", RedirectHome)
 
 	r.GET("/u/:pasteName", Redirect)
-	r.GET("/u", func(c *gin.Context) {
-		c.HTML(http.StatusNotFound, "404.html", nil)
-	})
+	r.GET("/u", RedirectHome)
+
+	r.GET("/r/:pasteName", HandleRaw)
+	r.GET("/r", RedirectHome)
 
 	r.POST("/submit", HandleSubmit)
-	r.GET("/list", HandleListPage)
-	r.GET("/guide", HandleGuidePage)
+	r.PATCH("/submit/:pasteName", HandleUpdate)
 
-	r.Run(":9454")
+	r.GET("/guide", HandlePage(gin.H{"Guide": true}, nil, ""))
+	r.GET("/admin", HandlePage(gin.H{"Admin": true}, adminHandler, "Pastes"))
+	r.GET("/list", HandlePage(gin.H{"List": true}, listHandler, "Pastes"))
+
+	r.Run(Config.Port)
 }

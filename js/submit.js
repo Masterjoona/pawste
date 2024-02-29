@@ -50,8 +50,8 @@ function submit() {
     formData.append("file", file);
 
     submitFormData(formData);
-    showToast("info", "Your data is being submitted");
-    showToast("info", " and you will be redirected to the result page!");
+    //showToast("info", "Your data is being submitted");
+    //showToast("info", " and you will be redirected to the result page!");
 }
 
 let typedSequence = "";
@@ -71,7 +71,7 @@ document.addEventListener("keydown", function (event) {
             console.log('The sequence "neko" was typed');
             // Reset the typed sequence after logging
             typedSequence = "";
-            showToast("info", "Neko!");
+            showToast("info", "neko");
         }
     }
 });

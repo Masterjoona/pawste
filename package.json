@@ -1,12 +1,14 @@
 {
   "name": "pawste",
   "version": "1.0.0",
-  "description": "Simple pastebin made in go.",
+  "description": "",
   "main": "index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
   },
+  "keywords": [],
   "author": "Masterjoona",
+  "license": "ISC",
   "dependencies": {
     "prettier": "^3.2.5",
     "prettier-plugin-go-template": "^0.0.15"

@@ -1,5 +1,6 @@
 .social-links {
     justify-content: center;
-    margin: 20px 0;
+    margin: 20px 10px;
     color: #788db5;
+    font-family: "Fira Code light";
 }

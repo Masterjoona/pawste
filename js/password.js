@@ -26,11 +26,13 @@ async function HashPassword(password) {
     }
 }
 
+/*
 // Example usage:
 const password = "test";
 HashPassword(password).then((hash) => {
     console.log("Hashed password:", hash);
 });
+*/
 
 function togglePasswordBoxVisibility() {
     const privacy = document.querySelector(

@@ -24,3 +24,13 @@
     align-items: center;
     gap: 10px;
 }
+
+#upload-password {
+    display: none;
+    background-color: #2a2a30; /* Match background color */
+    color: aliceblue; /* Match text color */
+    border: 2px solid #788db5; /* Match border color */
+    border-radius: 7px;
+    padding: 8px; /* Adjust padding */
+    font-size: 16px; /* Adjust font size */
+}

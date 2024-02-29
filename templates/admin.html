@@ -1,0 +1,32 @@
+{{ define "admin" }}
+    <link rel="stylesheet" type="text/css" href="/css/admin.css" />
+    <div class="stuff">
+        <div class="links" style="float: left;">
+            <h4>links</h4>
+            <a href="/docs">docs</a>
+            <a href="https://github.com/Masterjoona/pawste">source code</a>
+            <a href="https://github.com/Masterjoona/pawste/issues"
+                >Issues and feedback</a
+            >
+            <a href="https://github.com/sponsors/Masterjoona">donate</a>
+        </div>
+        <div class="info" style="float: right;">
+            <h4>quick info</h4>
+            <table class="info-table">
+                <tr>
+                    <td>version</td>
+                    <td>{{ .Version }}</td>
+                </tr>
+                <tr>
+                    <td>uptime</td>
+                    <td>{{ .Uptime }}</td>
+                </tr>
+                <tr>
+                    <td>uploads</td>
+                    <td>{{ .UploadCount }}</td>
+                </tr>
+            </table>
+        </div>
+        {{ template "list" . }}
+    </div>
+{{ end }}

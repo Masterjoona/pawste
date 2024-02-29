@@ -6,10 +6,20 @@
     </head>
     <body>
         {{ template "pastebinHeader" . }}
-        {{ template "options" . }}
-        {{ template "container" . }}
-        {{ template "buttons" . }}
-        {{ template "footer". }}
-        {{ template "toast" . }}
+        {{ if .Admin }}
+            {{ template "admin" . }}
+        {{ else if .List }}
+            {{ template "list" . }}
+        {{ else if .Guide }}
+            {{ template "guide" . }}
+        {{ else if .NotFound }}
+            {{ template "404" . }}
+        {{ else }}
+            {{ template "options" . }}
+            {{ template "container" . }}
+            {{ template "buttons" . }}
+            {{ template "footer". }}
+            {{ template "toast" . }}
+        {{ end }}
     </body>
 </html>

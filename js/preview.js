@@ -1,19 +1,15 @@
-import { highlightElement } from "./speed-highlight/index.js";
-import { detectLanguage } from "./speed-highlight/detect.js";
+import {
+    codeToHtml,
+    bundledThemes,
+    bundledLanguages,
+} from "https://esm.sh/shiki@1.1.6";
 import { waitForElementToDisplay } from "./helpers.js";
 
-export function languageOption(code) {
-    const syntax = document.getElementById("syntax").value;
-    if (syntax === "auto") {
-        return detectLanguage(code);
-    }
-    if (syntax === "none") {
-        return "";
-    }
-    return syntax;
+export function languageOption() {
+    return document.getElementById("syntax").value;
 }
 
-function togglePreview() {
+async function togglePreview() {
     const previewButton = document.getElementById("preview-button");
     const previewTextArea = document.getElementById("preview");
     const textarea = document.getElementById("text-input");
@@ -28,14 +24,41 @@ function togglePreview() {
         themeBox.style.display = "none";
     } else {
         textarea.style.display = "none";
-        previewTextArea.innerHTML = textarea.value;
-        const language = languageOption(textarea.value);
-        language === ""
-            ? highlightElement(previewTextArea, undefined, "multiline")
-            : highlightElement(previewTextArea, language, "multiline");
+        previewTextArea.innerHTML = await codeToHtml(textarea.value, {
+            lang: languageOption(),
+            theme: "solarized-dark",
+        });
         previewTextArea.style.display = "inline-block";
         previewButton.textContent = "edit";
         themeBox.style.display = "block";
+    }
+}
+
+function prettifyThemeName(theme) {
+    return theme
+        .split("-")
+        .map((word) => word.charAt(0).toUpperCase() + word.slice(1))
+        .join(" ");
+}
+
+function addThemeOptions() {
+    console.log(bundledThemes);
+    const themeSelect = document.getElementById("theme");
+    for (const theme in bundledThemes) {
+        const option = document.createElement("option");
+        option.value = theme;
+        option.text = prettifyThemeName(theme);
+        themeSelect.add(option);
+    }
+}
+
+function addLanguageOptions() {
+    console.log(bundledLanguages);
+    const syntaxSelect = document.getElementById("syntax");
+    console.log(Object.keys(bundledLanguages));
+    for (const language in Object.keys(bundledLanguages)) {
+        console.log("what the fuck");
+        console.log(language);
     }
 }
 
@@ -44,7 +67,11 @@ waitForElementToDisplay(
     function () {
         document
             .querySelector("body > div.buttons > button.preview-button")
-            .addEventListener("click", togglePreview);
+            .addEventListener("click", async () => {
+                await togglePreview();
+            });
+        addThemeOptions();
+        //addLanguageOptions();
     },
     500,
     5000,

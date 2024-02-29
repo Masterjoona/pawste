@@ -22,11 +22,32 @@
         <input
             type="file"
             id="file-input"
-            multiple
             onchange="handleFiles(this.files)"
             style="display: none"
         />
+        {{ if .Config.UploadingPassword }}
+            <script>
+                document
+                    .getElementById("file-input")
+                    .addEventListener("change", function () {
+                        const upPassElem =
+                            document.getElementById("upload-password");
+                        if (this.files.length > 0) {
+                            upPassElem.style.display = "block";
+                        } else {
+                            upPassElem.style.display = "none";
+                        }
+                    });
+            </script>
+            <form id="upload-password-form" class="upload-password-form">
+                <input
+                    type="password"
+                    id="upload-password"
+                    name="upload-password"
+                />
+            </form>
+        {{ end }}
         <button class="preview-button" id="preview-button">preview</button>
-        <button class="submit-button">submit</button>
+        <button class="submit-button">save</button>
     </div>
 {{ end }}

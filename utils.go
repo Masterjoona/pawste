@@ -1,22 +1,55 @@
 package main
 
 import (
-	"fmt"
+	"io"
+	"mime/multipart"
+	"os"
+	"regexp"
 	"time"
-
-	"github.com/gin-gonic/gin"
 )
 
 func SubmitToPaste(submit Submit, pasteName string, hashedPassword string) Paste {
+	var files []File
+	for _, file := range submit.Files {
+		if file == nil {
+			continue
+		}
+		fileName, fileSize, fileBlob := multipartIntoThings(file)
+		files = append(files, File{
+			FileName: fileName,
+			FileSize: fileSize,
+			FileBlob: fileBlob,
+		})
+	}
 	return Paste{
 		PasteName:      pasteName,
 		Expire:         HumanTimeToSQLTime(submit.Expiration),
 		Privacy:        submit.Privacy,
+		ReadCount:      1,
+		ReadLast:       GetCurrentDate(),
 		BurnAfter:      submit.BurnAfter,
 		Content:        submit.Text,
 		Syntax:         submit.Syntax,
 		HashedPassword: hashedPassword,
+		Files:          files,
+		UrlRedirect:    IsContentJustUrl(submit.Text),
+		CreatedAt:      GetCurrentDate(),
+		UpdatedAt:      GetCurrentDate(),
 	}
+}
+
+func multipartIntoThings(file *multipart.FileHeader) (string, int, []byte) {
+	src, err := file.Open()
+	if err != nil {
+		panic(err)
+	}
+	defer src.Close()
+
+	fileBlob, err := io.ReadAll(src)
+	if err != nil {
+		panic(err)
+	}
+	return file.Filename, len(fileBlob), fileBlob
 }
 
 func HumanTimeToSQLTime(humanTime string) string {
@@ -41,14 +74,28 @@ func HumanTimeToSQLTime(humanTime string) string {
 	default:
 		duration = 7 * 24 * time.Hour
 	}
-	return fmt.Sprintf("%d", time.Now().Add(duration).Unix())
+	// time into 2024-02-26T15:56:16Z + duration
+	return time.Now().Add(duration).Format("2006-01-02 15:04:05")
+}
+func DoesPasteHaveFiles(paste Paste) bool {
+	if _, err := os.Stat(Config.DataDir + paste.PasteName); os.IsNotExist(err) {
+		return false
+	}
+
+	files, err := os.ReadDir(Config.DataDir + paste.PasteName)
+	if err != nil {
+		return false
+	}
+	return len(files) > 0
 }
 
-func ErrorOnInvalidParam(c *gin.Context, paramName string) bool {
-	_, exists := c.Params.Get(paramName)
-	if !exists {
-		c.HTML(400, "400.html", nil)
-		return true
+func IsContentJustUrl(content string) int {
+	if regexp.MustCompile(`^(?:http|https|magnet):\/\/[^\s/$.?#].[^\s]*$`).MatchString(content) {
+		return 1
 	}
-	return false
+	return 0
+}
+
+func GetCurrentDate() string {
+	return time.Now().Format("2006-01-02 15:04:05")
 }

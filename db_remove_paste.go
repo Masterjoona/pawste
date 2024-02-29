@@ -5,9 +5,6 @@ import (
 )
 
 func RemovePaste(URLHref string) {
-	if PasteDB == nil {
-		panic("database connection is nil")
-	}
 	tx, err := PasteDB.Begin()
 	if err != nil {
 		panic(err)
