@@ -19,7 +19,13 @@ func CleanUpExpiredPastes() {
 	defer pastes.Close()
 	for pastes.Next() {
 		var paste Paste
-		err = pastes.Scan(&paste.ID, &paste.PasteName, &paste.Expire, &paste.Privacy, &paste.BurnAfter, &paste.Content, &paste.Syntax, &paste.HashedPassword)
+		err = pastes.Scan(
+			&paste.ID,
+			&paste.PasteName,
+			&paste.Expire,
+			&paste.Privacy,
+			&paste.BurnAfter,
+		)
 		if err != nil {
 			panic(err)
 		}

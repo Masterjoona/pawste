@@ -1,69 +1,88 @@
 package main
 
 import (
-	"io"
-	"os"
-
 	_ "github.com/mattn/go-sqlite3"
 )
 
-func CreatePaste(paste Paste, password string) {
+func CreatePaste(paste Paste, password string) error {
 	tx, err := PasteDB.Begin()
 	if err != nil {
-		panic(err)
+		return err
 	}
-	stmt, err := tx.Prepare("insert into pastes(paste_name, expire, privacy, read_count, read_last, burn_after, content, url_redirect, syntax, hashed_password, created_at, updated_at) values(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)")
+	defer func() {
+		if err != nil {
+			tx.Rollback()
+			return
+		}
+		err = tx.Commit()
+		if err != nil {
+			panic(err)
+		}
+	}()
+
+	stmt, err := tx.Prepare(`
+		INSERT INTO pastes(paste_name, expire, privacy, read_count, read_last, burn_after, content, url_redirect, syntax, hashed_password, created_at, updated_at)
+		VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+	`)
 	if err != nil {
-		panic(err)
+		return err
 	}
 	defer stmt.Close()
 
-	_, err = stmt.Exec(paste.PasteName, paste.Expire, paste.Privacy, paste.ReadCount, paste.ReadLast, paste.BurnAfter, paste.Content, paste.UrlRedirect, paste.Syntax, paste.HashedPassword, paste.CreatedAt, paste.UpdatedAt)
+	result, err := stmt.Exec(
+		paste.PasteName,
+		paste.Expire,
+		paste.Privacy,
+		paste.ReadCount,
+		paste.ReadLast,
+		paste.BurnAfter,
+		paste.Content,
+		paste.UrlRedirect,
+		paste.Syntax,
+		paste.HashedPassword,
+		paste.CreatedAt,
+		paste.UpdatedAt,
+	)
 	if err != nil {
-		panic(err)
-	}
-	err = tx.Commit()
-	if err != nil {
-		panic(err)
-	}
-	encrypt := (paste.Privacy == "private" || paste.Privacy == "secret") && password != ""
-	if encrypt {
-		println("Password:", password)
-		//SaveFilesIfExists(paste.Files, paste.PasteName, encrypt, password)
-		return
+		return err
 	}
 
-	SaveFilesIfExists(paste.Files, paste.PasteName, encrypt, password)
+	lastInsertID, err := result.LastInsertId()
+	if err != nil {
+		return err
+	}
 
+	// Save files if any
+	if len(paste.Files) > 0 {
+		err = SaveFiles(paste, lastInsertID, password)
+		if err != nil {
+			return err
+		}
+	}
+
+	return nil
 }
 
-func SaveFilesIfExists(files []File, pasteName string, encrypt bool, password string) {
-	if len(files) == 0 || files[0].FileName == "" {
-		return
-	}
-	_ = os.MkdirAll(Config.DataDir+pasteName, os.ModePerm)
-	if encrypt {
-		for index, file := range files {
-			Encrypt(file.FileBlob, password)
-		}
-		return
-	}
-	for _, file := range files {
-		println("Saving file:", file.Filename)
-		src, err := file.Open()
-		if err != nil {
-			panic(err)
-		}
-		defer src.Close()
+func SaveFiles(paste Paste, insertId int64, password string) error {
+	privacy := paste.Privacy
+	encrypt := (privacy == "private" || privacy == "secret") && password != ""
 
-		dst, err := os.Create(Config.DataDir + pasteName + "/" + file.Filename)
-		if err != nil {
-			panic(err)
+	for _, file := range paste.Files {
+		if encrypt {
+			blob, err := Encrypt(file, password)
+			if err != nil {
+				return err
+			}
+			file.Blob = blob
 		}
-		defer dst.Close()
-
-		if _, err = io.Copy(dst, src); err != nil {
-			panic(err)
+		_, err := PasteDB.Exec(`
+			INSERT INTO files(paste_id, file_name, file_size, file_blob)
+			VALUES (?, ?, ?, ?)
+		`, insertId, file.Name, file.Size, file.Blob)
+		if err != nil {
+			return err
 		}
 	}
+
+	return nil
 }

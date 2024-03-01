@@ -1,7 +1,6 @@
 package main
 
 import (
-	"bytes"
 	"crypto/aes"
 	"crypto/cipher"
 	"crypto/rand"
@@ -10,8 +9,6 @@ import (
 	"encoding/hex"
 	"fmt"
 	"io"
-	"os"
-	"strings"
 
 	"golang.org/x/crypto/pbkdf2"
 )
@@ -27,63 +24,37 @@ func deriveKey(password string) []byte {
 	return hash[:]
 }
 
-func Encrypt(file File, password string, pasteName string) {
-	plaintext, err := source.Open()
-	if err != nil {
-		panic(err)
-	}
-	plaintextBytes, err := io.ReadAll(plaintext)
-	if err != nil {
-		panic(err)
-	}
-
+func Encrypt(file File, password string) ([]byte, error) {
 	key := deriveKey(password)
 	nonce := make([]byte, 12)
 
-	// Randomizing the nonce
 	if _, err := io.ReadFull(rand.Reader, nonce); err != nil {
-		panic(err)
+		return nil, err
 	}
 
 	dk := pbkdf2.Key(key, nonce, 4096, 32, sha1.New)
 
 	block, err := aes.NewCipher(dk)
 	if err != nil {
-		panic(err)
+		return nil, err
 	}
 
 	aesgcm, err := cipher.NewGCM(block)
 	if err != nil {
-		panic(err)
+		return nil, err
 	}
 
-	ciphertext := aesgcm.Seal(nil, nonce, plaintextBytes, nil)
+	encryptedFileBytes := aesgcm.Seal(nil, nonce, file.Blob, nil)
 
-	ciphertext = append(ciphertext, nonce...)
+	encryptedFileBytes = append(encryptedFileBytes, nonce...)
 
-	f, err := os.Create(Config.DataDir + pasteName + "/" + source.Filename + ".enc")
-	if err != nil {
-		panic(err)
-	}
-	_, err = io.Copy(f, bytes.NewReader(ciphertext))
-	if err != nil {
-		panic(err)
-	}
+	return encryptedFileBytes, nil
 }
 
-func DecryptFile(source string, password string) {
-	if _, err := os.Stat(source); os.IsNotExist(err) {
-		panic(err)
-	}
-
-	ciphertext, err := os.ReadFile(source)
-
-	if err != nil {
-		panic(err)
-	}
-
+func Decrypt(fileBlob []byte, password string) ([]byte, error) {
 	key := deriveKey(password)
-	salt := ciphertext[len(ciphertext)-12:]
+	salt := fileBlob[len(fileBlob)-12:]
+	onlyFile := fileBlob[:len(fileBlob)-12]
 	str := hex.EncodeToString(salt)
 
 	nonce, err := hex.DecodeString(str)
@@ -103,26 +74,18 @@ func DecryptFile(source string, password string) {
 		panic(err)
 	}
 
-	plaintext, err := aesgcm.Open(nil, nonce, ciphertext[:len(ciphertext)-12], nil)
+	fileBytes, err := aesgcm.Open(nil, nonce, onlyFile, nil)
 	if err != nil {
-		panic(err)
+		return nil, err
 	}
 
-	f, err := os.Create(strings.TrimSuffix(source, ".enc"))
-	if err != nil {
-		panic(err)
-	}
-	_, err = io.Copy(f, bytes.NewReader(plaintext))
-	if err != nil {
-		panic(err)
-	}
+	return fileBytes, nil
 }
 
 func EncryptText(text string, password string) string {
 	key := deriveKey(password)
 	nonce := make([]byte, 12)
 
-	// Randomizing the nonce
 	if _, err := io.ReadFull(rand.Reader, nonce); err != nil {
 		panic(err)
 	}

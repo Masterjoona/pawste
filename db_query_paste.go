@@ -44,7 +44,9 @@ func GetPasteByName(pasteName string) (Paste, error) {
 
 func GetPublicPastes() []Paste {
 	CleanUpExpiredPastes()
-	rows, err := PasteDB.Query("select url, expire, burn_after from pastes where privacy = 'public'")
+	rows, err := PasteDB.Query(
+		"select url, expire, burn_after from pastes where privacy = 'public'",
+	)
 	if err != nil {
 		panic(err)
 	}

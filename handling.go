@@ -2,12 +2,15 @@ package main
 
 import (
 	"net/http"
-	"strings"
 
 	"github.com/gin-gonic/gin"
 )
 
-func HandlePage(settings map[string]interface{}, function func() interface{}, value string) gin.HandlerFunc {
+func HandlePage(
+	settings map[string]interface{},
+	function func() interface{},
+	value string,
+) gin.HandlerFunc {
 	CleanUpExpiredPastes()
 	settings["Config"] = Config
 	return func(c *gin.Context) {
@@ -54,21 +57,11 @@ func HandleRaw(c *gin.Context) {
 
 func Redirect(c *gin.Context) {
 	CleanUpExpiredPastes()
-	paste, err := GetPasteByName(c.Param("pasteName"))
-	if err != nil {
-		c.HTML(http.StatusNotFound, "404.html", nil)
-		return
-	}
-	content := paste.Content
-	if strings.HasPrefix(content, "http") || strings.HasPrefix(content, "magnet") {
-		c.Redirect(http.StatusFound, content)
-		return
-	} else {
-		c.Redirect(http.StatusFound, "/p/"+c.Param("pasteName"))
-		return
-	}
+	//paste, err := GetPasteByName(c.Param("pasteName"))
+	// refactor
 }
 
+// funny
 func adminHandler() interface{} {
 	return GetAllPastes()
 }

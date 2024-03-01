@@ -7,9 +7,9 @@ import (
 )
 
 type File struct {
-	FileName string
-	FileSize int
-	FileBlob []byte
+	Name string
+	Size int
+	Blob []byte
 }
 
 type Paste struct {

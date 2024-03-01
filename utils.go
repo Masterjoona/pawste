@@ -16,9 +16,9 @@ func SubmitToPaste(submit Submit, pasteName string, hashedPassword string) Paste
 		}
 		fileName, fileSize, fileBlob := multipartIntoThings(file)
 		files = append(files, File{
-			FileName: fileName,
-			FileSize: fileSize,
-			FileBlob: fileBlob,
+			Name: fileName,
+			Size: fileSize,
+			Blob: fileBlob,
 		})
 	}
 	return Paste{
