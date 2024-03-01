@@ -7,12 +7,9 @@ import (
 )
 
 func CleanUpExpiredPastes() {
-	/*_, err := PasteDB.Exec("delete from pastes where expire < datetime('now')")
-	if err != nil {
-		panic(err)
-	}*/
-	// for now we will just print the expired pastes
-	pastes, err := PasteDB.Query("select * from pastes where expire < datetime('now')")
+	pastes, err := PasteDB.Query(
+		"select id, paste_name, expire, privacy, burn_after from pastes where expire < datetime('now') or burn_after <= read_count",
+	)
 	if err != nil {
 		panic(err)
 	}

@@ -23,6 +23,7 @@ func HandlePage(
 
 func HandlePastePage(c *gin.Context) {
 	CleanUpExpiredPastes()
+	UpdateReadCount(c.Param("pasteName"))
 	paste, err := GetPasteByName(c.Param("pasteName"))
 	if err != nil {
 		c.HTML(http.StatusNotFound, "main.html", gin.H{
@@ -47,6 +48,7 @@ func RedirectHome(c *gin.Context) {
 
 func HandleRaw(c *gin.Context) {
 	CleanUpExpiredPastes()
+	UpdateReadCount(c.Param("pasteName"))
 	paste, err := GetPasteByName(c.Param("pasteName"))
 	if err != nil {
 		c.String(http.StatusNotFound, "Paste not found")
@@ -57,15 +59,16 @@ func HandleRaw(c *gin.Context) {
 
 func Redirect(c *gin.Context) {
 	CleanUpExpiredPastes()
+	UpdateReadCount(c.Param("pasteName"))
 	//paste, err := GetPasteByName(c.Param("pasteName"))
 	// refactor
 }
 
 // funny
-func adminHandler() interface{} {
+func AdminHandler() interface{} {
 	return GetAllPastes()
 }
 
-func listHandler() interface{} {
+func ListHandler() interface{} {
 	return GetPublicPastes()
 }

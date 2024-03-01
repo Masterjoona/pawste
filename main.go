@@ -33,7 +33,7 @@ var PasteDB *sql.DB
 
 func main() {
 	InitConfig()
-	PasteDB = CreateOrLoadDatabase(true)
+	PasteDB = CreateOrLoadDatabase(false)
 
 	r := gin.Default()
 
@@ -48,7 +48,7 @@ func main() {
 
 	r.GET("/", HandlePage(gin.H{}, nil, ""))
 
-	r.GET("/p/:pasteName", HandlePage(gin.H{}, nil, ""))
+	r.GET("/p/:pasteName", HandlePastePage)
 	r.GET("/p", RedirectHome)
 
 	r.GET("/u/:pasteName", Redirect)
@@ -61,8 +61,8 @@ func main() {
 	r.PATCH("/submit/:pasteName", HandleUpdate)
 
 	r.GET("/guide", HandlePage(gin.H{"Guide": true}, nil, ""))
-	r.GET("/admin", HandlePage(gin.H{"Admin": true}, adminHandler, "Pastes"))
-	r.GET("/list", HandlePage(gin.H{"List": true}, listHandler, "Pastes"))
+	r.GET("/admin", HandlePage(gin.H{"Admin": true}, AdminHandler, "Pastes"))
+	r.GET("/list", HandlePage(gin.H{"List": true}, ListHandler, "Pastes"))
 
 	r.Run(Config.Port)
 }
