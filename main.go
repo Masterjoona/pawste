@@ -33,7 +33,7 @@ var PasteDB *sql.DB
 
 func main() {
 	InitConfig()
-	PasteDB = CreateOrLoadDatabase(false)
+	PasteDB = CreateOrLoadDatabase(Config.IUnderstandTheRisks)
 
 	r := gin.Default()
 

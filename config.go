@@ -9,7 +9,6 @@ import (
 type ConfigEnv struct {
 	Salt          string
 	Port          string
-	DataDir       string
 	AdminPassword string
 
 	PublicList bool
@@ -26,6 +25,7 @@ type ConfigEnv struct {
 	DisableBurnAfter    bool
 	DefaultExpiry       string
 	ShortPasteNames     bool
+	IUnderstandTheRisks bool
 }
 
 var (
@@ -38,7 +38,6 @@ func InitConfig() {
 	Config = ConfigEnv{
 		Salt:                getEnv("SALT", "banana"),
 		Port:                getEnv("PORT", ":9454"),
-		DataDir:             getEnv("DATA_DIR", "pawste_data/"),
 		AdminPassword:       getEnv("ADMIN_PASSWORD", "admin"),
 		PublicList:          getEnv("PUBLIC_LIST", "true") == "true",
 		PublicURL:           getEnv("PUBLIC_URL", "http://localhost:"+getEnv("PORT", ":9454")),
@@ -52,6 +51,7 @@ func InitConfig() {
 		DisableBurnAfter:    getEnv("DISABLE_BURN_AFTER", "false") == "true",
 		DefaultExpiry:       getEnv("DEFAULT_EXPIRY", "1w"),
 		ShortPasteNames:     getEnv("SHORT_PASTE_NAMES", "false") == "true",
+		IUnderstandTheRisks: getEnv("I_UNDERSTAND_THE_RISKS", "false") == "true",
 	}
 }
 

@@ -59,7 +59,7 @@ func Redirect(c *gin.Context) {
 	UpdateReadCount(c.Param("pasteName"))
 	paste, err := GetPasteByName(c.Param("pasteName"))
 	if err != nil {
-		c.Redirect(http.StatusNotFound, "/")
+		c.Redirect(http.StatusFound, "/")
 		return
 	}
 	if paste.UrlRedirect == 0 {

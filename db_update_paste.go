@@ -12,16 +12,16 @@ func UpdateReadCount(pasteName string) {
 	if err != nil {
 		panic(err)
 	}
-	/*
-		if isAtBurnAfter(pasteName) {
-			RemovePaste(pasteName)
-		}
-	*/
+
+	if isAtBurnAfter(pasteName) {
+		RemovePaste(pasteName)
+	}
+
 }
 
 func isAtBurnAfter(pasteName string) bool {
 	row := PasteDB.QueryRow(
-		"select case when burn_after <= read_count then 1 else 0 end from pastes where paste_name = ?",
+		"select case when burn_after <= read_count and burn_after > 0 then 1 else 0 end from pastes where paste_name = ?",
 		pasteName,
 	)
 	var burned int
