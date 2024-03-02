@@ -33,12 +33,7 @@ function submit() {
     const text = document.getElementById("text-input").value;
     const file = document.getElementById("file-input").files[0] || null;
 
-    console.log(expiration);
-    console.log(burn);
-    console.log(password);
-    console.log(syntax);
-    console.log(privacy);
-    console.log(file);
+    console.log(expiration, burn, password, syntax, privacy, text, file);
 
     const formData = new FormData();
     formData.append("expiration", expiration);
@@ -50,26 +45,19 @@ function submit() {
     formData.append("file", file);
 
     submitFormData(formData);
-    //showToast("info", "Your data is being submitted");
-    //showToast("info", " and you will be redirected to the result page!");
 }
 
 let typedSequence = "";
 
-// Add event listener to the document
 document.addEventListener("keydown", function (event) {
-    // Check if the event target is not the textarea with class "input-textarea"
     if (
         event.target.tagName !== "TEXTAREA" ||
         !event.target.classList.contains("input-textarea")
     ) {
-        // Append the pressed key to the typed sequence
         typedSequence += event.key.toLowerCase();
         console.log(typedSequence);
-        // Check if the typed sequence contains "neko"
         if (typedSequence.includes("neko")) {
             console.log('The sequence "neko" was typed');
-            // Reset the typed sequence after logging
             typedSequence = "";
             showToast("info", "neko");
         }

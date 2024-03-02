@@ -1,14 +1,20 @@
 {{ define "list" }}
-    <body>
-        <h1>pastes</h1>
-        <table>
-            {{ range .Pastes }}
-                <tr>
-                    <td><a href="/p/{{ .PasteName }}">{{ .PasteName }}</a></td>
-                </tr>
-            {{ end }}
-        </table>
-        <h1>url redirects</h1>
-        <h3>to do</h3>
-    </body>
+    <h1>pastes</h1>
+    <table>
+        {{ range .PasteLists.Pastes }}
+            <tr>
+                <td><a href="/p/{{ .PasteName }}">{{ .PasteName }}</a></td>
+            </tr>
+        {{ end }}
+    </table>
+    <h1>url redirects</h1>
+    <table>
+        {{ range .PasteLists.Redirects }}
+            <tr>
+                <td>
+                    <a href="/u/{{ .PasteName }}">{{ .PasteName }}</a>
+                </td>
+            </tr>
+        {{ end }}
+    </table>
 {{ end }}

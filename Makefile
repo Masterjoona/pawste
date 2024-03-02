@@ -1,0 +1,11 @@
+binary_name="pawste"
+
+build:
+	go build -o $(binary_name) "-ldflags=-s -w" *.go
+
+run:
+	go run *.go
+
+clean:
+	rm $(binary_name)
+

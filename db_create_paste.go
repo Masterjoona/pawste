@@ -52,7 +52,6 @@ func CreatePaste(paste Paste, password string) error {
 		return err
 	}
 
-	// Save files if any
 	if len(paste.Files) > 0 {
 		err = SaveFiles(paste, lastInsertID, password)
 		if err != nil {
@@ -67,21 +66,35 @@ func SaveFiles(paste Paste, insertId int64, password string) error {
 	privacy := paste.Privacy
 	encrypt := (privacy == "private" || privacy == "secret") && password != ""
 
+	tx, err := PasteDB.Begin()
+	if err != nil {
+		return err
+	}
+
 	for _, file := range paste.Files {
 		if encrypt {
 			blob, err := Encrypt(file, password)
 			if err != nil {
+				tx.Rollback()
 				return err
 			}
 			file.Blob = blob
 		}
-		_, err := PasteDB.Exec(`
+
+		_, err = tx.Exec(`
 			INSERT INTO files(paste_id, file_name, file_size, file_blob)
 			VALUES (?, ?, ?, ?)
 		`, insertId, file.Name, file.Size, file.Blob)
 		if err != nil {
+			tx.Rollback()
 			return err
 		}
+	}
+
+	err = tx.Commit()
+	if err != nil {
+		tx.Rollback()
+		return err
 	}
 
 	return nil

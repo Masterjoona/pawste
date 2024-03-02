@@ -62,7 +62,7 @@ func main() {
 
 	r.GET("/guide", HandlePage(gin.H{"Guide": true}, nil, ""))
 	r.GET("/admin", HandlePage(gin.H{"Admin": true}, AdminHandler, "Pastes"))
-	r.GET("/list", HandlePage(gin.H{"List": true}, ListHandler, "Pastes"))
+	r.GET("/list", HandlePage(gin.H{"List": true}, ListHandler, "PasteLists"))
 
 	r.Run(Config.Port)
 }

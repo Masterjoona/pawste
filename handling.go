@@ -22,13 +22,12 @@ func HandlePage(
 }
 
 func HandlePastePage(c *gin.Context) {
-	CleanUpExpiredPastes()
 	UpdateReadCount(c.Param("pasteName"))
 	paste, err := GetPasteByName(c.Param("pasteName"))
 	if err != nil {
 		c.HTML(http.StatusNotFound, "main.html", gin.H{
-			"404":    true,
-			"Config": Config,
+			"NotFound": true,
+			"Config":   Config,
 		})
 		return
 	}
@@ -47,7 +46,6 @@ func RedirectHome(c *gin.Context) {
 }
 
 func HandleRaw(c *gin.Context) {
-	CleanUpExpiredPastes()
 	UpdateReadCount(c.Param("pasteName"))
 	paste, err := GetPasteByName(c.Param("pasteName"))
 	if err != nil {
@@ -58,10 +56,18 @@ func HandleRaw(c *gin.Context) {
 }
 
 func Redirect(c *gin.Context) {
-	CleanUpExpiredPastes()
 	UpdateReadCount(c.Param("pasteName"))
-	//paste, err := GetPasteByName(c.Param("pasteName"))
-	// refactor
+	paste, err := GetPasteByName(c.Param("pasteName"))
+	if err != nil {
+		c.Redirect(http.StatusNotFound, "/")
+		return
+	}
+	if paste.UrlRedirect == 0 {
+		c.Redirect(http.StatusFound, "/p/"+paste.PasteName)
+		return
+	}
+	c.Redirect(http.StatusFound, paste.Content)
+
 }
 
 // funny
@@ -69,6 +75,15 @@ func AdminHandler() interface{} {
 	return GetAllPastes()
 }
 
+type PasteLists struct {
+	Pastes    []Paste
+	Redirects []Paste
+}
+
 func ListHandler() interface{} {
-	return GetPublicPastes()
+	return PasteLists{
+		Pastes:    GetPublicPastes(),
+		Redirects: GetPublicRedirects(),
+	}
+
 }
