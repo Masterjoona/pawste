@@ -33,7 +33,6 @@ var Config ConfigEnv
 
 const (
 	PawsteVersion = ""
-	SizeFallback  = "1024 * 1024 * 10"
 	envPrefix     = "PAWSTE_"
 )
 
@@ -45,9 +44,9 @@ func InitConfig() {
 		PublicList:          getEnv("PUBLIC_LIST", "true") == "true",
 		PublicURL:           getEnv("PUBLIC_URL", "http://localhost:"+getEnv("PORT", ":9454")),
 		NoFileUpload:        getEnv("NO_FILE_UPLOAD", "false") == "true",
-		MaxFileSize:         int64(getEnvInt("MAX_FILE_SIZE", SizeFallback)),
-		MaxEncryptionSize:   int64(getEnvInt("MAX_ENCRYPTION_SIZE", SizeFallback)),
-		MaxContentLength:    int64(getEnvInt("MAX_CONTENT_LENGTH", SizeFallback+" * 0.1")),
+		MaxFileSize:         int64(getEnvInt("MAX_FILE_SIZE", "1024 * 1024 * 10")),
+		MaxEncryptionSize:   int64(getEnvInt("MAX_ENCRYPTION_SIZE", "1024 * 1024 * 10")),
+		MaxContentLength:    int64(getEnvInt("MAX_CONTENT_LENGTH", "1024 * 1024")),
 		UploadingPassword:   getEnv("UPLOADING_PASSWORD", ""),
 		DisableEternalPaste: getEnv("DISABLE_ETERNAL_PASTE", "false") == "true",
 		DisableReadCount:    getEnv("DISABLE_READ_COUNT", "false") == "true",

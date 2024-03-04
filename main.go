@@ -63,7 +63,7 @@ func main() {
 	r.PATCH("/submit/:pasteName", HandleUpdate)
 
 	r.GET("/guide", HandlePage(gin.H{"Guide": true}, nil, ""))
-	r.GET("/admin", HandlePage(gin.H{"Admin": true}, AdminHandler, "Pastes"))
+	r.GET("/admin", HandlePage(gin.H{"Admin": true}, AdminHandler, "PasteLists"))
 	r.GET("/list", HandlePage(gin.H{"List": true}, ListHandler, "PasteLists"))
 
 	r.Run(Config.Port)

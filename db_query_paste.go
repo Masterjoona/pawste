@@ -39,8 +39,9 @@ func getPastes(addQuery string, valueArgs []string, scanVariables []string) []Pa
 	return pastes
 }
 
-func GetAllPastes() []Paste {
-	return getPastes("",
+func GetAllPastes() PasteLists {
+	pastes := getPastes(
+		"where UrlRedirect = '0'",
 		[]string{},
 		[]string{
 			"PasteName",
@@ -48,6 +49,20 @@ func GetAllPastes() []Paste {
 			"Privacy",
 			"BurnAfter",
 		})
+	redirects := getPastes(
+		"where UrlRedirect != '0'",
+		[]string{},
+		[]string{
+			"PasteName",
+			"Expire",
+			"Privacy",
+			"BurnAfter",
+			"Syntax",
+		})
+	return PasteLists{
+		Pastes:    pastes,
+		Redirects: redirects,
+	}
 }
 
 func GetPublicPastes() []Paste {
