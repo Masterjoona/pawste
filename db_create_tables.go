@@ -20,19 +20,19 @@ func CreateOrLoadDatabase(deleteOld bool) *sql.DB {
 	if deleteOld {
 		createPasteTable := `
 		create table pastes 
-			(id integer not null primary key, 
-			paste_name text,
-			expire datetime, 
-			privacy text, 
-			read_count integer, 
-			read_last datetime,
-			burn_after integer, 
-			content text,
-			syntax text,
-			hashed_password text,
-			url_redirect integer,
-			created_at datetime, 
-			updated_at datetime
+			(ID integer not null primary key, 
+			PasteName text,
+			Expire datetime, 
+			Privacy text, 
+			ReadCount integer, 
+			ReadLast datetime,
+			BurnAfter integer, 
+			Content text,
+			Syntax text,
+			HashedPassword text,
+			UrlRedirect integer,
+			CreatedAt datetime, 
+			UpdatedAt datetime
 		);
 		`
 		_, err = sqldb.Exec(createPasteTable)
@@ -42,11 +42,11 @@ func CreateOrLoadDatabase(deleteOld bool) *sql.DB {
 		}
 		createFileTable := `
 		create table files
-			(id integer not null primary key,
-			paste_name text,
-			file_name text,
-			file_size integer,
-			file blob
+			(ID integer not null primary key,
+			PasteName text,
+			Name text,
+			Size integer,
+			Blob blob
 		);
 		`
 		_, err = sqldb.Exec(createFileTable)

@@ -24,31 +24,31 @@ func deriveKey(password string) []byte {
 	return hash[:]
 }
 
-func Encrypt(file File, password string) ([]byte, error) {
+func Encrypt(file *File, password string) error {
 	key := deriveKey(password)
 	nonce := make([]byte, 12)
 
 	if _, err := io.ReadFull(rand.Reader, nonce); err != nil {
-		return nil, err
+		return err
 	}
 
 	dk := pbkdf2.Key(key, nonce, 4096, 32, sha1.New)
 
 	block, err := aes.NewCipher(dk)
 	if err != nil {
-		return nil, err
+		return err
 	}
 
 	aesgcm, err := cipher.NewGCM(block)
 	if err != nil {
-		return nil, err
+		return err
 	}
 
-	encryptedFileBytes := aesgcm.Seal(nil, nonce, file.Blob, nil)
+	file.Blob = aesgcm.Seal(file.Blob[:0], nonce, file.Blob, nil)
 
-	encryptedFileBytes = append(encryptedFileBytes, nonce...)
+	file.Blob = append(file.Blob, nonce...)
 
-	return encryptedFileBytes, nil
+	return nil
 }
 
 func Decrypt(fileBlob []byte, password string) ([]byte, error) {
@@ -59,54 +59,56 @@ func Decrypt(fileBlob []byte, password string) ([]byte, error) {
 
 	nonce, err := hex.DecodeString(str)
 	if err != nil {
-		panic(err)
+		return nil, err
 	}
 
 	dk := pbkdf2.Key(key, nonce, 4096, 32, sha1.New)
 
 	block, err := aes.NewCipher(dk)
-	if err != nil {
-		panic(err)
-	}
-
-	aesgcm, err := cipher.NewGCM(block)
-	if err != nil {
-		panic(err)
-	}
-
-	fileBytes, err := aesgcm.Open(nil, nonce, onlyFile, nil)
 	if err != nil {
 		return nil, err
 	}
 
-	return fileBytes, nil
+	aesgcm, err := cipher.NewGCM(block)
+	if err != nil {
+		return nil, err
+	}
+
+	decryptedFileBytes, err := aesgcm.Open(nil, nonce, onlyFile, nil)
+	if err != nil {
+		return nil, err
+	}
+
+	copy(fileBlob[:len(decryptedFileBytes)], decryptedFileBytes)
+
+	return fileBlob[:len(decryptedFileBytes)], nil
 }
 
-func EncryptText(text string, password string) string {
+func EncryptText(text string, password string) (string, error) {
 	key := deriveKey(password)
 	nonce := make([]byte, 12)
 
 	if _, err := io.ReadFull(rand.Reader, nonce); err != nil {
-		panic(err)
+		return "", err
 	}
 
 	dk := pbkdf2.Key(key, nonce, 4096, 32, sha1.New)
 
 	block, err := aes.NewCipher(dk)
 	if err != nil {
-		panic(err)
+		return "", err
 	}
 
 	aesgcm, err := cipher.NewGCM(block)
 	if err != nil {
-		panic(err)
+		return "", err
 	}
 
 	ciphertext := aesgcm.Seal(nil, nonce, []byte(text), nil)
 
 	ciphertext = append(ciphertext, nonce...)
 
-	return hex.EncodeToString(ciphertext)
+	return hex.EncodeToString(ciphertext), nil
 }
 
 func DecryptText(text string, password string) string {

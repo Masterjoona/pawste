@@ -2,25 +2,33 @@ package main
 
 import (
 	"errors"
-	"fmt"
+	"strings"
 
 	_ "github.com/mattn/go-sqlite3"
 )
 
-func getPastes(addQuery string) []Paste {
+func getPastes(addQuery string, valueArgs []string, scanVariables []string) []Paste {
 	CleanUpExpiredPastes()
+
+	valueInterfaces := make([]interface{}, len(valueArgs))
+	for i, v := range valueArgs {
+		valueInterfaces[i] = v
+	}
+	query := "select " + strings.Join(scanVariables, ", ") + " from pastes " + addQuery
 	rows, err := PasteDB.Query(
-		"select paste_name, expire, privacy, burn_after from pastes " + addQuery,
+		query,
+		valueInterfaces...,
 	)
+
 	if err != nil {
 		panic(err)
 	}
 	defer rows.Close()
-
 	var pastes []Paste
+
 	for rows.Next() {
 		var paste Paste
-		if err := rows.Scan(&paste.PasteName, &paste.Expire, &paste.Privacy, &paste.BurnAfter); err != nil {
+		if err := rows.Scan(MakePastePointers(&paste, scanVariables)...); err != nil {
 			panic(err)
 		}
 		pastes = append(pastes, paste)
@@ -28,61 +36,70 @@ func getPastes(addQuery string) []Paste {
 	if err := rows.Err(); err != nil {
 		panic(err)
 	}
-	fmt.Printf("Pastes: %v\n", pastes)
 	return pastes
 }
 
 func GetAllPastes() []Paste {
-	return getPastes(
-		"",
-	)
+	return getPastes("",
+		[]string{},
+		[]string{
+			"PasteName",
+			"Expire",
+			"Privacy",
+			"BurnAfter",
+		})
 }
 
 func GetPublicPastes() []Paste {
 	return getPastes(
-		"where privacy = 'public' and url_redirect = '0'",
+		"where Privacy = 'public' and UrlRedirect = '0'",
+		[]string{},
+		[]string{
+			"PasteName",
+			"Expire",
+			"Privacy",
+			"BurnAfter",
+		},
 	)
 }
 
 func GetPublicRedirects() []Paste {
 	return getPastes(
-		"where privacy = 'public' and url_redirect != '0'",
+		"where Privacy = 'public' and UrlRedirect != '0'",
+		[]string{},
+		[]string{
+			"PasteName",
+			"Expire",
+			"Privacy",
+			"BurnAfter",
+			"Syntax",
+		},
 	)
 }
 
-// i do NOT like this, i wish i could assign the things i need to the paste struct
-
 func GetPasteByName(pasteName string) (Paste, error) {
 	CleanUpExpiredPastes()
-	var paste Paste
-	rows, err := PasteDB.Query(
-		"select id, paste_name, expire, privacy, read_count, read_last, burn_after, content, url_redirect, syntax, hashed_password, created_at, updated_at FROM pastes WHERE paste_name = ?",
-		pasteName,
+	pastes := getPastes(
+		"where PasteName = ?",
+		[]string{pasteName},
+		[]string{
+			"ID",
+			"PasteName",
+			"Expire",
+			"Privacy",
+			"ReadCount",
+			"ReadLast",
+			"BurnAfter",
+			"Content",
+			"UrlRedirect",
+			"Syntax",
+			"HashedPassword",
+			"CreatedAt",
+			"UpdatedAt",
+		},
 	)
-	if err != nil {
-		return Paste{}, err
+	if len(pastes) == 0 {
+		return Paste{}, errors.New("Paste not found")
 	}
-	defer rows.Close()
-	if rows.Next() {
-		err = rows.Scan(
-			&paste.ID,
-			&paste.PasteName,
-			&paste.Expire,
-			&paste.Privacy,
-			&paste.ReadCount,
-			&paste.ReadLast,
-			&paste.BurnAfter,
-			&paste.Content,
-			&paste.UrlRedirect,
-			&paste.Syntax,
-			&paste.HashedPassword,
-			&paste.CreatedAt,
-			&paste.UpdatedAt,
-		)
-		if err != nil {
-			return Paste{}, err
-		}
-		return paste, nil
-	}
-	return Paste{}, errors.New("paste not found")
+	return pastes[0], nil
 }

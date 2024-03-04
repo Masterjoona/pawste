@@ -1,6 +1,7 @@
 package main
 
 import (
+	"errors"
 	"mime/multipart"
 	"net/http"
 	"strconv"
@@ -19,6 +20,34 @@ type Submit struct {
 }
 
 func HandleSubmit(c *gin.Context) {
+	submit, err := parseSubmitForm(c)
+	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		return
+	}
+
+	if err := validateSubmit(submit); err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		return
+	}
+
+	pasteName := CreatePasteName()
+
+	c.JSON(http.StatusOK, gin.H{
+		"text":       submit.Text,
+		"expiration": submit.Expiration,
+		"burn":       submit.BurnAfter,
+		"syntax":     submit.Syntax,
+		"privacy":    submit.Privacy,
+		"file":       "file",
+		"pasteUrl":   pasteName,
+	})
+
+	paste := SubmitToPaste(submit, pasteName)
+	CreatePaste(paste)
+}
+
+func parseSubmitForm(c *gin.Context) (Submit, error) {
 	var submit Submit
 	submit.Text = c.PostForm("text")
 	submit.Expiration = c.PostForm("expiration")
@@ -27,39 +56,26 @@ func HandleSubmit(c *gin.Context) {
 	submit.Privacy = c.PostForm("privacy")
 	burnInt, err := strconv.Atoi(c.PostForm("burn"))
 	if err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"error": "burn must be an integer"})
-		return
+		return Submit{}, errors.New("burn must be an integer")
 	}
 	submit.BurnAfter = burnInt
 
 	form, err := c.MultipartForm()
 	if err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"error": "form error: " + err.Error()})
-		return
+		return Submit{}, errors.New("form error: " + err.Error())
 	}
 
-	files := form.File["files"]
+	submit.Files = form.File["files"]
+	return submit, nil
+}
 
-	if submit.Text == "" && submit.Files == nil {
-		c.JSON(http.StatusBadRequest, gin.H{"error": "text or file is required"})
-		return
+func validateSubmit(submit Submit) error {
+	if submit.Text == "" && len(submit.Files) == 0 {
+		return errors.New("text or file is required")
 	}
-	submit.Files = files
 
-	pasteName := CreatePasteName()
-	hashedPassword := HashPassword(submit.Password)
-	c.JSON(http.StatusOK, gin.H{
-		"text":       submit.Text,
-		"expiration": submit.Expiration,
-		"burn":       submit.BurnAfter,
-		"password":   hashedPassword,
-		"syntax":     submit.Syntax,
-		"privacy":    submit.Privacy,
-		"file":       "file",
-		"pasteUrl":   pasteName,
-	})
-
-	paste := SubmitToPaste(submit, pasteName, hashedPassword)
-	CreatePaste(paste, submit.Password)
-	// i feel like im doing something wrong here
+	if submit.Password == "" && (submit.Privacy == "private" || submit.Privacy == "secret") {
+		return errors.New("password is required for private or secret pastes")
+	}
+	return nil
 }

@@ -3,18 +3,17 @@ package main
 import (
 	"io"
 	"mime/multipart"
-	"os"
 	"regexp"
 	"time"
 )
 
-func SubmitToPaste(submit Submit, pasteName string, hashedPassword string) Paste {
+func SubmitToPaste(submit Submit, pasteName string) Paste {
 	var files []File
 	for _, file := range submit.Files {
 		if file == nil {
 			continue
 		}
-		fileName, fileSize, fileBlob := multipartIntoThings(file)
+		fileName, fileSize, fileBlob := convertMultipartFile(file)
 		files = append(files, File{
 			Name: fileName,
 			Size: fileSize,
@@ -30,7 +29,7 @@ func SubmitToPaste(submit Submit, pasteName string, hashedPassword string) Paste
 		BurnAfter:      submit.BurnAfter,
 		Content:        submit.Text,
 		Syntax:         submit.Syntax,
-		HashedPassword: hashedPassword,
+		HashedPassword: submit.Password,
 		Files:          files,
 		UrlRedirect:    IsContentJustUrl(submit.Text),
 		CreatedAt:      GetCurrentDate(),
@@ -38,7 +37,7 @@ func SubmitToPaste(submit Submit, pasteName string, hashedPassword string) Paste
 	}
 }
 
-func multipartIntoThings(file *multipart.FileHeader) (string, int, []byte) {
+func convertMultipartFile(file *multipart.FileHeader) (string, int, []byte) {
 	src, err := file.Open()
 	if err != nil {
 		panic(err)
@@ -74,19 +73,8 @@ func HumanTimeToSQLTime(humanTime string) string {
 	default:
 		duration = 7 * 24 * time.Hour
 	}
-	// time into 2024-02-26T15:56:16Z + duration
-	return time.Now().Add(duration).Format("2006-01-02 15:04:05")
-}
-func DoesPasteHaveFiles(paste Paste) bool {
-	if _, err := os.Stat(Config.DataDir + paste.PasteName); os.IsNotExist(err) {
-		return false
-	}
 
-	files, err := os.ReadDir(Config.DataDir + paste.PasteName)
-	if err != nil {
-		return false
-	}
-	return len(files) > 0
+	return time.Now().Add(duration).Format("2006-01-02 15:04:05")
 }
 
 func IsContentJustUrl(content string) int {

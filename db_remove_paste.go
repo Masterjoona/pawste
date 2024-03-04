@@ -9,7 +9,7 @@ func RemovePaste(pasteName string) {
 	if err != nil {
 		panic(err)
 	}
-	stmt, err := tx.Prepare("delete from pastes where paste_name = ?")
+	stmt, err := tx.Prepare("delete from pastes where PasteName = ?")
 	if err != nil {
 		panic(err)
 	}
@@ -29,7 +29,7 @@ func RemoveFiles(pasteName string) {
 	if err != nil {
 		panic(err)
 	}
-	stmt, err := tx.Prepare("delete from files where paste_name = ?")
+	stmt, err := tx.Prepare("delete from files where PasteName = ?")
 	if err != nil {
 		panic(err)
 	}

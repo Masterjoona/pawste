@@ -1,33 +1,33 @@
 package main
 
 import (
+	"database/sql"
+	"log"
+
 	_ "github.com/mattn/go-sqlite3"
 )
 
-func CreatePaste(paste Paste, password string) error {
+func CreatePaste(paste Paste) error {
 	tx, err := PasteDB.Begin()
 	if err != nil {
 		return err
 	}
-	defer func() {
-		if err != nil {
-			tx.Rollback()
-			return
-		}
-		err = tx.Commit()
-		if err != nil {
-			panic(err)
-		}
-	}()
+	defer rollbackAndClose(tx, &err)
 
 	stmt, err := tx.Prepare(`
-		INSERT INTO pastes(paste_name, expire, privacy, read_count, read_last, burn_after, content, url_redirect, syntax, hashed_password, created_at, updated_at)
+		INSERT INTO pastes(PasteName, Expire, Privacy, ReadCount, ReadLast, BurnAfter, Content, UrlRedirect, Syntax, HashedPassword, CreatedAt, UpdatedAt)
 		VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
 	`)
 	if err != nil {
 		return err
 	}
 	defer stmt.Close()
+
+	encrypt := (paste.Privacy == "private" || paste.Privacy == "secret") && paste.HashedPassword != ""
+	if encrypt {
+		println("Encrypting paste content")
+		encryptContent(&paste)
+	}
 
 	result, err := stmt.Exec(
 		paste.PasteName,
@@ -39,7 +39,7 @@ func CreatePaste(paste Paste, password string) error {
 		paste.Content,
 		paste.UrlRedirect,
 		paste.Syntax,
-		paste.HashedPassword,
+		HashPassword(paste.HashedPassword), // finally hashed
 		paste.CreatedAt,
 		paste.UpdatedAt,
 	)
@@ -53,7 +53,7 @@ func CreatePaste(paste Paste, password string) error {
 	}
 
 	if len(paste.Files) > 0 {
-		err = SaveFiles(paste, lastInsertID, password)
+		err = SaveFiles(tx, paste.Files, lastInsertID, paste.HashedPassword, encrypt)
 		if err != nil {
 			return err
 		}
@@ -62,40 +62,51 @@ func CreatePaste(paste Paste, password string) error {
 	return nil
 }
 
-func SaveFiles(paste Paste, insertId int64, password string) error {
-	privacy := paste.Privacy
-	encrypt := (privacy == "private" || privacy == "secret") && password != ""
-
-	tx, err := PasteDB.Begin()
-	if err != nil {
-		return err
-	}
-
-	for _, file := range paste.Files {
+func SaveFiles(tx *sql.Tx, files []File, pasteID int64, password string, encrypt bool) error {
+	for _, file := range files {
 		if encrypt {
-			blob, err := Encrypt(file, password)
-			if err != nil {
-				tx.Rollback()
-				return err
-			}
-			file.Blob = blob
+			encryptFile(&file, password)
 		}
 
-		_, err = tx.Exec(`
-			INSERT INTO files(paste_id, file_name, file_size, file_blob)
+		_, err := tx.Exec(`
+			INSERT INTO files(ID, Name, Size, Blob)
 			VALUES (?, ?, ?, ?)
-		`, insertId, file.Name, file.Size, file.Blob)
+		`, pasteID, file.Name, file.Size, file.Blob)
 		if err != nil {
-			tx.Rollback()
 			return err
 		}
 	}
 
-	err = tx.Commit()
-	if err != nil {
-		tx.Rollback()
-		return err
+	return nil
+}
+
+func rollbackAndClose(tx *sql.Tx, err *error) {
+	if *err != nil {
+		if rollbackErr := tx.Rollback(); rollbackErr != nil {
+			log.Println("Failed to rollback transaction:", rollbackErr)
+		}
+		return
 	}
 
-	return nil
+	if commitErr := tx.Commit(); commitErr != nil {
+		*err = commitErr
+	}
+}
+
+func encryptContent(paste *Paste) {
+	encryptedText, err := EncryptText(paste.Content, paste.HashedPassword)
+	if err != nil {
+		log.Println("Failed to encrypt content:", err)
+		return
+	}
+	paste.Content = encryptedText
+}
+
+func encryptFile(file *File, password string) {
+	err := Encrypt(file, password)
+	if err != nil {
+		log.Println("Failed to encrypt file:", err)
+		return
+	}
+
 }

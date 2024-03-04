@@ -7,6 +7,7 @@ import (
 )
 
 type File struct {
+	ID   int
 	Name string
 	Size int
 	Blob []byte
@@ -33,6 +34,7 @@ var PasteDB *sql.DB
 
 func main() {
 	InitConfig()
+	println("Using version: " + PawsteVersion)
 	PasteDB = CreateOrLoadDatabase(Config.IUnderstandTheRisks)
 
 	r := gin.Default()

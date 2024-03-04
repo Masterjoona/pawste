@@ -6,7 +6,7 @@ import (
 
 func UpdateReadCount(pasteName string) {
 	_, err := PasteDB.Exec(
-		"update pastes set read_count = read_count + 1, read_last = datetime('now') where paste_name = ?",
+		"update pastes set ReadCount = ReadCount + 1, ReadLast = datetime('now') where PasteName = ?",
 		pasteName,
 	)
 	if err != nil {
@@ -14,14 +14,14 @@ func UpdateReadCount(pasteName string) {
 	}
 
 	if isAtBurnAfter(pasteName) {
-		RemovePaste(pasteName)
+		println(pasteName, "should be deleted")
 	}
 
 }
 
 func isAtBurnAfter(pasteName string) bool {
 	row := PasteDB.QueryRow(
-		"select case when burn_after <= read_count and burn_after > 0 then 1 else 0 end from pastes where paste_name = ?",
+		"select case when BurnAfter <= ReadCount and BurnAfter > 0 then 1 else 0 end from pastes where PasteName = ?",
 		pasteName,
 	)
 	var burned int
@@ -55,10 +55,10 @@ func UpdatePaste(paste Paste, password string) error {
 
 	stmt, err := tx.Prepare(`
 		update pastes set
-			content = ?,
-			syntax = ?,
-			updated_at = datetime('now')
-		where paste_name = ?
+			Content = ?,
+			Syntax = ?,
+			UpdatedAt = datetime('now')
+		where PasteName = ?
 	`)
 	if err != nil {
 		return err

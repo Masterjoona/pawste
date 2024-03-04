@@ -108,7 +108,7 @@ func createShortPasteName(r *rand.Rand) string {
 
 func pasteExists(name string) bool {
 	var exists bool
-	err := PasteDB.QueryRow("SELECT EXISTS(SELECT 1 FROM pastes WHERE paste_name = ?)", name).
+	err := PasteDB.QueryRow("SELECT EXISTS(SELECT 1 FROM pastes WHERE PasteName = ?)", name).
 		Scan(&exists)
 	if err != nil {
 		panic(err)

@@ -1,6 +1,7 @@
 package main
 
 import (
+	"log"
 	"os"
 	"strconv"
 	"strings"
@@ -28,9 +29,11 @@ type ConfigEnv struct {
 	IUnderstandTheRisks bool
 }
 
-var (
-	Config        ConfigEnv
-	PawsteVersion string
+var Config ConfigEnv
+
+const (
+	PawsteVersion = ""
+	SizeFallback  = "1024 * 1024 * 10"
 	envPrefix     = "PAWSTE_"
 )
 
@@ -42,9 +45,9 @@ func InitConfig() {
 		PublicList:          getEnv("PUBLIC_LIST", "true") == "true",
 		PublicURL:           getEnv("PUBLIC_URL", "http://localhost:"+getEnv("PORT", ":9454")),
 		NoFileUpload:        getEnv("NO_FILE_UPLOAD", "false") == "true",
-		MaxFileSize:         int64(getEnvInt("MAX_FILE_SIZE", "1024 * 1024 * 10")),
-		MaxEncryptionSize:   int64(getEnvInt("MAX_ENCRYPTION_SIZE", "1024 * 1024 * 10")),
-		MaxContentLength:    int64(getEnvInt("MAX_CONTENT_LENGTH", "1024 * 1024 * 10")),
+		MaxFileSize:         int64(getEnvInt("MAX_FILE_SIZE", SizeFallback)),
+		MaxEncryptionSize:   int64(getEnvInt("MAX_ENCRYPTION_SIZE", SizeFallback)),
+		MaxContentLength:    int64(getEnvInt("MAX_CONTENT_LENGTH", SizeFallback+" * 0.1")),
 		UploadingPassword:   getEnv("UPLOADING_PASSWORD", ""),
 		DisableEternalPaste: getEnv("DISABLE_ETERNAL_PASTE", "false") == "true",
 		DisableReadCount:    getEnv("DISABLE_READ_COUNT", "false") == "true",
@@ -57,7 +60,7 @@ func InitConfig() {
 
 func getEnv(key, fallback string) string {
 	if value, exists := os.LookupEnv(envPrefix + key); exists {
-		println("Using env var", envPrefix+key, "with value", value)
+		log.Println("Using environment variable", envPrefix+key, "with value", value)
 		return value
 	}
 	return fallback

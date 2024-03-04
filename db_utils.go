@@ -1,13 +1,15 @@
 package main
 
 import (
+	"reflect"
+
 	_ "github.com/mattn/go-sqlite3"
 )
 
 func IsSamePassword(pasteName, password string) bool {
 	hashed := HashPassword(password)
 	row := PasteDB.QueryRow(
-		"select case when hashed_password = ? then 1 else 0 end from pastes where paste_name = ?",
+		"select case when HashedPassword = ? then 1 else 0 end from pastes where paste_name = ?",
 		hashed,
 		pasteName,
 	)
@@ -17,4 +19,13 @@ func IsSamePassword(pasteName, password string) bool {
 		panic(err)
 	}
 	return same == 1
+}
+
+func MakePastePointers(paste *Paste, scanVariables []string) []interface{} {
+	pastePointers := make([]interface{}, len(scanVariables))
+	val := reflect.ValueOf(paste).Elem()
+	for i, variable := range scanVariables {
+		pastePointers[i] = val.FieldByName(variable).Addr().Interface()
+	}
+	return pastePointers
 }
