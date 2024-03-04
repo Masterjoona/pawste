@@ -26,7 +26,7 @@ func HandleSubmit(c *gin.Context) {
 		return
 	}
 
-	if err := validateSubmit(submit); err != nil {
+	if err := validateSubmit(&submit); err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
 	}
@@ -69,13 +69,52 @@ func parseSubmitForm(c *gin.Context) (Submit, error) {
 	return submit, nil
 }
 
-func validateSubmit(submit Submit) error {
+func validateSubmit(submit *Submit) error {
 	if submit.Text == "" && len(submit.Files) == 0 {
 		return errors.New("text or file is required")
 	}
-
-	if submit.Password == "" && (submit.Privacy == "private" || submit.Privacy == "secret") {
+	encrypt := (submit.Privacy == "private" || submit.Privacy == "secret")
+	if submit.Password == "" && encrypt {
 		return errors.New("password is required for private or secret pastes")
 	}
+
+	if NotAllowedPrivacy(submit.Privacy) {
+		return errors.New("invalid privacy")
+	}
+
+	if Config.DisableEternalPaste && submit.Expiration == "never" {
+		submit.Expiration = "1w"
+	}
+
+	if Config.MaxContentLength > 0 && len(submit.Text) > Config.MaxContentLength {
+		return errors.New("content is too long")
+	}
+
+	if Config.MaxFileSize > 0 && len(submit.Files) > 0 {
+		totalSize := 0
+		for _, file := range submit.Files {
+			if file == nil {
+				continue
+			}
+			totalSize += int(file.Size)
+		}
+		if totalSize > Config.MaxFileSize {
+			return errors.New("file size is too large")
+		}
+	}
+
+	if Config.MaxEncryptionSize > 0 && encrypt && len(submit.Files) > 0 {
+		totalSize := 0
+		for _, file := range submit.Files {
+			if file == nil {
+				continue
+			}
+			totalSize += int(file.Size)
+		}
+		if totalSize > Config.MaxEncryptionSize {
+			return errors.New("file size is too large for encryption")
+		}
+	}
+
 	return nil
 }

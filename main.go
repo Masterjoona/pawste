@@ -51,6 +51,7 @@ func main() {
 	r.GET("/", HandlePage(gin.H{}, nil, ""))
 
 	r.GET("/p/:pasteName", HandlePastePage)
+	r.GET("/p/:pasteName/json", HandlePasteJSON)
 	r.GET("/p", RedirectHome)
 
 	r.GET("/u/:pasteName", Redirect)
@@ -64,6 +65,8 @@ func main() {
 
 	r.GET("/guide", HandlePage(gin.H{"Guide": true}, nil, ""))
 	r.GET("/admin", HandlePage(gin.H{"Admin": true}, AdminHandler, "PasteLists"))
+	r.POST("/admin/reload-config", ReloadConfig)
+	r.GET("/about", HandlePage(gin.H{"About": true}, nil, ""))
 	r.GET("/list", HandlePage(gin.H{"List": true}, ListHandler, "PasteLists"))
 
 	r.Run(Config.Port)

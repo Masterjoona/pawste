@@ -87,3 +87,12 @@ func IsContentJustUrl(content string) int {
 func GetCurrentDate() string {
 	return time.Now().Format("2006-01-02 15:04:05")
 }
+
+func NotAllowedPrivacy(x string) bool {
+	for _, item := range []string{"public", "unlisted", "readonly", "private", "secret"} {
+		if item == x {
+			return false
+		}
+	}
+	return true
+}

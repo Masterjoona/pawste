@@ -12,6 +12,8 @@
             {{ template "list" . }}
         {{ else if .Guide }}
             {{ template "guide" . }}
+        {{ else if .About }}
+            {{ template "about" . }}
         {{ else if .NotFound }}
             {{ template "404" . }}
         {{ else }}

@@ -1,19 +1,28 @@
 {{ define "list" }}
-    <h1>pastes</h1>
-    <table>
+    <h2 class="table-titles">pastes</h2>
+    <link rel="stylesheet" type="text/css" href="/css/list.css" />
+    <table class="table">
         {{ range .PasteLists.Pastes }}
             <tr>
-                <td><a href="/p/{{ .PasteName }}">{{ .PasteName }}</a></td>
+                <td>
+                    <a class="paste-link" href="/p/{{ .PasteName }}"
+                        >{{ .PasteName }}</a
+                    >
+                </td>
+                <td class="paste-info">{{ .Expire }}</td>
             </tr>
         {{ end }}
     </table>
-    <h1>url redirects</h1>
-    <table>
+    <h2 class="table-titles">redirects</h2>
+    <table class="table">
         {{ range .PasteLists.Redirects }}
             <tr>
                 <td>
-                    <a href="/u/{{ .PasteName }}">{{ .PasteName }}</a>
+                    <a class="paste-link" href="/u/{{ .PasteName }}"
+                        >{{ .PasteName }}</a
+                    >
                 </td>
+                <td class="paste-info">{{ .Expire }}</td>
             </tr>
         {{ end }}
     </table>
