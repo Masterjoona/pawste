@@ -6,6 +6,7 @@ import (
 	"os"
 
 	_ "github.com/mattn/go-sqlite3"
+	"github.com/romana/rlog"
 )
 
 func CreateOrLoadDatabase(deleteOld bool) *sql.DB {
@@ -37,7 +38,7 @@ func CreateOrLoadDatabase(deleteOld bool) *sql.DB {
 		`
 		_, err = sqldb.Exec(createPasteTable)
 		if err != nil {
-			log.Printf("%q: %s\n", err, createPasteTable)
+			rlog.Critical("Could not create pastes table", err)
 			return nil
 		}
 		createFileTable := `
@@ -46,12 +47,11 @@ func CreateOrLoadDatabase(deleteOld bool) *sql.DB {
 			PasteName text,
 			Name text,
 			Size integer,
-			Blob blob
 		);
 		`
 		_, err = sqldb.Exec(createFileTable)
 		if err != nil {
-			log.Printf("%q: %s\n", err, createFileTable)
+			rlog.Critical("Could not create files table", err)
 			return nil
 		}
 	}

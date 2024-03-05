@@ -33,6 +33,7 @@ func isAtBurnAfter(pasteName string) bool {
 }
 
 func UpdatePaste(paste Paste, password string) error {
+	// todo: check encryption level if password is needed
 	if !IsSamePassword(paste.PasteName, password) {
 		return errors.New("wrong password")
 	}

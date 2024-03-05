@@ -1,9 +1,8 @@
 package main
 
 import (
-	"log"
-
 	_ "github.com/mattn/go-sqlite3"
+	"github.com/romana/rlog"
 )
 
 func CleanUpExpiredPastes() {
@@ -11,7 +10,7 @@ func CleanUpExpiredPastes() {
 		"select ID, PasteName, Expire, Privacy, BurnAfter from pastes where Expire < datetime('now') or BurnAfter <= ReadCount and BurnAfter > 0",
 	)
 	if err != nil {
-		panic(err)
+		rlog.Error("Could not clean up expired pastes", err)
 	}
 	defer pastes.Close()
 	for pastes.Next() {
@@ -26,6 +25,6 @@ func CleanUpExpiredPastes() {
 		if err != nil {
 			panic(err)
 		}
-		log.Printf("Cleaning up paste %s", paste.PasteName)
+		rlog.Info("Cleaning up expired paste", paste.PasteName)
 	}
 }

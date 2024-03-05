@@ -3,6 +3,7 @@ package main
 import (
 	"io"
 	"mime/multipart"
+	"os"
 	"regexp"
 	"time"
 )
@@ -95,4 +96,16 @@ func NotAllowedPrivacy(x string) bool {
 		}
 	}
 	return true
+}
+
+func SaveFileToDisk(file *File, pasteName string) error {
+	err := os.WriteFile(
+		Config.DataDir+pasteName+"/"+file.Name,
+		file.Blob,
+		0644,
+	)
+	if err != nil {
+		return err
+	}
+	return nil
 }

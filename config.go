@@ -1,15 +1,17 @@
 package main
 
 import (
-	"log"
 	"os"
 	"strconv"
 	"strings"
+
+	"github.com/romana/rlog"
 )
 
 type ConfigEnv struct {
 	Salt          string
 	Port          string
+	DataDir       string
 	AdminPassword string
 
 	PublicList bool
@@ -40,6 +42,7 @@ func InitConfig() {
 	Config = ConfigEnv{
 		Salt:                getEnv("SALT", "banana"),
 		Port:                getEnv("PORT", ":9454"),
+		DataDir:             getEnv("DATA_DIR", "pawste_data/"),
 		AdminPassword:       getEnv("ADMIN_PASSWORD", "admin"),
 		PublicList:          getEnv("PUBLIC_LIST", "true") == "true",
 		PublicURL:           getEnv("PUBLIC_URL", "http://localhost:"+getEnv("PORT", ":9454")),
@@ -59,7 +62,7 @@ func InitConfig() {
 
 func getEnv(key, fallback string) string {
 	if value, exists := os.LookupEnv(envPrefix + key); exists {
-		log.Println("Using environment variable", envPrefix+key, "with value", value)
+		rlog.Info("Using environment variable", envPrefix+key, "with value", value)
 		return value
 	}
 	return fallback

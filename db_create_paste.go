@@ -2,9 +2,9 @@ package main
 
 import (
 	"database/sql"
-	"log"
 
 	_ "github.com/mattn/go-sqlite3"
+	"github.com/romana/rlog"
 )
 
 func CreatePaste(paste Paste) error {
@@ -23,13 +23,13 @@ func CreatePaste(paste Paste) error {
 	}
 	defer stmt.Close()
 
-	encrypt := (paste.Privacy == "private" || paste.Privacy == "secret") && paste.HashedPassword != ""
+	encrypt := (paste.Privacy == "private" || paste.Privacy == "secret") &&
+		paste.HashedPassword != ""
 	if encrypt {
-		println("Encrypting paste content")
 		encryptContent(&paste)
 	}
 
-	result, err := stmt.Exec(
+	_, err = stmt.Exec(
 		paste.PasteName,
 		paste.Expire,
 		paste.Privacy,
@@ -39,51 +39,42 @@ func CreatePaste(paste Paste) error {
 		paste.Content,
 		paste.UrlRedirect,
 		paste.Syntax,
-		HashPassword(paste.HashedPassword), // finally hashed
+		HashPassword(paste.HashedPassword),
 		paste.CreatedAt,
 		paste.UpdatedAt,
 	)
-	if err != nil {
-		return err
-	}
 
-	lastInsertID, err := result.LastInsertId()
 	if err != nil {
 		return err
 	}
 
 	if len(paste.Files) > 0 {
-		err = SaveFiles(tx, paste.Files, lastInsertID, paste.HashedPassword, encrypt)
+		err = SaveFiles(tx, paste.Files, paste.PasteName, paste.HashedPassword, encrypt)
 		if err != nil {
 			return err
 		}
 	}
-
 	return nil
 }
 
-func SaveFiles(tx *sql.Tx, files []File, pasteID int64, password string, encrypt bool) error {
+func SaveFiles(tx *sql.Tx, files []File, pasteName string, password string, encrypt bool) error {
 	for _, file := range files {
 		if encrypt {
 			encryptFile(&file, password)
 		}
-
-		_, err := tx.Exec(`
-			INSERT INTO files(ID, Name, Size, Blob)
-			VALUES (?, ?, ?, ?)
-		`, pasteID, file.Name, file.Size, file.Blob)
+		err := SaveFileToDisk(&file, pasteName)
 		if err != nil {
+			rlog.Error("Failed to save file to disk:", err)
 			return err
 		}
 	}
-
 	return nil
 }
 
 func rollbackAndClose(tx *sql.Tx, err *error) {
 	if *err != nil {
 		if rollbackErr := tx.Rollback(); rollbackErr != nil {
-			log.Println("Failed to rollback transaction:", rollbackErr)
+			rlog.Error("Failed to rollback transaction:", rollbackErr)
 		}
 		return
 	}
@@ -96,7 +87,7 @@ func rollbackAndClose(tx *sql.Tx, err *error) {
 func encryptContent(paste *Paste) {
 	encryptedText, err := EncryptText(paste.Content, paste.HashedPassword)
 	if err != nil {
-		log.Println("Failed to encrypt content:", err)
+		rlog.Error("Failed to encrypt paste content:", err)
 		return
 	}
 	paste.Content = encryptedText
@@ -105,7 +96,7 @@ func encryptContent(paste *Paste) {
 func encryptFile(file *File, password string) {
 	err := Encrypt(file, password)
 	if err != nil {
-		log.Println("Failed to encrypt file:", err)
+		rlog.Error("Failed to encrypt file:", err)
 		return
 	}
 

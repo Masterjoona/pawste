@@ -2,6 +2,7 @@ package main
 
 import (
 	_ "github.com/mattn/go-sqlite3"
+	"github.com/romana/rlog"
 )
 
 func RemovePaste(pasteName string) {
@@ -22,6 +23,7 @@ func RemovePaste(pasteName string) {
 	if err != nil {
 		panic(err)
 	}
+	rlog.Info("Removed paste from database", pasteName)
 }
 
 func RemoveFiles(pasteName string) {
@@ -42,4 +44,5 @@ func RemoveFiles(pasteName string) {
 	if err != nil {
 		panic(err)
 	}
+	rlog.Info("Removed files from db for paste", pasteName)
 }

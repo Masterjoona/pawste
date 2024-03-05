@@ -4,6 +4,7 @@ import (
 	"database/sql"
 
 	"github.com/gin-gonic/gin"
+	"github.com/romana/rlog"
 )
 
 type File struct {
@@ -34,7 +35,7 @@ var PasteDB *sql.DB
 
 func main() {
 	InitConfig()
-	println("Using version: " + PawsteVersion)
+	rlog.Info("Starting Pawste " + PawsteVersion)
 	PasteDB = CreateOrLoadDatabase(Config.IUnderstandTheRisks)
 
 	r := gin.Default()
