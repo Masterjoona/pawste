@@ -6,15 +6,6 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
-type SubmittedPassword struct {
-	Password string `form:"password"`
-}
-
-type PasteLists struct {
-	Pastes    []Paste
-	Redirects []Paste
-}
-
 func HandlePage(
 	settings map[string]interface{},
 	function func() interface{},

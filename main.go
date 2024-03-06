@@ -7,30 +7,6 @@ import (
 	"github.com/romana/rlog"
 )
 
-type File struct {
-	ID   int
-	Name string
-	Size int
-	Blob []byte
-}
-
-type Paste struct {
-	ID             int
-	PasteName      string
-	Expire         string
-	Privacy        string
-	ReadCount      int
-	ReadLast       string
-	BurnAfter      int
-	Content        string
-	UrlRedirect    int
-	Syntax         string
-	HashedPassword string
-	Files          []File
-	CreatedAt      string
-	UpdatedAt      string
-}
-
 var PasteDB *sql.DB
 
 func main() {
