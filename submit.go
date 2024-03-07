@@ -31,7 +31,8 @@ func HandleSubmit(c *gin.Context) {
 		return
 	}
 
-	pasteName := CreatePasteName()
+	isRedirect := IsContentJustUrl(submit.Text)
+	pasteName := CreatePasteName(isRedirect)
 
 	c.JSON(http.StatusOK, gin.H{
 		"text":       submit.Text,
@@ -43,7 +44,7 @@ func HandleSubmit(c *gin.Context) {
 		"pasteUrl":   pasteName,
 	})
 
-	paste := SubmitToPaste(submit, pasteName)
+	paste := SubmitToPaste(submit, pasteName, isRedirect)
 	CreatePaste(paste)
 }
 

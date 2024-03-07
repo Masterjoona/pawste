@@ -42,16 +42,17 @@ type ConfigEnv struct {
 	PublicList bool
 	PublicURL  string
 
-	DefaultExpiryTime   string
-	NoFileUpload        bool
-	MaxFileSize         int
-	MaxEncryptionSize   int
-	MaxContentLength    int
-	UploadingPassword   string
-	DisableEternalPaste bool
-	DisableReadCount    bool
-	DisableBurnAfter    bool
-	DefaultExpiry       string
-	ShortPasteNames     bool
-	IUnderstandTheRisks bool
+	DefaultExpiryTime     string
+	NoFileUpload          bool
+	MaxFileSize           int
+	MaxEncryptionSize     int
+	MaxContentLength      int
+	UploadingPassword     string
+	DisableEternalPaste   bool
+	DisableReadCount      bool
+	DisableBurnAfter      bool
+	DefaultExpiry         string
+	ShortPasteNames       bool
+	ShortenRedirectPastes bool
+	IUnderstandTheRisks   bool
 }

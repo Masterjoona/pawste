@@ -8,7 +8,7 @@ import (
 	"time"
 )
 
-func SubmitToPaste(submit Submit, pasteName string) Paste {
+func SubmitToPaste(submit Submit, pasteName string, isRedirect int) Paste {
 	var files []File
 	for _, file := range submit.Files {
 		if file == nil {
@@ -32,7 +32,7 @@ func SubmitToPaste(submit Submit, pasteName string) Paste {
 		Syntax:         submit.Syntax,
 		HashedPassword: submit.Password,
 		Files:          files,
-		UrlRedirect:    IsContentJustUrl(submit.Text),
+		UrlRedirect:    isRedirect,
 		CreatedAt:      GetCurrentDate(),
 		UpdatedAt:      GetCurrentDate(),
 	}

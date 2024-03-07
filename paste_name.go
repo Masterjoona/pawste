@@ -75,9 +75,9 @@ var AnimalNames = []string{
 
 const characters = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789"
 
-func CreatePasteName() string {
+func CreatePasteName(shorten int) string {
 	r := rand.New(rand.NewSource(time.Now().UnixNano()))
-	if Config.ShortPasteNames {
+	if Config.ShortPasteNames || shorten == 1 {
 		return createShortPasteName(r)
 	}
 	for {
