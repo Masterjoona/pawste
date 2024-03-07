@@ -1,10 +1,5 @@
 {{ define "options" }}
     <link rel="stylesheet" type="text/css" href="/css/options.css" />
-    <link
-        rel="stylesheet"
-        href="/css/themes/atom-dark.css"
-        id="theme-stylesheet"
-    />
     <script type="module" src="/js/themechange.js"></script>
     <script type="module" src="/js/password.js"></script>
     <div class="options">
@@ -32,43 +27,7 @@
         </div>
         <div class="option-group">
             <label for="syntax" class="options-label">Syntax:</label>
-            <select id="syntax" name="syntax" class="options">
-                <option value="auto">Auto</option>
-                <option value="none">None</option>
-                <option value="asm">ASM</option>
-                <option value="bash">Bash</option>
-                <option value="bf">Brainfuck</option>
-                <option value="c">C</option>
-                <option value="csv">CSV</option>
-                <option value="diff">Diff</option>
-                <option value="docker">Docker</option>
-                <option value="git">Git</option>
-                <option value="go">Go</option>
-                <option value="html">HTML</option>
-                <option value="http">HTTP</option>
-                <option value="ini">INI</option>
-                <option value="java">Java</option>
-                <option value="js">JavaScript</option>
-                <option value="jsdoc">JSDoc</option>
-                <option value="json">JSON</option>
-                <option value="leanpub-md">Leanpub Markdown</option>
-                <option value="log">Log</option>
-                <option value="lua">Lua</option>
-                <option value="make">Make</option>
-                <option value="md">Markdown</option>
-                <option value="pl">Perl</option>
-                <option value="plain">Plain text</option>
-                <option value="py">Python</option>
-                <option value="regex">Regex</option>
-                <option value="rs">Rust</option>
-                <option value="sql">SQL</option>
-                <option value="todo">Todo</option>
-                <option value="toml">TOML</option>
-                <option value="ts">TypeScript</option>
-                <option value="uri">URI</option>
-                <option value="xml">XML</option>
-                <option value="yaml">YAML</option>
-            </select>
+            <select id="syntax" name="syntax" class="options"></select>
         </div>
         <div class="option-group">
             <label for="privacy" class="options-label">Privacy:</label>

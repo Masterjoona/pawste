@@ -2,7 +2,7 @@ import {
     codeToHtml,
     bundledThemes,
     bundledLanguages,
-} from "https://esm.sh/shiki@1.1.6";
+} from "https://esm.sh/shiki@1.1.7";
 import { waitForElementToDisplay } from "./helpers.js";
 
 export function languageOption() {
@@ -34,7 +34,7 @@ async function togglePreview() {
     }
 }
 
-function prettifyThemeName(theme) {
+function prettifyName(theme) {
     return theme
         .split("-")
         .map((word) => word.charAt(0).toUpperCase() + word.slice(1))
@@ -42,23 +42,22 @@ function prettifyThemeName(theme) {
 }
 
 function addThemeOptions() {
-    console.log(bundledThemes);
     const themeSelect = document.getElementById("theme");
     for (const theme in bundledThemes) {
         const option = document.createElement("option");
         option.value = theme;
-        option.text = prettifyThemeName(theme);
+        option.text = prettifyName(theme);
         themeSelect.add(option);
     }
 }
 
 function addLanguageOptions() {
-    console.log(bundledLanguages);
     const syntaxSelect = document.getElementById("syntax");
-    console.log(Object.keys(bundledLanguages));
-    for (const language in Object.keys(bundledLanguages)) {
-        console.log("what the fuck");
-        console.log(language);
+    for (const language in bundledLanguages) {
+        const option = document.createElement("option");
+        option.value = language;
+        option.text = prettifyName(language);
+        syntaxSelect.add(option);
     }
 }
 
@@ -71,7 +70,7 @@ waitForElementToDisplay(
                 await togglePreview();
             });
         addThemeOptions();
-        //addLanguageOptions();
+        addLanguageOptions();
     },
     500,
     5000,

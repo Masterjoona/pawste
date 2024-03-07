@@ -1,9 +1,17 @@
 import { showToast } from "./toast.js";
 import { waitForElementToDisplay } from "./helpers.js";
+import { languageOption } from "./preview.js";
+import { codeToHtml } from "https://esm.sh/shiki@1.1.7";
 
-function changeTheme() {
+async function changeTheme() {
     const theme = document.getElementById("theme").value;
-
+    document.getElementById("preview").innerHTML = await codeToHtml(
+        document.getElementById("text-input").value,
+        {
+            lang: languageOption(),
+            theme: theme,
+        },
+    );
     showToast("info", `Theme changed to ${theme}`);
 }
 
@@ -12,10 +20,10 @@ waitForElementToDisplay(
     function () {
         document
             .getElementById("theme")
-            .addEventListener("change", changeTheme);
+            .addEventListener("change", async () => {
+                changeTheme();
+            });
     },
     500,
     5000,
 );
-
-document.getElementById("theme").addEventListener("change", changeTheme);

@@ -1,6 +1,7 @@
 .submit-button,
 .attach-button,
-.remove-button {
+.remove-button,
+.copy-button {
     font-family: "Short Stack", cursive;
     background-color: #788db5;
     color: #292828;
@@ -14,7 +15,8 @@
 
 .submit-button:hover,
 .attach-button:hover,
-.remove-button:hover {
+.remove-button:hover,
+.copy-button:hover {
     background-color: #a3b9d1;
 }
 

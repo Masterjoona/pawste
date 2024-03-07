@@ -46,3 +46,9 @@
     width: 60vw;
     font-family: "Fira Code light";
 }
+
+.preview-container > pre {
+    padding: 10px;
+    border-radius: 7px;
+    font-size: 1.3em;
+}

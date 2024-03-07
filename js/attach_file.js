@@ -1,3 +1,11 @@
+window.addEventListener("paste", (e) => {
+    const fileInput = document.getElementById("file-input");
+    console.log(e.clipboardData.files);
+    fileInput.files = e.clipboardData.files;
+    const event = new Event("change");
+    fileInput.dispatchEvent(event);
+});
+
 function handleFiles(files) {
     const filename = files[0].name;
     const fileButton = document.getElementById("attach-button");

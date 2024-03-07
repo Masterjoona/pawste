@@ -48,6 +48,23 @@
             </form>
         {{ end }}
         <button class="preview-button" id="preview-button">preview</button>
+        <button class="copy-button" id="copy-button" onclick="copyText()">
+            copy
+        </button>
         <button class="submit-button">save</button>
+        <script>
+            document
+                .querySelector(".copy-button")
+                .addEventListener("click", function () {
+                    const copyButton = document.getElementById("copy-button");
+                    copyButton.textContent = "copied!";
+                    navigator.clipboard.writeText(
+                        document.getElementById("text-input").value,
+                    );
+                    setTimeout(() => {
+                        copyButton.textContent = "copy";
+                    }, 1000);
+                });
+        </script>
     </div>
 {{ end }}
