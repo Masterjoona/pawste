@@ -4,65 +4,71 @@
     <script src="/js/attach_file.js"></script>
     <script type="module" src="/js/preview.js"></script>
     <div class="buttons">
-        <button
-            class="attach-button"
-            id="attach-button"
-            onclick="document.getElementById('file-input').click()"
-        >
-            attach file
-        </button>
-        <button
-            class="remove-button"
-            id="remove-button"
-            onclick="removeFiles()"
-            style="display: none"
-        >
-            remove file
-        </button>
-        <input
-            type="file"
-            id="file-input"
-            onchange="handleFiles(this.files)"
-            style="display: none"
-        />
-        {{ if .Config.UploadingPassword }}
-            <script>
-                document
-                    .getElementById("file-input")
-                    .addEventListener("change", function () {
-                        const upPassElem =
-                            document.getElementById("upload-password");
-                        if (this.files.length > 0) {
-                            upPassElem.style.display = "block";
-                        } else {
-                            upPassElem.style.display = "none";
-                        }
-                    });
-            </script>
-            <form id="upload-password-form" class="upload-password-form">
-                <input
-                    type="password"
-                    id="upload-password"
-                    name="upload-password"
-                />
-            </form>
-        {{ end }}
-        <button class="preview-button" id="preview-button">preview</button>
-        <button class="copy-button" id="copy-button" onclick="copyText()">
-            copy
-        </button>
-        <button class="submit-button">save</button>
+        <div class="left-buttons">
+            <button
+                class="attach-button"
+                id="attach-button"
+                onclick="document.getElementById('file-input').click()"
+            >
+                attach file
+            </button>
+            <button
+                class="remove-button"
+                id="remove-button"
+                onclick="removeFiles()"
+                style="display: none"
+            >
+                remove file
+            </button>
+            <input
+                type="file"
+                id="file-input"
+                onchange="handleFiles(this.files)"
+                style="display: none"
+            />
+            {{ if .Config.UploadingPassword }}
+                <script>
+                    document
+                        .getElementById("file-input")
+                        .addEventListener("change", function () {
+                            const upPassElem =
+                                document.getElementById("upload-password");
+                            if (this.files.length > 0) {
+                                upPassElem.style.display = "block";
+                            } else {
+                                upPassElem.style.display = "none";
+                            }
+                        });
+                </script>
+                <form id="upload-password-form" class="upload-password-form">
+                    <input
+                        type="password"
+                        id="upload-password"
+                        name="upload-password"
+                    />
+                </form>
+            {{ end }}
+            <button class="copy-button" id="copy-button" onclick="copyText()">
+                copy
+            </button>
+        </div>
+        <div class="right-buttons">
+            <button class="preview-button" id="preview-button">preview</button>
+            <button class="submit-button">save</button>
+        </div>
         <script>
             document
                 .querySelector(".copy-button")
                 .addEventListener("click", function () {
                     const copyButton = document.getElementById("copy-button");
                     copyButton.textContent = "copied!";
+                    copyButton.classList.add("clicked");
                     navigator.clipboard.writeText(
                         document.getElementById("text-input").value,
                     );
                     setTimeout(() => {
                         copyButton.textContent = "copy";
+                        copyButton.classList.remove("clicked");
                     }, 1000);
                 });
         </script>

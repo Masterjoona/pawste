@@ -1,4 +1,4 @@
-module pawste
+module github.com/Masterjoona/pawste
 
 go 1.22.1
 

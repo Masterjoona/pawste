@@ -1,4 +1,5 @@
 window.addEventListener("paste", (e) => {
+    if (e.clipboardData.files.length === 0) return;
     const fileInput = document.getElementById("file-input");
     console.log(e.clipboardData.files);
     fileInput.files = e.clipboardData.files;

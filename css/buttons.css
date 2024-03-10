@@ -22,9 +22,11 @@
 
 .buttons {
     display: flex;
-    justify-content: center;
     align-items: center;
     gap: 10px;
+    justify-content: space-between;
+    max-width: 60vw;
+    margin: 0 auto;
 }
 
 #upload-password {
@@ -35,4 +37,14 @@
     border-radius: 7px;
     padding: 8px; /* Adjust padding */
     font-size: 16px; /* Adjust font size */
+}
+
+.left-buttons {
+    display: flex;
+    gap: 10px;
+}
+
+.right-buttons {
+    display: flex;
+    gap: 10px;
 }
