@@ -15,6 +15,7 @@ func CreateOrLoadDatabase(deleteOld bool) *sql.DB {
 		PasteName text,
 		Expire datetime, 
 		Privacy text, 
+		IsEncrypted integer,
 		ReadCount integer, 
 		ReadLast datetime,
 		BurnAfter integer, 

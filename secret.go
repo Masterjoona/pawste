@@ -15,12 +15,12 @@ import (
 
 func HashPassword(password string) string {
 	hash := sha256.New()
-	hash.Write([]byte(password))
+	hash.Write([]byte(password + Config.Salt))
 	return fmt.Sprintf("%x", hash.Sum(nil))
 }
 
 func deriveKey(password string) []byte {
-	hash := sha256.Sum256([]byte(password)) // wahh so secure
+	hash := sha256.Sum256([]byte(password + Config.Salt))
 	return hash[:]
 }
 

@@ -16,6 +16,10 @@
             {{ template "about" . }}
         {{ else if .NotFound }}
             {{ template "404" . }}
+        {{ else if .Paste }}
+            {{ template "view_paste" . }}
+        {{ else if .Edit }}
+            {{ template "edit" . }}
         {{ else }}
             {{ template "options" . }}
             {{ template "container" . }}

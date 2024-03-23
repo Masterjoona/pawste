@@ -1,4 +1,3 @@
-import { showToast } from "./toast.js";
 import { waitForElementToDisplay } from "./helpers.js";
 function submitFormData(formData) {
     fetch("/submit", {
@@ -47,28 +46,13 @@ function submit() {
     submitFormData(formData);
 }
 
-let typedSequence = "";
-
-document.addEventListener("keydown", function (event) {
-    if (
-        event.target.tagName !== "TEXTAREA" ||
-        !event.target.classList.contains("input-textarea")
-    ) {
-        typedSequence += event.key.toLowerCase();
-        console.log(typedSequence);
-        if (typedSequence.includes("neko")) {
-            console.log('The sequence "neko" was typed');
-            typedSequence = "";
-            showToast("info", "neko");
-        }
-    }
-});
-
 waitForElementToDisplay(
-    "body > div.buttons > button.submit-button",
+    "body > div.buttons > div.right-buttons > button.submit-button",
     function () {
         document
-            .querySelector("body > div.buttons > button.submit-button")
+            .querySelector(
+                "body > div.buttons > div.right-buttons > button.submit-button",
+            )
             .addEventListener("click", submit);
     },
     500,

@@ -1,9 +1,5 @@
 package main
 
-import (
-	"errors"
-)
-
 func UpdateReadCount(pasteName string) {
 	_, err := PasteDB.Exec(
 		"update pastes set ReadCount = ReadCount + 1, ReadLast = datetime('now') where PasteName = ?",
@@ -32,12 +28,7 @@ func isAtBurnAfter(pasteName string) bool {
 	return burned == 1
 }
 
-func UpdatePaste(paste Paste, password string) error {
-	// todo: check encryption level if password is needed
-	if !IsSamePassword(paste.PasteName, password) {
-		return errors.New("wrong password")
-	}
-
+func updatePasteContent(paste Paste) error {
 	tx, err := PasteDB.Begin()
 	if err != nil {
 		return err
@@ -57,7 +48,6 @@ func UpdatePaste(paste Paste, password string) error {
 	stmt, err := tx.Prepare(`
 		update pastes set
 			Content = ?,
-			Syntax = ?,
 			UpdatedAt = datetime('now')
 		where PasteName = ?
 	`)
@@ -68,13 +58,27 @@ func UpdatePaste(paste Paste, password string) error {
 
 	_, err = stmt.Exec(
 		paste.Content,
-		paste.Syntax,
 		paste.PasteName,
 	)
 	if err != nil {
 		return err
 	}
+	return nil
+}
+func updatePasteFiles(paste Paste) error {
+	return nil
+}
 
-	// todo update files
+func UpdatePaste(paste Paste) error {
+	err := updatePasteContent(paste)
+	if err != nil {
+		return err
+	}
+
+	err = updatePasteFiles(paste)
+	if err != nil {
+		return err
+	}
+
 	return nil
 }

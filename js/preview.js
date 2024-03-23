@@ -62,10 +62,12 @@ function addLanguageOptions() {
 }
 
 waitForElementToDisplay(
-    "body > div.buttons > button.preview-button",
+    "body > div.buttons > div.right-buttons > button.preview-button",
     function () {
         document
-            .querySelector("body > div.buttons > button.preview-button")
+            .querySelector(
+                "body > div.buttons > div.right-buttons > button.preview-button",
+            )
             .addEventListener("click", async () => {
                 await togglePreview();
             });

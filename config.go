@@ -15,7 +15,7 @@ const (
 	envPrefix     = "PAWSTE_"
 )
 
-func InitConfig() {
+func (ConfigEnv) InitConfig() {
 	Config = ConfigEnv{
 		Salt:                  getEnv("SALT", "banana"),
 		Port:                  getEnv("PORT", ":9454"),
@@ -48,12 +48,12 @@ func getEnv(key, fallback string) string {
 
 func getEnvInt(key string, fallback string) int {
 	if value, exists := os.LookupEnv(envPrefix + key); exists {
-		return CalculateIntFromString(value)
+		return calculateIntFromString(value)
 	}
-	return CalculateIntFromString(fallback)
+	return calculateIntFromString(fallback)
 }
 
-func CalculateIntFromString(s string) int {
+func calculateIntFromString(s string) int {
 	parts := strings.Split(s, "*")
 	result := 1
 	for _, part := range parts {

@@ -1,7 +1,7 @@
 package main
 
-type SubmittedPassword struct {
-	Password string `form:"password"`
+type PasswordSubmission struct {
+	Password string `json:"password"`
 }
 
 type PasteLists struct {
@@ -21,6 +21,7 @@ type Paste struct {
 	PasteName      string
 	Expire         string
 	Privacy        string
+	IsEncrypted    int
 	ReadCount      int
 	ReadLast       string
 	BurnAfter      int

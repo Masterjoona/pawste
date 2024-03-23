@@ -10,7 +10,7 @@ import (
 var PasteDB *sql.DB
 
 func main() {
-	InitConfig()
+	Config.InitConfig()
 	rlog.Info("Starting Pawste " + PawsteVersion)
 	PasteDB = CreateOrLoadDatabase(Config.IUnderstandTheRisks)
 
@@ -37,12 +37,15 @@ func main() {
 	r.GET("/r/:pasteName", HandleRaw)
 	r.GET("/r", RedirectHome)
 
+	r.GET("/e/:pasteName", HandleEdit)
+	r.GET("/e", RedirectHome)
+
 	r.POST("/submit", HandleSubmit)
-	r.PATCH("/submit/:pasteName", HandleUpdate)
+	r.PATCH("/p/:pasteName", HandleUpdate)
 
 	r.GET("/guide", HandlePage(gin.H{"Guide": true}, nil, ""))
 	r.GET("/admin", HandlePage(gin.H{"Admin": true}, AdminHandler, "PasteLists"))
-	r.POST("/admin/reload-config", ReloadConfig)
+	r.POST("/admin/reload-config", Config.ReloadConfig)
 	r.GET("/about", HandlePage(gin.H{"About": true}, nil, ""))
 	r.GET("/list", HandlePage(gin.H{"List": true}, ListHandler, "PasteLists"))
 

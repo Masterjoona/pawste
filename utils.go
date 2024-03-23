@@ -21,10 +21,12 @@ func SubmitToPaste(submit Submit, pasteName string, isRedirect int) Paste {
 			Blob: fileBlob,
 		})
 	}
+
 	return Paste{
 		PasteName:      pasteName,
 		Expire:         HumanTimeToSQLTime(submit.Expiration),
 		Privacy:        submit.Privacy,
+		IsEncrypted:    0,
 		ReadCount:      1,
 		ReadLast:       GetCurrentDate(),
 		BurnAfter:      submit.BurnAfter,
