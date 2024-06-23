@@ -18,6 +18,7 @@ body {
 	font-family: var(--default-font), monospace;
 	color: var(--main-color);
 	background-color: var(--bg-color);
+	font-display: fallback;
 }
 a {
 	color: var(--main-color);
