@@ -2,8 +2,7 @@
 js/speed-highlight
 node_modules
 pawste
-build
-dist
+build/*
 
 svelte-dev/node_modules
 svelte-dev/.svelte-kit

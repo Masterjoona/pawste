@@ -1,5 +1,5 @@
 <script>
-    import '@fortawesome/fontawesome-free/css/all.css';
+    // import '@fortawesome/fontawesome-free/css/all.css';
 	export let data; // GO needs to handle this btw
 
 
