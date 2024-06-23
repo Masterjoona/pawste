@@ -33,7 +33,7 @@ func CreateOrLoadDatabase(deleteOld bool) *sql.DB {
 		(ID integer not null primary key,
 		PasteName text,
 		Name text,
-		Size integer,
+		Size integer
 	);
 	`
 	if deleteOld {

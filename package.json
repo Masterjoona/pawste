@@ -9,8 +9,11 @@
   "keywords": [],
   "author": "Masterjoona",
   "license": "ISC",
+  "type": "module",
   "dependencies": {
+    "golte": "^0.0.4",
     "prettier": "^3.2.5",
-    "prettier-plugin-go-template": "^0.0.15"
+    "prettier-plugin-go-template": "^0.0.15",
+    "svelte": "^4.2.18"
   }
 }

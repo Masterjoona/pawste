@@ -2,19 +2,47 @@ package main
 
 import (
 	"database/sql"
+	"net/http"
+
+	"github.com/Masterjoona/pawste/build"
 
 	"github.com/gin-gonic/gin"
+	"github.com/nichady/golte"
 	"github.com/romana/rlog"
 )
 
 var PasteDB *sql.DB
+
+var wrapMiddleware = func(middleware func(http.Handler) http.Handler) func(ctx *gin.Context) {
+	return func(ctx *gin.Context) {
+		middleware(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+			ctx.Request = r
+			ctx.Next()
+		})).ServeHTTP(ctx.Writer, ctx.Request)
+		if golte.GetRenderContext(ctx.Request) == nil {
+			ctx.Abort()
+		}
+	}
+}
 
 func main() {
 	Config.InitConfig()
 	rlog.Info("Starting Pawste " + PawsteVersion)
 	PasteDB = CreateOrLoadDatabase(Config.IUnderstandTheRisks)
 
+	page := func(c string) gin.HandlerFunc {
+		return gin.WrapH(golte.Page(c))
+	}
+	layout := func(c string) gin.HandlerFunc {
+		return wrapMiddleware(golte.Layout(c))
+	}
+
 	r := gin.Default()
+
+	r.Use(wrapMiddleware(build.Golte))
+	r.Use(layout("layout/main"))
+
+	r.GET("/contact", page("page/contact"))
 
 	r.LoadHTMLGlob("templates/*")
 

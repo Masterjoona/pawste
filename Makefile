@@ -1,13 +1,13 @@
 binary_name="pawste"
 
 build:
-	go build -o $(binary_name) "-ldflags=-s -w" *.go
+	pnpm dlx golte dev && go build -o $(binary_name) "-ldflags=-s -w"
 
 run:
-	go run *.go
+	pnpm dlx golte dev && go run .
 
 clean:
 	rm $(binary_name)
 
 newdb:
-	PAWSTE_I_UNDERSTAND_THE_RISKS="true" go run *.go
+	PAWSTE_I_UNDERSTAND_THE_RISKS="true" pnpm dlx golte dev && go run .
