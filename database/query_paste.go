@@ -114,7 +114,7 @@ func GetPasteByName(pasteName string) (paste.Paste, error) {
 		},
 	)
 	if len(pastes) == 0 {
-		return paste.Paste{}, errors.New("Paste not found")
+		return paste.Paste{}, errors.New("paste not found")
 	}
 	return pastes[0], nil
 }

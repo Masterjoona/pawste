@@ -47,14 +47,14 @@ func main() {
 
 	r.GET("/contact", page("page/contact"))
 
-	r.LoadHTMLGlob("templates/*")
+	r.LoadHTMLGlob("oldweb/templates/*")
 
-	r.Static("/css", "./css")
-	r.Static("/js", "./js")
-	r.Static("/fonts", "./fonts")
+	r.Static("/css", "./oldweb/css")
+	r.Static("/js", "./oldweb/js")
+	r.Static("/fonts", "./oldweb/fonts")
 
-	r.StaticFile("/favicon.ico", "./static/favicon.ico")
-	r.StaticFile("/static/suzume.png", "./static/suzume.png")
+	r.StaticFile("/favicon.ico", "./oldweb/static/favicon.ico")
+	r.StaticFile("/static/suzume.png", "./oldweb/static/suzume.png")
 
 	r.GET("/", handling.HandlePage(gin.H{}, nil, ""))
 
