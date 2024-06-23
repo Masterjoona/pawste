@@ -1,4 +1,6 @@
-package main
+package database
+
+import "github.com/Masterjoona/pawste/paste"
 
 func UpdateReadCount(pasteName string) {
 	_, err := PasteDB.Exec(
@@ -12,7 +14,6 @@ func UpdateReadCount(pasteName string) {
 	if isAtBurnAfter(pasteName) {
 		println(pasteName, "should be deleted")
 	}
-
 }
 
 func isAtBurnAfter(pasteName string) bool {
@@ -28,7 +29,7 @@ func isAtBurnAfter(pasteName string) bool {
 	return burned == 1
 }
 
-func updatePasteContent(paste Paste) error {
+func updatePasteContent(paste paste.Paste) error {
 	tx, err := PasteDB.Begin()
 	if err != nil {
 		return err
@@ -65,11 +66,12 @@ func updatePasteContent(paste Paste) error {
 	}
 	return nil
 }
-func updatePasteFiles(paste Paste) error {
+
+func updatePasteFiles(paste paste.Paste) error {
 	return nil
 }
 
-func UpdatePaste(paste Paste) error {
+func UpdatePaste(paste paste.Paste) error {
 	err := updatePasteContent(paste)
 	if err != nil {
 		return err

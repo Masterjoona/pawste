@@ -1,23 +1,15 @@
-package main
+package handling
 
 import (
 	"errors"
-	"mime/multipart"
 	"net/http"
 	"strconv"
 
+	"github.com/Masterjoona/pawste/database"
+	"github.com/Masterjoona/pawste/shared"
+	"github.com/Masterjoona/pawste/shared/config"
 	"github.com/gin-gonic/gin"
 )
-
-type Submit struct {
-	Text       string                  `form:"text,omitempty"`
-	Expiration string                  `form:"expiration,omitempty"`
-	BurnAfter  int                     `form:"burn,omitempty"`
-	Password   string                  `form:"password,omitempty"`
-	Syntax     string                  `form:"syntax,omitempty"`
-	Privacy    string                  `form:"privacy,omitempty"`
-	Files      []*multipart.FileHeader `form:"file,omitempty"`
-}
 
 func HandleSubmit(c *gin.Context) {
 	submit, err := parseSubmitForm(c)
@@ -31,8 +23,8 @@ func HandleSubmit(c *gin.Context) {
 		return
 	}
 
-	isRedirect := IsContentJustUrl(submit.Text)
-	pasteName := CreatePasteName(isRedirect)
+	isRedirect := shared.IsContentJustUrl(submit.Text)
+	pasteName := database.CreatePasteName(isRedirect)
 
 	c.JSON(http.StatusOK, gin.H{
 		"text":       submit.Text,
@@ -44,12 +36,12 @@ func HandleSubmit(c *gin.Context) {
 		"pasteUrl":   pasteName,
 	})
 
-	paste := SubmitToPaste(submit, pasteName, isRedirect)
-	CreatePaste(paste)
+	paste := shared.SubmitToPaste(submit, pasteName, isRedirect)
+	database.CreatePaste(paste)
 }
 
-func parseSubmitForm(c *gin.Context) (Submit, error) {
-	var submit Submit
+func parseSubmitForm(c *gin.Context) (shared.Submit, error) {
+	var submit shared.Submit
 	submit.Text = c.PostForm("text")
 	submit.Expiration = c.PostForm("expiration")
 	submit.Password = c.PostForm("password")
@@ -57,20 +49,20 @@ func parseSubmitForm(c *gin.Context) (Submit, error) {
 	submit.Privacy = c.PostForm("privacy")
 	burnInt, err := strconv.Atoi(c.PostForm("burn"))
 	if err != nil {
-		return Submit{}, errors.New("burn must be an integer")
+		return shared.Submit{}, errors.New("burn must be an integer")
 	}
 	submit.BurnAfter = burnInt
 
 	form, err := c.MultipartForm()
 	if err != nil {
-		return Submit{}, errors.New("form error: " + err.Error())
+		return shared.Submit{}, errors.New("form error: " + err.Error())
 	}
 
 	submit.Files = form.File["files"]
 	return submit, nil
 }
 
-func validateSubmit(submit *Submit) error {
+func validateSubmit(submit *shared.Submit) error {
 	if submit.Text == "" && len(submit.Files) == 0 {
 		return errors.New("text or file is required")
 	}
@@ -79,19 +71,19 @@ func validateSubmit(submit *Submit) error {
 		return errors.New("password is required for private or secret pastes")
 	}
 
-	if NotAllowedPrivacy(submit.Privacy) {
+	if shared.NotAllowedPrivacy(submit.Privacy) {
 		return errors.New("invalid privacy")
 	}
 
-	if Config.DisableEternalPaste && submit.Expiration == "never" {
+	if config.Config.DisableEternalPaste && submit.Expiration == "never" {
 		submit.Expiration = "1w"
 	}
 
-	if Config.MaxContentLength > 0 && len(submit.Text) > Config.MaxContentLength {
+	if config.Config.MaxContentLength > 0 && len(submit.Text) > config.Config.MaxContentLength {
 		return errors.New("content is too long")
 	}
 
-	if Config.MaxFileSize > 0 && len(submit.Files) > 0 {
+	if config.Config.MaxFileSize > 0 && len(submit.Files) > 0 {
 		totalSize := 0
 		for _, file := range submit.Files {
 			if file == nil {
@@ -99,12 +91,12 @@ func validateSubmit(submit *Submit) error {
 			}
 			totalSize += int(file.Size)
 		}
-		if totalSize > Config.MaxFileSize {
+		if totalSize > config.Config.MaxFileSize {
 			return errors.New("file size is too large")
 		}
 	}
 
-	if Config.MaxEncryptionSize > 0 && encrypt && len(submit.Files) > 0 {
+	if config.Config.MaxEncryptionSize > 0 && encrypt && len(submit.Files) > 0 {
 		totalSize := 0
 		for _, file := range submit.Files {
 			if file == nil {
@@ -112,7 +104,7 @@ func validateSubmit(submit *Submit) error {
 			}
 			totalSize += int(file.Size)
 		}
-		if totalSize > Config.MaxEncryptionSize {
+		if totalSize > config.Config.MaxEncryptionSize {
 			return errors.New("file size is too large for encryption")
 		}
 	}

@@ -1,30 +1,27 @@
-package main
+package paste
 
 import (
 	"crypto/aes"
 	"crypto/cipher"
 	"crypto/rand"
-	"crypto/sha1"
 	"crypto/sha256"
 	"encoding/hex"
-	"fmt"
 	"io"
 
+	"github.com/Masterjoona/pawste/shared/config"
 	"golang.org/x/crypto/pbkdf2"
 )
 
-func HashPassword(password string) string {
-	hash := sha256.New()
-	hash.Write([]byte(password + Config.Salt))
-	return fmt.Sprintf("%x", hash.Sum(nil))
+func SecurePassword(password string) []byte {
+	return []byte(config.Config.Salt[:len(password)/2] + password + config.Config.Salt + password[:len(password)/2])
 }
 
 func deriveKey(password string) []byte {
-	hash := sha256.Sum256([]byte(password + Config.Salt))
+	hash := sha256.Sum256(SecurePassword(password))
 	return hash[:]
 }
 
-func Encrypt(file *File, password string) error {
+func (f *File) Encrypt(password string) error {
 	key := deriveKey(password)
 	nonce := make([]byte, 12)
 
@@ -32,7 +29,7 @@ func Encrypt(file *File, password string) error {
 		return err
 	}
 
-	dk := pbkdf2.Key(key, nonce, 4096, 32, sha1.New)
+	dk := pbkdf2.Key(key, nonce, 4096, 32, sha256.New)
 
 	block, err := aes.NewCipher(dk)
 	if err != nil {
@@ -44,14 +41,13 @@ func Encrypt(file *File, password string) error {
 		return err
 	}
 
-	file.Blob = aesgcm.Seal(file.Blob[:0], nonce, file.Blob, nil)
-
-	file.Blob = append(file.Blob, nonce...)
-
+	f.Blob = aesgcm.Seal(f.Blob[:0], nonce, f.Blob, nil)
+	f.Blob = append(f.Blob, nonce...)
 	return nil
 }
 
-func Decrypt(fileBlob []byte, password string) ([]byte, error) {
+func (f *File) Decrypt(password string) ([]byte, error) {
+	fileBlob := f.Blob
 	key := deriveKey(password)
 	salt := fileBlob[len(fileBlob)-12:]
 	onlyFile := fileBlob[:len(fileBlob)-12]
@@ -62,7 +58,7 @@ func Decrypt(fileBlob []byte, password string) ([]byte, error) {
 		return nil, err
 	}
 
-	dk := pbkdf2.Key(key, nonce, 4096, 32, sha1.New)
+	dk := pbkdf2.Key(key, nonce, 4096, 32, sha256.New)
 
 	block, err := aes.NewCipher(dk)
 	if err != nil {
@@ -84,40 +80,40 @@ func Decrypt(fileBlob []byte, password string) ([]byte, error) {
 	return fileBlob[:len(decryptedFileBytes)], nil
 }
 
-func EncryptText(text string, password string) (string, error) {
-	key := deriveKey(password)
+func (p *Paste) EncryptText() error {
+	key := deriveKey(p.Password)
 	nonce := make([]byte, 12)
 
 	if _, err := io.ReadFull(rand.Reader, nonce); err != nil {
-		return "", err
+		return err
 	}
 
-	dk := pbkdf2.Key(key, nonce, 4096, 32, sha1.New)
+	dk := pbkdf2.Key(key, nonce, 4096, 32, sha256.New)
 
 	block, err := aes.NewCipher(dk)
 	if err != nil {
-		return "", err
+		return err
 	}
 
 	aesgcm, err := cipher.NewGCM(block)
 	if err != nil {
-		return "", err
+		return err
 	}
 
-	ciphertext := aesgcm.Seal(nil, nonce, []byte(text), nil)
-
+	ciphertext := aesgcm.Seal(nil, nonce, []byte(p.Content), nil)
 	ciphertext = append(ciphertext, nonce...)
 
-	return hex.EncodeToString(ciphertext), nil
+	p.Content = hex.EncodeToString(ciphertext)
+	return nil
 }
 
-func DecryptText(text string, password string) string {
-	ciphertext, err := hex.DecodeString(text)
+func (p *Paste) DecryptText() string {
+	ciphertext, err := hex.DecodeString(p.Content)
 	if err != nil {
 		panic(err)
 	}
 
-	key := deriveKey(password)
+	key := deriveKey(p.Password)
 	salt := ciphertext[len(ciphertext)-12:]
 	str := hex.EncodeToString(salt)
 
@@ -126,7 +122,7 @@ func DecryptText(text string, password string) string {
 		panic(err)
 	}
 
-	dk := pbkdf2.Key(key, nonce, 4096, 32, sha1.New)
+	dk := pbkdf2.Key(key, nonce, 4096, 32, sha256.New)
 
 	block, err := aes.NewCipher(dk)
 	if err != nil {

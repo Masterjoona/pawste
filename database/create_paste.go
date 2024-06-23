@@ -1,13 +1,17 @@
-package main
+package database
 
 import (
 	"database/sql"
+	"os"
 
+	"github.com/Masterjoona/pawste/paste"
+	"github.com/Masterjoona/pawste/shared"
+	"github.com/Masterjoona/pawste/shared/config"
 	_ "github.com/mattn/go-sqlite3"
 	"github.com/romana/rlog"
 )
 
-func CreatePaste(paste Paste) error {
+func CreatePaste(paste paste.Paste) error {
 	tx, err := PasteDB.Begin()
 	if err != nil {
 		return err
@@ -15,7 +19,7 @@ func CreatePaste(paste Paste) error {
 	defer rollbackAndClose(tx, &err)
 
 	stmt, err := tx.Prepare(`
-		INSERT INTO pastes(PasteName, Expire, Privacy, ReadCount, ReadLast, BurnAfter, Content, UrlRedirect, Syntax, HashedPassword, CreatedAt, UpdatedAt)
+		INSERT INTO pastes(PasteName, Expire, Privacy, ReadCount, ReadLast, BurnAfter, Content, UrlRedirect, Syntax, Password, CreatedAt, UpdatedAt)
 		VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
 	`)
 	if err != nil {
@@ -24,10 +28,12 @@ func CreatePaste(paste Paste) error {
 	defer stmt.Close()
 
 	encrypt := (paste.Privacy == "private" || paste.Privacy == "secret") &&
-		paste.HashedPassword != ""
+		paste.Password != ""
 	if encrypt {
-		encryptContent(&paste)
+		err = paste.EncryptText()
 	}
+
+	NewPassword := shared.TernaryString(encrypt, HashPassword(paste.Password), "")
 
 	_, err = stmt.Exec(
 		paste.PasteName,
@@ -39,7 +45,7 @@ func CreatePaste(paste Paste) error {
 		paste.Content,
 		paste.UrlRedirect,
 		paste.Syntax,
-		HashPassword(paste.HashedPassword),
+		NewPassword,
 		paste.CreatedAt,
 		paste.UpdatedAt,
 	)
@@ -49,7 +55,7 @@ func CreatePaste(paste Paste) error {
 	}
 
 	if len(paste.Files) > 0 {
-		err = SaveFiles(tx, paste.Files, paste.PasteName, paste.HashedPassword, encrypt)
+		err = saveFiles(&paste, encrypt)
 		if err != nil {
 			return err
 		}
@@ -57,16 +63,32 @@ func CreatePaste(paste Paste) error {
 	return nil
 }
 
-func SaveFiles(tx *sql.Tx, files []File, pasteName string, password string, encrypt bool) error {
-	for _, file := range files {
+func saveFiles(paste *paste.Paste, encrypt bool) error {
+	for _, file := range paste.Files {
 		if encrypt {
-			encryptFile(&file, password)
+			err := file.Encrypt(paste.Password)
+			if err != nil {
+				rlog.Error("Failed to encrypt file:", err)
+				return err
+			}
 		}
-		err := SaveFileToDisk(&file, pasteName)
+		err := saveFileToDisk(&file, paste.PasteName)
 		if err != nil {
 			rlog.Error("Failed to save file to disk:", err)
 			return err
 		}
+	}
+	return nil
+}
+
+func saveFileToDisk(file *paste.File, pasteName string) error {
+	err := os.WriteFile(
+		config.Config.DataDir+pasteName+"/"+file.Name,
+		file.Blob,
+		0644,
+	)
+	if err != nil {
+		return err
 	}
 	return nil
 }
@@ -82,22 +104,4 @@ func rollbackAndClose(tx *sql.Tx, err *error) {
 	if commitErr := tx.Commit(); commitErr != nil {
 		*err = commitErr
 	}
-}
-
-func encryptContent(paste *Paste) {
-	encryptedText, err := EncryptText(paste.Content, paste.HashedPassword)
-	if err != nil {
-		rlog.Error("Failed to encrypt paste content:", err)
-		return
-	}
-	paste.Content = encryptedText
-}
-
-func encryptFile(file *File, password string) {
-	err := Encrypt(file, password)
-	if err != nil {
-		rlog.Error("Failed to encrypt file:", err)
-		return
-	}
-
 }

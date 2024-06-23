@@ -12,13 +12,23 @@
             <li aria-current={$url.pathname === "/about" ? "page" : undefined}>
                 <a href="/about" use:preload>About</a>
             </li>
-            <li aria-current={$url.pathname === "/contact" ? "page" : undefined}>
+            <li
+                aria-current={$url.pathname === "/contact" ? "page" : undefined}
+            >
                 <a href="/contact" use:preload>Contact</a>
             </li>
-            <li aria-current={$url.pathname === "/user/profile" ? "page" : undefined}>
+            <li
+                aria-current={$url.pathname === "/user/profile"
+                    ? "page"
+                    : undefined}
+            >
                 <a href="/user/profile" use:preload>Profile</a>
             </li>
-            <li aria-current={$url.pathname === "/user/login" ? "page" : undefined}>
+            <li
+                aria-current={$url.pathname === "/user/login"
+                    ? "page"
+                    : undefined}
+            >
                 <a href="/user/login" use:preload>Login</a>
             </li>
         </ul>
@@ -39,8 +49,8 @@
         height: 60px;
 
         list-style: none;
-		background: #ccddf8;;
-        
+        background: #ccddf8;
+
         display: flex;
         gap: 10px;
         justify-content: center;
@@ -54,18 +64,18 @@
 
     li[aria-current="page"] {
         border-bottom: solid 2px orangered;
-	}
-    
+    }
+
     a {
         height: 100%;
         display: flex;
         align-items: center;
         color: inherit;
-        
-        font-family: "Gill Sans", sans-serif;;
+
+        font-family: "Gill Sans", sans-serif;
         font-weight: 700;
-		font-size: 0.9rem;
-		text-decoration: none;
+        font-size: 0.9rem;
+        text-decoration: none;
     }
 
     a:hover {

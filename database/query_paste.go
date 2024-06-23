@@ -1,13 +1,14 @@
-package main
+package database
 
 import (
 	"errors"
 	"strings"
 
+	"github.com/Masterjoona/pawste/paste"
 	_ "github.com/mattn/go-sqlite3"
 )
 
-func getPastes(addQuery string, valueArgs []string, scanVariables []string) []Paste {
+func getPastes(addQuery string, valueArgs []string, scanVariables []string) []paste.Paste {
 	CleanUpExpiredPastes()
 
 	valueInterfaces := make([]interface{}, len(valueArgs))
@@ -24,10 +25,10 @@ func getPastes(addQuery string, valueArgs []string, scanVariables []string) []Pa
 		panic(err)
 	}
 	defer rows.Close()
-	var pastes []Paste
+	var pastes []paste.Paste
 
 	for rows.Next() {
-		var paste Paste
+		var paste paste.Paste
 		if err := rows.Scan(MakePastePointers(&paste, scanVariables)...); err != nil {
 			panic(err)
 		}
@@ -39,7 +40,7 @@ func getPastes(addQuery string, valueArgs []string, scanVariables []string) []Pa
 	return pastes
 }
 
-func GetAllPastes() PasteLists {
+func GetAllPastes() paste.PasteLists {
 	pastes := getPastes(
 		"where UrlRedirect = '0'",
 		[]string{},
@@ -59,13 +60,13 @@ func GetAllPastes() PasteLists {
 			"BurnAfter",
 			"Syntax",
 		})
-	return PasteLists{
+	return paste.PasteLists{
 		Pastes:    pastes,
 		Redirects: redirects,
 	}
 }
 
-func GetPublicPastes() []Paste {
+func GetPublicPastes() []paste.Paste {
 	return getPastes(
 		"where Privacy = 'public' and UrlRedirect = '0'",
 		[]string{},
@@ -78,7 +79,7 @@ func GetPublicPastes() []Paste {
 	)
 }
 
-func GetPublicRedirects() []Paste {
+func GetPublicRedirects() []paste.Paste {
 	return getPastes(
 		"where Privacy = 'public' and UrlRedirect != '0'",
 		[]string{},
@@ -92,8 +93,7 @@ func GetPublicRedirects() []Paste {
 	)
 }
 
-func GetPasteByName(pasteName string) (Paste, error) {
-	CleanUpExpiredPastes()
+func GetPasteByName(pasteName string) (paste.Paste, error) {
 	pastes := getPastes(
 		"where PasteName = ?",
 		[]string{pasteName},
@@ -108,13 +108,13 @@ func GetPasteByName(pasteName string) (Paste, error) {
 			"Content",
 			"UrlRedirect",
 			"Syntax",
-			"HashedPassword",
+			"Password",
 			"CreatedAt",
 			"UpdatedAt",
 		},
 	)
 	if len(pastes) == 0 {
-		return Paste{}, errors.New("Paste not found")
+		return paste.Paste{}, errors.New("Paste not found")
 	}
 	return pastes[0], nil
 }

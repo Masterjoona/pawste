@@ -1,7 +1,8 @@
-package main
+package database
 
 import (
 	"database/sql"
+	"fmt"
 	"os"
 
 	_ "github.com/mattn/go-sqlite3"
@@ -21,7 +22,7 @@ func CreateOrLoadDatabase(deleteOld bool) *sql.DB {
 		BurnAfter integer, 
 		Content text,
 		Syntax text,
-		HashedPassword text,
+		Password text,
 		UrlRedirect integer,
 		CreatedAt datetime, 
 		UpdatedAt datetime
@@ -45,10 +46,11 @@ func CreateOrLoadDatabase(deleteOld bool) *sql.DB {
 		rlog.Critical("Could not open database", err)
 	}
 	if deleteOld || newDb {
-		_, err = sqldb.Exec(createPasteTable)
+		res, err := sqldb.Exec(createPasteTable)
 		if err != nil {
 			rlog.Critical("Could not create pastes table", err)
 		}
+		fmt.Println(res)
 		_, err = sqldb.Exec(createFileTable)
 		if err != nil {
 			rlog.Critical("Could not create files table", err)

@@ -1,10 +1,12 @@
-package main
+package config
 
 import (
+	"net/http"
 	"os"
 	"strconv"
 	"strings"
 
+	"github.com/gin-gonic/gin"
 	"github.com/romana/rlog"
 )
 
@@ -16,14 +18,15 @@ const (
 )
 
 func (ConfigEnv) InitConfig() {
+	port := getEnv("PORT", ":9454")
 	Config = ConfigEnv{
 		Salt:                  getEnv("SALT", "banana"),
-		Port:                  getEnv("PORT", ":9454"),
+		Port:                  port,
 		DataDir:               getEnv("DATA_DIR", "pawste_data/"),
 		AdminPassword:         getEnv("ADMIN_PASSWORD", "admin"),
 		PublicList:            getEnv("PUBLIC_LIST", "true") == "true",
-		PublicURL:             getEnv("PUBLIC_URL", "http://localhost:"+getEnv("PORT", ":9454")),
-		NoFileUpload:          getEnv("NO_FILE_UPLOAD", "false") == "true",
+		PublicURL:             getEnv("PUBLIC_URL", "http://localhost"+port),
+		NoFileUpload:          getEnv("FILE_UPLOAD", "true") == "true",
 		MaxFileSize:           getEnvInt("MAX_FILE_SIZE", "1024 * 1024 * 10"),
 		MaxEncryptionSize:     getEnvInt("MAX_ENCRYPTION_SIZE", "1024 * 1024 * 10"),
 		MaxContentLength:      getEnvInt("MAX_CONTENT_LENGTH", "1024 * 1024"),
@@ -64,4 +67,22 @@ func calculateIntFromString(s string) int {
 		result *= num
 	}
 	return result
+}
+
+type PasswordSubmission struct {
+	Password string `json:"password"`
+}
+
+func (ConfigEnv) ReloadConfig(c *gin.Context) {
+	var password PasswordSubmission
+	if err := c.Bind(&password); err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "give a password dumbass"})
+		return
+	}
+	if password.Password != Config.AdminPassword {
+		c.JSON(http.StatusUnauthorized, gin.H{"error": "wrong password"})
+		return
+	}
+	Config.InitConfig()
+	c.JSON(http.StatusOK, gin.H{"message": "reloaded config"})
 }

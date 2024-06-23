@@ -1,9 +1,11 @@
-package main
+package database
 
 import (
 	"math/rand"
 	"strings"
 	"time"
+
+	"github.com/Masterjoona/pawste/shared/config"
 )
 
 var AnimalNames = []string{
@@ -77,7 +79,7 @@ const characters = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ01234567
 
 func CreatePasteName(shorten int) string {
 	r := rand.New(rand.NewSource(time.Now().UnixNano()))
-	if Config.ShortPasteNames || shorten == 1 {
+	if config.Config.ShortPasteNames || shorten == 1 {
 		return createShortPasteName(r)
 	}
 	for {
@@ -104,14 +106,4 @@ func createShortPasteName(r *rand.Rand) string {
 			return trimmedName
 		}
 	}
-}
-
-func pasteExists(name string) bool {
-	var exists bool
-	err := PasteDB.QueryRow("select exists(select 1 from pastes where PasteName = ?)", name).
-		Scan(&exists)
-	if err != nil {
-		panic(err)
-	}
-	return exists
 }

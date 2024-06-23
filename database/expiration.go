@@ -1,6 +1,7 @@
-package main
+package database
 
 import (
+	"github.com/Masterjoona/pawste/paste"
 	_ "github.com/mattn/go-sqlite3"
 	"github.com/romana/rlog"
 )
@@ -14,7 +15,7 @@ func CleanUpExpiredPastes() {
 	}
 	defer pastes.Close()
 	for pastes.Next() {
-		var paste Paste
+		var paste paste.Paste
 		err = pastes.Scan(
 			&paste.ID,
 		)

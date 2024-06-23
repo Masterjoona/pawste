@@ -1,42 +1,43 @@
-package main
+package shared
 
 import (
 	"io"
 	"mime/multipart"
-	"os"
 	"regexp"
 	"time"
+
+	"github.com/Masterjoona/pawste/paste"
 )
 
-func SubmitToPaste(submit Submit, pasteName string, isRedirect int) Paste {
-	var files []File
+func SubmitToPaste(submit Submit, pasteName string, isRedirect int) paste.Paste {
+	var files []paste.File
 	for _, file := range submit.Files {
 		if file == nil {
 			continue
 		}
 		fileName, fileSize, fileBlob := convertMultipartFile(file)
-		files = append(files, File{
+		files = append(files, paste.File{
 			Name: fileName,
 			Size: fileSize,
 			Blob: fileBlob,
 		})
 	}
 
-	return Paste{
-		PasteName:      pasteName,
-		Expire:         HumanTimeToSQLTime(submit.Expiration),
-		Privacy:        submit.Privacy,
-		IsEncrypted:    0,
-		ReadCount:      1,
-		ReadLast:       GetCurrentDate(),
-		BurnAfter:      submit.BurnAfter,
-		Content:        submit.Text,
-		Syntax:         submit.Syntax,
-		HashedPassword: submit.Password,
-		Files:          files,
-		UrlRedirect:    isRedirect,
-		CreatedAt:      GetCurrentDate(),
-		UpdatedAt:      GetCurrentDate(),
+	return paste.Paste{
+		PasteName:   pasteName,
+		Expire:      HumanTimeToSQLTime(submit.Expiration),
+		Privacy:     submit.Privacy,
+		IsEncrypted: 0,
+		ReadCount:   1,
+		ReadLast:    GetCurrentDate(),
+		BurnAfter:   submit.BurnAfter,
+		Content:     submit.Text,
+		Syntax:      submit.Syntax,
+		Password:    submit.Password,
+		Files:       files,
+		UrlRedirect: isRedirect,
+		CreatedAt:   GetCurrentDate(),
+		UpdatedAt:   GetCurrentDate(),
 	}
 }
 
@@ -56,6 +57,7 @@ func convertMultipartFile(file *multipart.FileHeader) (string, int, []byte) {
 
 func HumanTimeToSQLTime(humanTime string) string {
 	var duration time.Duration
+	duration = 7 * 24 * time.Hour
 	switch humanTime {
 	case "10min":
 		duration = 10 * time.Minute
@@ -69,12 +71,8 @@ func HumanTimeToSQLTime(humanTime string) string {
 		duration = 24 * time.Hour
 	case "72h":
 		duration = 72 * time.Hour
-	case "1w":
-		duration = 7 * 24 * time.Hour
 	case "never":
-		duration = 100 * 365 * 25 // cope if you're still using this in 100 years
-	default:
-		duration = 7 * 24 * time.Hour
+		duration = 100 * 365 * 24 * time.Hour // cope if you're still using this in 100 years
 	}
 
 	return time.Now().Add(duration).Format("2006-01-02 15:04:05")
@@ -100,14 +98,9 @@ func NotAllowedPrivacy(x string) bool {
 	return true
 }
 
-func SaveFileToDisk(file *File, pasteName string) error {
-	err := os.WriteFile(
-		Config.DataDir+pasteName+"/"+file.Name,
-		file.Blob,
-		0644,
-	)
-	if err != nil {
-		return err
+func TernaryString(condition bool, trueVal, falseVal string) string {
+	if condition {
+		return trueVal
 	}
-	return nil
+	return falseVal
 }
