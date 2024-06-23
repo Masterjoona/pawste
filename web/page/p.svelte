@@ -1,29 +1,28 @@
 <script>
     // import '@fortawesome/fontawesome-free/css/all.css';
-	export let data; // GO needs to handle this btw
-
+    export let data; // GO needs to handle this btw
 
     // GO must handle giving us data, however, here's a placeholder for debugging purposes
     if (Object.keys(data).length == 0) {
         data = {
-                id: "debug",
-                title: 'kid named debugger',
-                textContent: 'owo meow meow nya purr - taro.tf',
-                readCount: 69,
-                bytes: 420
-            }
+            id: "debug",
+            title: "kid named debugger",
+            textContent: "owo meow meow nya purr - taro.tf",
+            readCount: 69,
+            bytes: 420,
+        };
     }
 </script>
+
 <div id="container">
     <div class="card">
         <div class="properties">
             <p>{data.title} (id: {data.id})</p>
-            <div class = "spacer"></div>
-            <div class = "icon-container">
+            <div class="spacer"></div>
+            <div class="icon-container">
                 <p>{data.readCount} <i class="fa-solid fa-eye"></i></p>
                 <p>{data.bytes} <i class="fa-solid fa-file-lines"></i></p>
             </div>
-
         </div>
         <textarea readonly>{data.textContent}</textarea>
         <div class="buttons">
@@ -38,7 +37,6 @@
     :root {
         --font-size: 1.2em;
     }
-
 
     #container {
         height: 100%;
@@ -82,7 +80,7 @@
     .icon-container {
         display: flex;
         flex-direction: row;
-        gap:10px;
+        gap: 10px;
     }
 
     textarea {
@@ -118,5 +116,4 @@
     button:hover {
         background-color: var(--main-color-dark);
     }
-
 </style>

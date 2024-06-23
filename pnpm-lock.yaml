@@ -29,6 +29,10 @@ importers:
       svelte:
         specifier: ^4.2.18
         version: 4.2.18
+    devDependencies:
+      prettier-plugin-svelte:
+        specifier: ^3.2.5
+        version: 3.2.5(prettier@3.2.5)(svelte@4.2.18)
 
 packages:
 
@@ -613,6 +617,12 @@ packages:
     peerDependencies:
       prettier: ^3.0.0
 
+  prettier-plugin-svelte@3.2.5:
+    resolution: {integrity: sha512-vP/M/Goc8z4iVIvrwXwbrYVjJgA0Hf8PO1G4LBh/ocSt6vUP6sLvyu9F3ABEGr+dbKyxZjEKLkeFsWy/yYl0HQ==}
+    peerDependencies:
+      prettier: ^3.0.0
+      svelte: ^3.2.0 || ^4.0.0-next.0 || ^5.0.0-next.0
+
   prettier@3.2.5:
     resolution: {integrity: sha512-3/GWa9aOC0YeD7LUfvOG2NiDyhOWRvt1k+rcKhOuYnMY24iiCphgneUfJDyFXd6rZCAnuLBv6UeAULtrhT/F4A==}
     engines: {node: '>=14'}
@@ -1148,6 +1158,11 @@ snapshots:
     dependencies:
       prettier: 3.2.5
       ulid: 2.3.0
+
+  prettier-plugin-svelte@3.2.5(prettier@3.2.5)(svelte@4.2.18):
+    dependencies:
+      prettier: 3.2.5
+      svelte: 4.2.18
 
   prettier@3.2.5: {}
 
