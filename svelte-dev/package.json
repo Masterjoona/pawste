@@ -2,7 +2,7 @@
 	"name": "svelte-dev",
 	"version": "0.0.1",
 	"scripts": {
-		"dev": "vite dev",
+		"dev": "vite dev --host 192.168.48.1",
 		"build": "vite build",
 		"preview": "vite preview",
 		"lint": "prettier --check .",

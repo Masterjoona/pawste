@@ -1,6 +1,6 @@
 <script>
-	import Header from '$lib/ui/Header.svelte';
-	import Footer from '$lib/ui/footer.svelte';
+	import Header from "../lib/ui/header.svelte"
+	import Footer from '../lib/ui/footer.svelte';
 	import './styles.css';
 </script>
 
