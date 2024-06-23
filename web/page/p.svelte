@@ -1,6 +1,18 @@
 <script>
     import '@fortawesome/fontawesome-free/css/all.css';
-	export let data;
+	export let data; // GO needs to handle this btw
+
+
+    // GO must handle giving us data, however, here's a placeholder for debugging purposes
+    if (Object.keys(data).length == 0) {
+        data = {
+                id: "debug",
+                title: 'kid named debugger',
+                textContent: 'owo meow meow nya purr - taro.tf',
+                readCount: 69,
+                bytes: 420
+            }
+    }
 </script>
 <div id="container">
     <div class="card">
