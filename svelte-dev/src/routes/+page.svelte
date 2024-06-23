@@ -9,6 +9,6 @@
 
 <center>
 	<h1>U-Undew devewopment ;;w;;</h1>
-<p>have this c-cute giww in the meanwhile x3</p>
-<img src={suzume} alt="Cute girl" />
+	<p>have this c-cute giww in the meanwhile x3</p>
+	<img src={suzume} alt="Cute girl" />
 </center>
