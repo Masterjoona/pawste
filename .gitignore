@@ -2,14 +2,7 @@
 js/speed-highlight
 node_modules
 pawste
-build
-
-
+build/*
 .svelte-kit
-build
 .DS_Store
 Thumbs.db
-svelte-dev/.env
-svelte-dev/.env.*
-svelte-dev/vite.config.js.timestamp-*
-svelte-dev/vite.config.ts.timestamp-*

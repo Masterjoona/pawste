@@ -11,9 +11,15 @@
   "license": "ISC",
   "type": "module",
   "dependencies": {
+    "@fontsource-variable/fira-code": "^5.0.18",
+    "@fontsource/short-stack": "^5.0.12",
+    "@fortawesome/fontawesome-free": "^6.5.2",
     "golte": "^0.0.4",
     "prettier": "^3.2.5",
     "prettier-plugin-go-template": "^0.0.15",
     "svelte": "^4.2.18"
+  },
+  "devDependencies": {
+    "prettier-plugin-svelte": "^3.2.5"
   }
 }

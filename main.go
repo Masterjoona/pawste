@@ -6,7 +6,6 @@ import (
 
 	"github.com/Masterjoona/pawste/build"
 	"github.com/Masterjoona/pawste/database"
-	"github.com/Masterjoona/pawste/handling"
 	"github.com/Masterjoona/pawste/shared/config"
 
 	"github.com/gin-gonic/gin"
@@ -44,8 +43,11 @@ func main() {
 
 	r.Use(wrapMiddleware(build.Golte))
 	r.Use(layout("layout/main"))
-
-	r.GET("/contact", page("page/contact"))
+	
+	r.GET("/about", page("page/about"))
+	r.GET("/", page("page/index"))
+	r.GET("/new", page("page/new"))
+	r.GET("/p", page("page/p"))
 
 	r.LoadHTMLGlob("oldweb/templates/*")
 
@@ -56,29 +58,29 @@ func main() {
 	r.StaticFile("/favicon.ico", "./oldweb/static/favicon.ico")
 	r.StaticFile("/static/suzume.png", "./oldweb/static/suzume.png")
 
-	r.GET("/", handling.HandlePage(gin.H{}, nil, ""))
+	// r.GET("/", handling.HandlePage(gin.H{}, nil, ""))
 
-	r.GET("/p/:pasteName", handling.HandlePastePage)
-	r.GET("/p/:pasteName/json", handling.HandlePasteJSON)
-	r.GET("/p", handling.RedirectHome)
+	// r.GET("/p/:pasteName", handling.HandlePastePage)
+	// r.GET("/p/:pasteName/json", handling.HandlePasteJSON)
+	// r.GET("/p", handling.RedirectHome)
 
-	r.GET("/u/:pasteName", handling.Redirect)
-	r.GET("/u", handling.RedirectHome)
+	// r.GET("/u/:pasteName", handling.Redirect)
+	// r.GET("/u", handling.RedirectHome)
 
-	r.GET("/r/:pasteName", handling.HandleRaw)
-	r.GET("/r", handling.RedirectHome)
+	// r.GET("/r/:pasteName", handling.HandleRaw)
+	// r.GET("/r", handling.RedirectHome)
 
-	r.GET("/e/:pasteName", handling.HandleEdit)
-	r.GET("/e", handling.RedirectHome)
+	// r.GET("/e/:pasteName", handling.HandleEdit)
+	// r.GET("/e", handling.RedirectHome)
 
-	r.POST("/submit", handling.HandleSubmit)
-	r.PATCH("/p/:pasteName", handling.HandleUpdate)
+	// r.POST("/submit", handling.HandleSubmit)
+	// r.PATCH("/p/:pasteName", handling.HandleUpdate)
 
-	r.GET("/guide", handling.HandlePage(gin.H{"Guide": true}, nil, ""))
-	r.GET("/admin", handling.HandlePage(gin.H{"Admin": true}, handling.AdminHandler, "PasteLists"))
-	r.POST("/admin/reload-config", config.Config.ReloadConfig)
-	r.GET("/about", handling.HandlePage(gin.H{"About": true}, nil, ""))
-	r.GET("/list", handling.HandlePage(gin.H{"List": true}, handling.ListHandler, "PasteLists"))
+	// r.GET("/guide", handling.HandlePage(gin.H{"Guide": true}, nil, ""))
+	// r.GET("/admin", handling.HandlePage(gin.H{"Admin": true}, handling.AdminHandler, "PasteLists"))
+	// r.POST("/admin/reload-config", config.Config.ReloadConfig)
+	// r.GET("/about", handling.HandlePage(gin.H{"About": true}, nil, ""))
+	// r.GET("/list", handling.HandlePage(gin.H{"List": true}, handling.ListHandler, "PasteLists"))
 
 	r.Run(config.Config.Port)
 }
