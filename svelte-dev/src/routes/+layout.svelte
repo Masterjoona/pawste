@@ -1,18 +1,10 @@
 <script>
+	import './styles.css';
 	import Header from "../lib/ui/header.svelte"
 	import Footer from '../lib/ui/footer.svelte';
-	import './styles.css';
-	import { onMount } from "svelte";
-	let display = false;
-	onMount(() => {
-		setTimeout(() => {
-			display = true
-		}, 50);
-	})
 </script>
 
-
-<div id ="container" class:hidden={!display}>
+<div id ="container" >
 	<div id ="header"><Header/></div>
 	
 	<main>
@@ -36,8 +28,5 @@
 	main {
 		width: 80vw;
         height: 80vh;
-	}
-	.hidden {
-		opacity: 0;
 	}
 </style>
