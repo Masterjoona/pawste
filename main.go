@@ -43,9 +43,9 @@ func main() {
 	r := gin.Default()
 
 	r.Use(wrapMiddleware(build.Golte))
-	r.Use(layout("layout/main"))
+	r.Use(layout("layout/footer"))
 
-	r.GET("/contact", page("page/contact"))
+	r.GET("/new", page("page/new"))
 
 	r.LoadHTMLGlob("oldweb/templates/*")
 

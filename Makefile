@@ -6,7 +6,7 @@ build:
 run:
 	npx golte dev --use-pnpm && go run .
 
-runnopnpm:
+runnoweb:
 	go run .
 
 clean:
