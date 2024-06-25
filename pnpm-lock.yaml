@@ -8,9 +8,15 @@ importers:
 
   .:
     dependencies:
+      '@fontsource-variable/fira-code':
+        specifier: ^5.0.18
+        version: 5.0.18
       '@fontsource/fira-mono':
         specifier: ^5.0.13
         version: 5.0.13
+      '@fontsource/short-stack':
+        specifier: ^5.0.12
+        version: 5.0.12
       '@fortawesome/fontawesome-free':
         specifier: ^6.5.2
         version: 6.5.2
@@ -38,10 +44,6 @@ importers:
       svelte:
         specifier: ^4.2.18
         version: 4.2.18
-    devDependencies:
-      prettier-plugin-svelte:
-        specifier: ^3.2.5
-        version: 3.2.5(prettier@3.2.5)(svelte@4.2.18)
 
 packages:
 
@@ -325,8 +327,14 @@ packages:
     cpu: [x64]
     os: [win32]
 
+  '@fontsource-variable/fira-code@5.0.18':
+    resolution: {integrity: sha512-Pmbnf4HukX4y928RY9g47hWyVECQglwV7HLv5taaDQwI3UBXyoLUnyRsjJxeviCPhdwJY5qyLT4GaCMlgC9oCQ==}
+
   '@fontsource/fira-mono@5.0.13':
     resolution: {integrity: sha512-fZDjR2BdAqmauEbTjcIT62zYzbOgDa5+IQH34D2k8Pxmy1T815mAqQkZciWZVQ9dc/BgdTtTUV9HJ2ulBNwchg==}
+
+  '@fontsource/short-stack@5.0.12':
+    resolution: {integrity: sha512-hcgYMQZ9f/vUznyfGc95SyyCPwq/cB71eFIDaDXRuk81ilfD9uwbuMIH69rzN8ENJY/Zk2vm8fh+Td+m0nLK8g==}
 
   '@fortawesome/fontawesome-free@6.5.2':
     resolution: {integrity: sha512-hRILoInAx8GNT5IMkrtIt9blOdrqHOnPBH+k70aWUAqPZPgopb9G5EQJFpaBx/S8zp2fC+mPW349Bziuk1o28Q==}
@@ -910,7 +918,11 @@ snapshots:
   '@esbuild/win32-x64@0.21.5':
     optional: true
 
+  '@fontsource-variable/fira-code@5.0.18': {}
+
   '@fontsource/fira-mono@5.0.13': {}
+
+  '@fontsource/short-stack@5.0.12': {}
 
   '@fortawesome/fontawesome-free@6.5.2': {}
 

@@ -43,9 +43,15 @@ func main() {
 	r := gin.Default()
 
 	r.Use(wrapMiddleware(build.Golte))
-	r.Use(layout("layout/footer"))
+	r.Use(layout("layout/main"))
 
 	r.GET("/new", page("page/new"))
+
+	r.GET("/test", func(ctx *gin.Context) {
+		golte.RenderPage(ctx.Writer, ctx.Request, "page/p", map[string]any{
+			"textContent": "Hello, World!",
+		})
+	})
 
 	r.LoadHTMLGlob("oldweb/templates/*")
 
