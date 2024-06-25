@@ -43,7 +43,7 @@ func main() {
 
 	r.Use(wrapMiddleware(build.Golte))
 	r.Use(layout("layout/main"))
-	
+
 	r.GET("/about", page("page/about"))
 	r.GET("/", page("page/index"))
 	r.GET("/new", page("page/new"))

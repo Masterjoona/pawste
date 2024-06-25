@@ -1,11 +1,12 @@
 <div>
     <h1>About us ♡</h1>
     <p>
-        Hewwo thewe! UwU We'we two Finnish femboys who just wuv making fun and
-        awesome stuff togethew! OwO Our jouwney stawted with a simple dweam: to
-        cweate something cool and meaningful that makes us feel vawidated and
-        happy! ^w^ Meet <a href="https://masterjoona.dev" target="_blank"
-            >Joona</a
+        Hewwo thewe! UwU We'we one Finnish femboy and one normal boy who just
+        wuv making fun and awesome stuff togethew! OwO Our jouwney stawted with
+        a simple dweam: to cweate something cool and meaningful that makes us
+        feel vawidated and happy! ^w^ Meet <a
+            href="https://masterjoona.dev"
+            target="_blank">Joona</a
         >
         and <a href="https://taro.tf" target="_blank">Taro!</a> (｡♥‿♥｡) We'we best
         fwiends with a passion fow cweativity and self-expwession. We aim to bwing
@@ -30,6 +31,7 @@
     </p>
     <p>
         Send us an email at <a href="mailto:team@pawst.eu">team@pawst.eu</a>!
+        Send us an email at <a href="mailto:team@pawst.eu">team@pawst.eu</a>!
     </p>
 </div>
 
@@ -41,8 +43,9 @@
     h1,
     p {
         text-align: center;
-        width: 66.6%;
+        width: 76.6%;
         align-self: center;
+        line-height: 1.9em;
     }
 
     p {
@@ -52,3 +55,4 @@
         color: rgb(169, 95, 120);
     }
 </style>
+
