@@ -1,26 +1,22 @@
 <script>
-    export let data; // GO needs to handle this btw
-    export let textContent;
-    data = {
-        id: "debug",
-        title: "kid named debugger",
-        textContent: textContent,
-        readCount: 69,
-        bytes: 420,
-    };
+    export let pasteName;
+    export let expire;
+    export let content;
+    export let readCount;
 </script>
 
 <div id="container">
     <div class="card">
         <div class="properties">
-            <p>{data.title} (id: {data.id})</p>
+            <p>{pasteName} | commies (id: cummies)</p>
             <div class="spacer"></div>
             <div class="icon-container">
-                <p>{data.readCount} <i class="fa-solid fa-eye"></i></p>
-                <p>{data.bytes} <i class="fa-solid fa-file-lines"></i></p>
+                <p>{readCount} <i class="fa-solid fa-eye"></i></p>
+                <p>{content.length} <i class="fa-solid fa-file-lines"></i></p>
+                <p>{expire} <i class="fa-solid fa-clock"></i></p>
             </div>
         </div>
-        <textarea readonly>{textContent}</textarea>
+        <textarea readonly>{content}</textarea>
         <div class="buttons">
             <button>Modify</button>
             <button>Copy Text</button>

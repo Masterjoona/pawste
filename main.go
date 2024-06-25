@@ -48,8 +48,12 @@ func main() {
 	r.GET("/new", page("page/new"))
 
 	r.GET("/test", func(ctx *gin.Context) {
+		paste, _ := database.GetPasteByName("bear-pigeon-lizard")
 		golte.RenderPage(ctx.Writer, ctx.Request, "page/p", map[string]any{
-			"textContent": "Hello, World!",
+			"content":   paste.Content,
+			"expire":    paste.Expire,
+			"pasteName": paste.PasteName,
+			"readCount": paste.ReadCount,
 		})
 	})
 
