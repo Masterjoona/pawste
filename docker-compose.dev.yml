@@ -1,0 +1,11 @@
+services:
+  pawste:
+    build:
+      dockerfile: ./Dockerfile
+    container_name: pawste
+    env_file: .env
+    ports:
+      - "9454:9454"
+    volumes:
+      - ./pastes.db:/app/pastes.db
+      - /pawste_data:/app/pawste_data

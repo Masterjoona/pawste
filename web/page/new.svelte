@@ -46,7 +46,6 @@
         --font-size: 1.2em;
     }
 
-
     #container {
         height: 100%;
         width: 100%;
@@ -86,7 +85,7 @@
     }
 
     select {
-        background-color: #1E1E1E;
+        background-color: #1e1e1e;
         color: white;
         border: 1px solid #444;
         padding: 5px;
