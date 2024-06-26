@@ -7,6 +7,7 @@ import (
 	"github.com/Masterjoona/pawste/build"
 	"github.com/Masterjoona/pawste/database"
 	"github.com/Masterjoona/pawste/handling"
+	"github.com/Masterjoona/pawste/paste"
 	"github.com/Masterjoona/pawste/shared/config"
 
 	"github.com/gin-gonic/gin"
@@ -45,10 +46,18 @@ func main() {
 	r.Use(wrapMiddleware(build.Golte))
 	r.Use(layout("layout/main"))
 
+	r.GET("/", page("page/index"))
 	r.GET("/new", page("page/new"))
-
+	r.GET("/list", func(ctx *gin.Context) {
+		golte.RenderPage(ctx.Writer, ctx.Request, "page/list", map[string]any{
+			"pasteArr":    database.GetPublicPastes(),
+			"redirectArr": database.GetPublicRedirects(),
+		})
+	})
 	r.GET("/test", func(ctx *gin.Context) {
-		paste, _ := database.GetPasteByName("bear-pigeon-lizard")
+		newPaste := paste.Paste{ID: 0, PasteName: "meerkat-meerkat-meerkat", Expire: "never", Privacy: "public", IsEncrypted: 0, BurnAfter: 0, Content: "meow meow nyahhhh~", Syntax: "none", CreatedAt: "0"}
+		database.CreatePaste(newPaste)
+		paste, _ := database.GetPasteByName("meerkat-meerkat-meerkat")
 		golte.RenderPage(ctx.Writer, ctx.Request, "page/p", map[string]any{
 			"content":   paste.Content,
 			"expire":    paste.Expire,
@@ -56,6 +65,8 @@ func main() {
 			"readCount": paste.ReadCount,
 		})
 	})
+	r.GET("/about", page("page/about"))
+	
 
 	r.LoadHTMLGlob("oldweb/templates/*")
 
@@ -66,7 +77,6 @@ func main() {
 	r.StaticFile("/favicon.ico", "./oldweb/static/favicon.ico")
 	r.StaticFile("/static/suzume.png", "./oldweb/static/suzume.png")
 
-	r.GET("/", handling.HandlePage(gin.H{}, nil, ""))
 
 	r.GET("/p/:pasteName", handling.HandlePastePage)
 	r.GET("/p/:pasteName/json", handling.HandlePasteJSON)
@@ -87,8 +97,6 @@ func main() {
 	r.GET("/guide", handling.HandlePage(gin.H{"Guide": true}, nil, ""))
 	r.GET("/admin", handling.HandlePage(gin.H{"Admin": true}, handling.AdminHandler, "PasteLists"))
 	r.POST("/admin/reload-config", config.Config.ReloadConfig)
-	r.GET("/about", handling.HandlePage(gin.H{"About": true}, nil, ""))
-	r.GET("/list", handling.HandlePage(gin.H{"List": true}, handling.ListHandler, "PasteLists"))
 
 	r.Run(config.Config.Port)
 }

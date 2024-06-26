@@ -1,4 +1,5 @@
 <script>
+    import { copy } from 'svelte-copy';
     export let pasteName;
     export let expire;
     export let content;
@@ -8,7 +9,7 @@
 <div id="container">
     <div class="card">
         <div class="properties">
-            <p>{pasteName} | commies (id: cummies)</p>
+            <h>{pasteName}</h>
             <div class="spacer"></div>
             <div class="icon-container">
                 <p>{readCount} <i class="fa-solid fa-eye"></i></p>
@@ -19,8 +20,8 @@
         <textarea readonly>{content}</textarea>
         <div class="buttons">
             <button>Modify</button>
-            <button>Copy Text</button>
-            <button>Copy URL</button>
+            <button use:copy={content} on:svelte-copy={(e) => {window?.alert("Text copied!")}}>Copy Text</button>
+            <button use:copy={window?.location?.href} on:svelte-copy={(e) => {window?.alert(`URL copied!`)}}>Copy URL</button>
         </div>
     </div>
 </div>

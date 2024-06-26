@@ -1,0 +1,53 @@
+<script>
+    export let pasteArr;
+    export let redirectArr;
+    console.log(pasteArr, redirectArr)
+</script>
+
+<div id="container">
+    {#if pasteArr?.length > 0}
+        <table id = "pastes">
+            <tr>
+                <th>Name</th>
+                <th>Views</th>
+                <th><i class="fa-solid fa-maximize"></i></th>
+            </tr>
+            {#each pasteArr as { ID, PasteName, ReadCount}}
+                <tr>
+                    <td>{PasteName}</td>
+                    <td>{ReadCount} <i class="fa-solid fa-eye"></i></td>
+                    <td><a href = "/p/{ID}">View :3</a></td>
+            </tr>
+            {/each}
+        </table>
+    {:else}
+        <div id = "nopastes">
+            <p>No pastes to show :(</p>
+            <p>Would you like to <a href = "/new">make one</a> instead?</p>
+        </div>
+        {/if}
+    </div>
+<style>
+    #container {
+        height: 100%;
+        width: 100%;
+        margin-top: 50px;
+        display: flex;
+        flex-direction: column;
+        justify-content: flex-start;
+        align-items: center;
+        font-family: var(--main-font);
+    }
+    table {
+        width: 66.6%;
+    }
+    th, td {
+        border: 1px solid var(--main-color);
+        text-align: center;
+    }
+    #nopastes {
+        border: 1px solid var(--main-color);
+        border-radius: 15px;
+        padding: 10px;
+    }
+</style>
