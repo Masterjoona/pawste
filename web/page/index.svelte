@@ -3,8 +3,8 @@
 </script>
 
 <svelte:head>
-    <title>Pawste :3</title>
-    <meta name="description" content="Pawst.eu" />
+    <title>pawste :3</title>
+    <meta name="description" content="pawst.eu" />
 </svelte:head>
 
 <center>
