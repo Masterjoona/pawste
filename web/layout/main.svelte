@@ -5,12 +5,14 @@
     import "../app.css";
     import Header from "../lib/ui/header.svelte";
     import Footer from "../lib/ui/footer.svelte";
+    import { SvelteToast } from "@zerodevx/svelte-toast";
 </script>
 
 <div id="container">
     <div id="header"><Header /></div>
 
     <main>
+        <SvelteToast />
         <slot />
     </main>
 

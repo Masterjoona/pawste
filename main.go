@@ -55,18 +55,24 @@ func main() {
 		})
 	})
 	r.GET("/test", func(ctx *gin.Context) {
-		newPaste := paste.Paste{ID: 0, PasteName: "meerkat-meerkat-meerkat", Expire: "never", Privacy: "public", IsEncrypted: 0, BurnAfter: 0, Content: "meow meow nyahhhh~", Syntax: "none", CreatedAt: "0"}
+		newPaste := paste.Paste{
+			ID:          0,
+			PasteName:   "meerkat-meerkat-meerkat",
+			Expire:      "never",
+			Privacy:     "public",
+			IsEncrypted: 0,
+			BurnAfter:   0,
+			Content:     "meow meow nyahhhh~",
+			Syntax:      "none",
+			CreatedAt:   "0",
+		}
 		database.CreatePaste(newPaste)
 		paste, _ := database.GetPasteByName("meerkat-meerkat-meerkat")
 		golte.RenderPage(ctx.Writer, ctx.Request, "page/p", map[string]any{
-			"content":   paste.Content,
-			"expire":    paste.Expire,
-			"pasteName": paste.PasteName,
-			"readCount": paste.ReadCount,
+			"paste": paste,
 		})
 	})
 	r.GET("/about", page("page/about"))
-	
 
 	r.LoadHTMLGlob("oldweb/templates/*")
 
@@ -76,7 +82,6 @@ func main() {
 
 	r.StaticFile("/favicon.ico", "./oldweb/static/favicon.ico")
 	r.StaticFile("/static/suzume.png", "./oldweb/static/suzume.png")
-
 
 	r.GET("/p/:pasteName", handling.HandlePastePage)
 	r.GET("/p/:pasteName/json", handling.HandlePasteJSON)

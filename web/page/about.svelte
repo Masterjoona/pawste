@@ -6,8 +6,7 @@
         a simple dweam: to cweate something cool and meaningful that makes us
         feel vawidated and happy! ^w^ Meet <a
             href="https://masterjoona.dev"
-            target="_blank">Joona</a
-        >
+            target="_blank">Joona</a>
         and <a href="https://taro.tf" target="_blank">Taro!</a> (｡♥‿♥｡) We'we best
         fwiends with a passion fow cweativity and self-expwession. We aim to bwing
         a smile to youw face and a warm fuzzy feeling to youw heawt. ^w^ We bewieve

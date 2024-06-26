@@ -1,33 +1,34 @@
 <script>
     export let pasteArr;
     export let redirectArr;
-    console.log(pasteArr, redirectArr)
+    console.log(pasteArr, redirectArr);
 </script>
 
-<div id = "spacemaker"></div>
+<div id="spacemaker"></div>
 <div id="container">
     {#if pasteArr?.length > 0}
-        <table id = "pastes">
+        <table id="pastes">
             <tr>
                 <th>Name</th>
                 <th>Views</th>
                 <th><i class="fa-solid fa-maximize"></i></th>
             </tr>
-            {#each pasteArr as { ID, PasteName, ReadCount}}
+            {#each pasteArr as { ID, PasteName, ReadCount }}
                 <tr>
                     <td>{PasteName}</td>
                     <td>{ReadCount} <i class="fa-solid fa-eye"></i></td>
-                    <td><a href = "/p/{ID}">View :3</a></td>
-            </tr>
+                    <td><a href="/p/{PasteName}">View :3</a></td>
+                </tr>
             {/each}
         </table>
     {:else}
-        <div id = "nopastes">
+        <div id="nopastes">
             <p>No pastes to show :(</p>
-            <p>Would you like to <a href = "/new">make one</a> instead?</p>
+            <p>Would you like to <a href="/new">make one</a> instead?</p>
         </div>
-        {/if}
-    </div>
+    {/if}
+</div>
+
 <style>
     #spacemaker {
         margin-top: 50px;
@@ -45,7 +46,8 @@
     table {
         width: 66.6%;
     }
-    th, td {
+    th,
+    td {
         border: 1px solid var(--main-color);
         text-align: center;
     }

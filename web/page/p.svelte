@@ -1,27 +1,48 @@
 <script>
-    import { copy } from 'svelte-copy';
-    export let pasteName;
-    export let expire;
-    export let content;
-    export let readCount;
+    import { toast } from "@zerodevx/svelte-toast";
+    import { copy } from "svelte-copy";
+    export let paste;
+    const successToast = (msg) => {
+        toast.push(msg, {
+            theme: {
+                "--toastColor": "mintcream",
+                "--toastBackground": "rgba(72,187,120,0.9)",
+                "--toastBarBackground": "#2F855A",
+            },
+        });
+    };
 </script>
 
 <div id="container">
     <div class="card">
         <div class="properties">
-            <h>{pasteName}</h>
+            <h>{paste.PasteName}</h>
             <div class="spacer"></div>
             <div class="icon-container">
-                <p>{readCount} <i class="fa-solid fa-eye"></i></p>
-                <p>{content.length} <i class="fa-solid fa-file-lines"></i></p>
-                <p>{expire} <i class="fa-solid fa-clock"></i></p>
+                <p>{paste.ReadCount} <i class="fa-solid fa-eye"></i></p>
+                <p>
+                    {paste.Content.length}
+                    <i class="fa-solid fa-file-lines"></i>
+                </p>
+                <p>{paste.Expire} <i class="fa-solid fa-clock"></i></p>
             </div>
         </div>
-        <textarea readonly>{content}</textarea>
+        <textarea readonly>{paste.Content}</textarea>
         <div class="buttons">
-            <button>Modify</button>
-            <button use:copy={content} on:svelte-copy={(e) => {window?.alert("Text copied!")}}>Copy Text</button>
-            <button use:copy={window?.location?.href} on:svelte-copy={(e) => {window?.alert(`URL copied!`)}}>Copy URL</button>
+            <button
+                on:click={() =>
+                    (window.location.href = "/e/" + paste.PasteName)}
+                >Edit</button>
+            <button
+                use:copy={paste.Content}
+                on:svelte-copy={() => {
+                    successToast("Text copied!");
+                }}>Copy Text</button>
+            <button
+                use:copy={window?.location?.href}
+                on:svelte-copy={() => {
+                    successToast("URL copied!");
+                }}>Copy URL</button>
         </div>
     </div>
 </div>
