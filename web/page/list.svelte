@@ -4,6 +4,7 @@
     console.log(pasteArr, redirectArr)
 </script>
 
+<div id = "spacemaker"></div>
 <div id="container">
     {#if pasteArr?.length > 0}
         <table id = "pastes">
@@ -28,15 +29,18 @@
         {/if}
     </div>
 <style>
+    #spacemaker {
+        margin-top: 50px;
+    }
     #container {
         height: 100%;
         width: 100%;
-        margin-top: 50px;
         display: flex;
         flex-direction: column;
         justify-content: flex-start;
         align-items: center;
         font-family: var(--main-font);
+        overflow: auto;
     }
     table {
         width: 66.6%;
