@@ -1,6 +1,6 @@
 package database
 
-import "github.com/Masterjoona/pawste/paste"
+import "github.com/Masterjoona/pawste/pkg/paste"
 
 func UpdateReadCount(pasteName string) {
 	_, err := PasteDB.Exec(

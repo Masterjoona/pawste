@@ -5,9 +5,9 @@ import (
 	"net/http"
 	"strconv"
 
-	"github.com/Masterjoona/pawste/database"
-	"github.com/Masterjoona/pawste/shared"
-	"github.com/Masterjoona/pawste/shared/config"
+	"github.com/Masterjoona/pawste/pkg/database"
+	"github.com/Masterjoona/pawste/pkg/shared"
+	"github.com/Masterjoona/pawste/pkg/shared/config"
 	"github.com/gin-gonic/gin"
 )
 

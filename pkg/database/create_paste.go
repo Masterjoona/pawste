@@ -4,9 +4,9 @@ import (
 	"database/sql"
 	"os"
 
-	"github.com/Masterjoona/pawste/paste"
-	"github.com/Masterjoona/pawste/shared"
-	"github.com/Masterjoona/pawste/shared/config"
+	"github.com/Masterjoona/pawste/pkg/paste"
+	"github.com/Masterjoona/pawste/pkg/shared"
+	"github.com/Masterjoona/pawste/pkg/shared/config"
 	_ "github.com/mattn/go-sqlite3"
 	"github.com/romana/rlog"
 )

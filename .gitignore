@@ -2,7 +2,7 @@
 js/speed-highlight
 node_modules
 pawste
-build/*
+pkg/build/*
 .svelte-kit
 .DS_Store
 Thumbs.db

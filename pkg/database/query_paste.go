@@ -4,7 +4,7 @@ import (
 	"errors"
 	"strings"
 
-	"github.com/Masterjoona/pawste/paste"
+	"github.com/Masterjoona/pawste/pkg/paste"
 	_ "github.com/mattn/go-sqlite3"
 )
 

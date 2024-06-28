@@ -5,7 +5,7 @@ import (
 	"strings"
 	"time"
 
-	"github.com/Masterjoona/pawste/shared/config"
+	"github.com/Masterjoona/pawste/pkg/shared/config"
 )
 
 var AnimalNames = []string{

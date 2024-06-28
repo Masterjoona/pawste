@@ -12,7 +12,7 @@ RUN pnpm install
 
 COPY ./web ./web
 
-RUN npx golte dev
+RUN npx golte dev 
 
 FROM golang:1.22.4 AS go-builder
 

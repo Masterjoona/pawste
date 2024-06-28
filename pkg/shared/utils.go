@@ -6,7 +6,7 @@ import (
 	"regexp"
 	"time"
 
-	"github.com/Masterjoona/pawste/paste"
+	"github.com/Masterjoona/pawste/pkg/paste"
 )
 
 func SubmitToPaste(submit Submit, pasteName string, isRedirect int) paste.Paste {

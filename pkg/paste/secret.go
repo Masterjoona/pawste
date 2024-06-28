@@ -8,7 +8,7 @@ import (
 	"encoding/hex"
 	"io"
 
-	"github.com/Masterjoona/pawste/shared/config"
+	"github.com/Masterjoona/pawste/pkg/shared/config"
 	"golang.org/x/crypto/pbkdf2"
 )
 

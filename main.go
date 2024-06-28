@@ -4,11 +4,10 @@ import (
 	"database/sql"
 	"net/http"
 
-	"github.com/Masterjoona/pawste/build"
-	"github.com/Masterjoona/pawste/database"
-	"github.com/Masterjoona/pawste/handling"
-	"github.com/Masterjoona/pawste/paste"
-	"github.com/Masterjoona/pawste/shared/config"
+	"github.com/Masterjoona/pawste/pkg/build"
+	"github.com/Masterjoona/pawste/pkg/database"
+	"github.com/Masterjoona/pawste/pkg/handling"
+	"github.com/Masterjoona/pawste/pkg/shared/config"
 
 	"github.com/gin-gonic/gin"
 	"github.com/nichady/golte"
@@ -55,18 +54,6 @@ func main() {
 		})
 	})
 	r.GET("/test", func(ctx *gin.Context) {
-		newPaste := paste.Paste{
-			ID:          0,
-			PasteName:   "meerkat-meerkat-meerkat",
-			Expire:      "never",
-			Privacy:     "public",
-			IsEncrypted: 0,
-			BurnAfter:   0,
-			Content:     "meow meow nyahhhh~",
-			Syntax:      "none",
-			CreatedAt:   "0",
-		}
-		database.CreatePaste(newPaste)
 		paste, _ := database.GetPasteByName("meerkat-meerkat-meerkat")
 		golte.RenderPage(ctx.Writer, ctx.Request, "page/p", map[string]any{
 			"paste": paste,
