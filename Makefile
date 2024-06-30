@@ -1,5 +1,5 @@
 build:
-	pnpm dlx golte dev && go build -o pawste "-ldflags=-s -w"
+	pnpm dlx golte && go build -o pawste "-ldflags=-s -w"
 
 run:
 	pnpm dlx golte dev && go run .

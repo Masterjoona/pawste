@@ -55,11 +55,12 @@ func main() {
 	})
 	r.GET("/test", func(ctx *gin.Context) {
 		paste, _ := database.GetPasteByName("meerkat-meerkat-meerkat")
-		golte.RenderPage(ctx.Writer, ctx.Request, "page/p", map[string]any{
+		golte.RenderPage(ctx.Writer, ctx.Request, "page/paste", map[string]any{
 			"paste": paste,
 		})
 	})
 	r.GET("/about", page("page/about"))
+	r.GET("/guide", page("page/guide"))
 
 	r.LoadHTMLGlob("oldweb/templates/*")
 
@@ -86,7 +87,6 @@ func main() {
 	r.POST("/submit", handling.HandleSubmit)
 	r.PATCH("/p/:pasteName", handling.HandleUpdate)
 
-	r.GET("/guide", handling.HandlePage(gin.H{"Guide": true}, nil, ""))
 	r.GET("/admin", handling.HandlePage(gin.H{"Admin": true}, handling.AdminHandler, "PasteLists"))
 	r.POST("/admin/reload-config", config.Config.ReloadConfig)
 

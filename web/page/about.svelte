@@ -1,5 +1,5 @@
 <div>
-    <h1>About us ♡</h1>
+    <h2>About us ♡</h2>
     <p>
         Hewwo thewe! UwU We'we one Finnish femboy and one normal boy who just
         wuv making fun and awesome stuff togethew! OwO Our jouwney stawted with
@@ -38,7 +38,7 @@
         display: flex;
         flex-direction: column;
     }
-    h1,
+    h2,
     p {
         text-align: center;
         width: 76.6%;

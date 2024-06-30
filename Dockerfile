@@ -1,9 +1,7 @@
-# Stage 1: Base image with pnpm installed
 FROM node:20-alpine AS base
 
 RUN npm i -g pnpm
 
-# Stage 2: Install dependencies
 FROM base AS dependencies
 
 WORKDIR /app
@@ -23,6 +21,7 @@ COPY main.go ./
 COPY go.mod go.sum ./
 
 #RUN --mount=type=cache,target="/root/.cache/go-build" go build -o pawste "-ldflags=-s -w"
+RUN go build -o pawste "-ldflags=-s -w"
 
 FROM alpine:latest
 
