@@ -2,10 +2,11 @@
     import "@fontsource-variable/fira-code";
     import "@fontsource/short-stack";
     import "@fortawesome/fontawesome-free/css/all.css";
-    import "../app.css";
-    import Header from "../lib/ui/header.svelte";
-    import Footer from "../lib/ui/footer.svelte";
     import { SvelteToast } from "@zerodevx/svelte-toast";
+    import "../app.css";
+    import Animegirl from "../lib/ui/animegirl.svelte";
+    import Footer from "../lib/ui/footer.svelte";
+    import Header from "../lib/ui/header.svelte";
 </script>
 
 <div id="container">
@@ -13,6 +14,7 @@
 
     <main>
         <SvelteToast />
+        <Animegirl />
         <slot />
     </main>
 
