@@ -1,7 +1,7 @@
 <script>
     export let pasteArr;
     export let redirectArr;
-    console.log(pasteArr, redirectArr);
+    //console.log(pasteArr, redirectArr);
 </script>
 
 <div id="spacemaker"></div>

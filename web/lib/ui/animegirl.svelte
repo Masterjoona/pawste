@@ -3,8 +3,17 @@
     let src = "";
 
     const loadImage = async () => {
-        const girls = ["faye", "asuka", "suzume"];
-        const girl = girls[Math.floor(girls.length * Math.random())];
+        const girls = [
+            "faye",
+            "asuka",
+            "suzume",
+            "bocchi",
+            "mai",
+            "marin",
+            "nanami",
+        ];
+        const girl = girls[~~(girls.length * Math.random())];
+        console.log(`Loading ${girl}...`);
         const image = await import(`../../assets/${girl}.png`);
         src = image.default;
     };
