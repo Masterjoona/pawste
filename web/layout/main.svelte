@@ -3,6 +3,7 @@
     import "@fontsource/short-stack";
     import "@fortawesome/fontawesome-free/css/all.css";
     import { SvelteToast } from "@zerodevx/svelte-toast";
+
     import "../app.css";
     import Animegirl from "../lib/ui/animegirl.svelte";
     import Footer from "../lib/ui/footer.svelte";
@@ -14,11 +15,14 @@
 
     <main>
         <SvelteToast />
-        <Animegirl />
+
         <slot />
     </main>
 
-    <div id="footer"><Footer /></div>
+    <div id="footer">
+        <Animegirl />
+        <Footer />
+    </div>
 </div>
 
 <style>

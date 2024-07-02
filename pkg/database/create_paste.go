@@ -54,13 +54,7 @@ func CreatePaste(paste paste.Paste) error {
 		return err
 	}
 
-	if len(paste.Files) > 0 {
-		err = saveFiles(&paste, encrypt)
-		if err != nil {
-			return err
-		}
-	}
-	return nil
+	return saveFiles(&paste, encrypt)
 }
 
 func saveFiles(paste *paste.Paste, encrypt bool) error {
@@ -82,15 +76,15 @@ func saveFiles(paste *paste.Paste, encrypt bool) error {
 }
 
 func saveFileToDisk(file *paste.File, pasteName string) error {
-	err := os.WriteFile(
+	err := os.MkdirAll(config.Config.DataDir+pasteName, 0755)
+	if err != nil {
+		return err
+	}
+	return os.WriteFile(
 		config.Config.DataDir+pasteName+"/"+file.Name,
 		file.Blob,
 		0644,
 	)
-	if err != nil {
-		return err
-	}
-	return nil
 }
 
 func rollbackAndClose(tx *sql.Tx, err *error) {

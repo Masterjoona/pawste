@@ -58,7 +58,7 @@ func parseSubmitForm(c *gin.Context) (shared.Submit, error) {
 		return shared.Submit{}, errors.New("form error: " + err.Error())
 	}
 
-	submit.Files = form.File["files"]
+	submit.Files = form.File["file"]
 	return submit, nil
 }
 

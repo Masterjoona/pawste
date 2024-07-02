@@ -1,19 +1,19 @@
 <script>
     import { onMount } from "svelte";
     let src = "";
+    let girl = "";
 
     const loadImage = async () => {
         const girls = [
             "faye",
             "asuka",
             "suzume",
-            "bocchi",
+            //"bocchi", too wide
             "mai",
             "marin",
             "nanami",
         ];
-        const girl = girls[~~(girls.length * Math.random())];
-        console.log(`Loading ${girl}...`);
+        girl = girls[~~(girls.length * Math.random())];
         const image = await import(`../../assets/${girl}.png`);
         src = image.default;
     };
@@ -23,14 +23,14 @@
     });
 </script>
 
-<img class="anime-girl" {src} alt="girl" />
+<img class="anime-girl" {src} alt={girl} />
 
 <style>
     .anime-girl {
         position: fixed;
         max-height: 30%;
-        bottom: 0;
-        right: 0;
+        bottom: 1%;
+        right: -2%;
         margin: 10px;
     }
 </style>

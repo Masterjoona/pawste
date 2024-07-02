@@ -90,5 +90,8 @@ func main() {
 	r.GET("/admin", handling.HandlePage(gin.H{"Admin": true}, handling.AdminHandler, "PasteLists"))
 	r.POST("/admin/reload-config", config.Config.ReloadConfig)
 
+	// for testing purposes
+	r.GET("/old", handling.HandlePage(gin.H{}, nil, ""))
+
 	r.Run(config.Config.Port)
 }

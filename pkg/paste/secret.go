@@ -7,13 +7,16 @@ import (
 	"crypto/sha256"
 	"encoding/hex"
 	"io"
+	"math"
 
 	"github.com/Masterjoona/pawste/pkg/shared/config"
 	"golang.org/x/crypto/pbkdf2"
 )
 
 func SecurePassword(password string) []byte {
-	return []byte(config.Config.Salt[:len(password)/2] + password + config.Config.Salt + password[:len(password)/2])
+	salt := config.Config.Salt
+	halfLen := int(math.Ceil(float64(len(password)) / 2.0))
+	return []byte(salt[:halfLen] + password + salt + password[:halfLen])
 }
 
 func deriveKey(password string) []byte {
@@ -46,8 +49,7 @@ func (f *File) Encrypt(password string) error {
 	return nil
 }
 
-func (f *File) Decrypt(password string) ([]byte, error) {
-	fileBlob := f.Blob
+func Decrypt(password string, fileBlob []byte) ([]byte, error) {
 	key := deriveKey(password)
 	salt := fileBlob[len(fileBlob)-12:]
 	onlyFile := fileBlob[:len(fileBlob)-12]

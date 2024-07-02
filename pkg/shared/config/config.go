@@ -39,6 +39,10 @@ func (ConfigEnv) InitConfig() {
 		ShortenRedirectPastes: getEnv("SHORTEN_REDIRECT_PASTES", "false") == "true",
 		IUnderstandTheRisks:   getEnv("I_UNDERSTAND_THE_RISKS", "false") == "true",
 	}
+
+	if _, err := os.Stat(Config.DataDir); os.IsNotExist(err) {
+		os.Mkdir(Config.DataDir, 0755)
+	}
 }
 
 func getEnv(key, fallback string) string {

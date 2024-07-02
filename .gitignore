@@ -5,4 +5,6 @@ pawste
 pkg/build/*
 .svelte-kit
 .DS_Store
-Thumbs.db
+*.upx
+pawste_data
+*.png

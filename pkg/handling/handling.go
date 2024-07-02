@@ -120,7 +120,6 @@ func Redirect(c *gin.Context) {
 	}
 	database.UpdateReadCount(c.Param("pasteName"))
 	c.Redirect(http.StatusFound, paste.Content)
-
 }
 
 // funny
