@@ -47,6 +47,7 @@ func main() {
 
 	r.GET("/", page("page/index"))
 	r.GET("/new", page("page/new"))
+	r.GET("/password", page("page/password"))
 	r.GET("/list", func(ctx *gin.Context) {
 		golte.RenderPage(ctx.Writer, ctx.Request, "page/list", map[string]any{
 			"pasteArr":    database.GetPublicPastes(),
@@ -92,6 +93,7 @@ func main() {
 
 	// for testing purposes
 	r.GET("/old", handling.HandlePage(gin.H{}, nil, ""))
+	r.GET("/p/:pasteName/files/:fileName", handling.HandleFile)
 
 	r.Run(config.Config.Port)
 }

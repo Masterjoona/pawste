@@ -18,6 +18,15 @@ func MakePastePointers(paste *paste.Paste, scanVariables []string) []interface{}
 	return pastePointers
 }
 
+func MakeFilePointers(paste *paste.File, scanVariables []string) []interface{} {
+	filePointers := make([]interface{}, len(scanVariables))
+	val := reflect.ValueOf(paste).Elem()
+	for i, variable := range scanVariables {
+		filePointers[i] = val.FieldByName(variable).Addr().Interface()
+	}
+	return filePointers
+}
+
 func pasteExists(name string) bool {
 	var exists bool
 	err := PasteDB.QueryRow("select exists(select 1 from pastes where PasteName = ?)", name).

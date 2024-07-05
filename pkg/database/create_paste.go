@@ -31,6 +31,9 @@ func CreatePaste(paste paste.Paste) error {
 		paste.Password != ""
 	if encrypt {
 		err = paste.EncryptText()
+		if err != nil {
+			return err
+		}
 	}
 
 	NewPassword := shared.TernaryString(encrypt, HashPassword(paste.Password), "")
@@ -54,10 +57,15 @@ func CreatePaste(paste paste.Paste) error {
 		return err
 	}
 
-	return saveFiles(&paste, encrypt)
+	err = saveFiles(tx, &paste, encrypt)
+	if err != nil {
+		return err
+	}
+
+	return tx.Commit()
 }
 
-func saveFiles(paste *paste.Paste, encrypt bool) error {
+func saveFiles(tx *sql.Tx, paste *paste.Paste, encrypt bool) error {
 	for _, file := range paste.Files {
 		if encrypt {
 			err := file.Encrypt(paste.Password)
@@ -69,6 +77,24 @@ func saveFiles(paste *paste.Paste, encrypt bool) error {
 		err := saveFileToDisk(&file, paste.PasteName)
 		if err != nil {
 			rlog.Error("Failed to save file to disk:", err)
+			return err
+		}
+
+		stmt, err := tx.Prepare(`
+            INSERT INTO files(PasteName, Name, Size)
+            VALUES (?, ?, ?)
+        `)
+		if err != nil {
+			return err
+		}
+		defer stmt.Close()
+
+		_, err = stmt.Exec(
+			paste.PasteName,
+			file.Name,
+			file.Size,
+		)
+		if err != nil {
 			return err
 		}
 	}

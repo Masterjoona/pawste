@@ -109,17 +109,32 @@ func HandleRaw(c *gin.Context) {
 }
 
 func Redirect(c *gin.Context) {
-	paste, err := database.GetPasteByName(c.Param("pasteName"))
+	pasteName := c.Param("pasteName")
+	paste, err := database.GetPasteByName(pasteName)
 	if err != nil {
 		c.Redirect(http.StatusFound, "/")
 		return
 	}
+	database.UpdateReadCount(pasteName)
 	if paste.UrlRedirect == 0 {
 		c.Redirect(http.StatusFound, "/p/"+paste.PasteName)
 		return
 	}
-	database.UpdateReadCount(c.Param("pasteName"))
 	c.Redirect(http.StatusFound, paste.Content)
+}
+
+func HandleFile(c *gin.Context) {
+	paste, err := database.GetPasteByName(c.Param("pasteName"))
+	if err != nil {
+		c.JSON(http.StatusNotFound, gin.H{"error": "paste not found"})
+		return
+	}
+	file, err := database.GetFile(paste.PasteName, c.Param("fileName"))
+	if err != nil {
+		c.JSON(http.StatusNotFound, gin.H{"error": "file not found"})
+		return
+	}
+	c.JSON(http.StatusOK, file)
 }
 
 // funny

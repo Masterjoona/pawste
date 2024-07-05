@@ -37,7 +37,11 @@ func HandleSubmit(c *gin.Context) {
 	})
 
 	paste := shared.SubmitToPaste(submit, pasteName, isRedirect)
-	database.CreatePaste(paste)
+	err = database.CreatePaste(paste)
+	if err != nil {
+		println(err.Error())
+		return
+	}
 }
 
 func parseSubmitForm(c *gin.Context) (shared.Submit, error) {

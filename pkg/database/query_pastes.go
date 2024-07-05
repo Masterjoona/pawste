@@ -8,7 +8,7 @@ import (
 	_ "github.com/mattn/go-sqlite3"
 )
 
-func getPastes(addQuery string, valueArgs []string, scanVariables []string) []paste.Paste {
+func queryPastes(addQuery string, valueArgs []string, scanVariables []string) []paste.Paste {
 	CleanUpExpiredPastes()
 
 	valueInterfaces := make([]interface{}, len(valueArgs))
@@ -41,7 +41,7 @@ func getPastes(addQuery string, valueArgs []string, scanVariables []string) []pa
 }
 
 func GetAllPastes() paste.PasteLists {
-	pastes := getPastes(
+	pastes := queryPastes(
 		"where UrlRedirect = '0'",
 		[]string{},
 		[]string{
@@ -50,7 +50,7 @@ func GetAllPastes() paste.PasteLists {
 			"Privacy",
 			"BurnAfter",
 		})
-	redirects := getPastes(
+	redirects := queryPastes(
 		"where UrlRedirect != '0'",
 		[]string{},
 		[]string{
@@ -67,7 +67,7 @@ func GetAllPastes() paste.PasteLists {
 }
 
 func GetPublicPastes() []paste.Paste {
-	return getPastes(
+	return queryPastes(
 		"where Privacy = 'public' and UrlRedirect = '0'",
 		[]string{},
 		[]string{
@@ -80,7 +80,7 @@ func GetPublicPastes() []paste.Paste {
 }
 
 func GetPublicRedirects() []paste.Paste {
-	return getPastes(
+	return queryPastes(
 		"where Privacy = 'public' and UrlRedirect != '0'",
 		[]string{},
 		[]string{
@@ -94,7 +94,7 @@ func GetPublicRedirects() []paste.Paste {
 }
 
 func GetPasteByName(pasteName string) (paste.Paste, error) {
-	pastes := getPastes(
+	pastes := queryPastes(
 		"where PasteName = ?",
 		[]string{pasteName},
 		[]string{
