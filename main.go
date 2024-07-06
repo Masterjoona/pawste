@@ -56,17 +56,14 @@ func main() {
 	r.GET("/guide", page("page/guide"))
 
 	r.GET("/p/:pasteName", handling.HandlePastePage)
+	r.GET("/p/auth/:pasteName", handling.HandlePasteAuth)
+	r.GET("/p/:pasteName/raw", handling.HandlePasteRaw)
 	r.GET("/p/:pasteName/json", handling.HandlePasteJSON)
 	r.GET("/p", handling.RedirectHome)
 
 	r.GET("/u/:pasteName", handling.Redirect)
-	r.GET("/u", handling.RedirectHome)
-
-	r.GET("/r/:pasteName", handling.HandleRaw)
-	r.GET("/r", handling.RedirectHome)
 
 	r.GET("/e/:pasteName", handling.HandleEdit)
-	r.GET("/e", handling.RedirectHome)
 
 	r.POST("/submit", handling.HandleSubmit)
 	r.PATCH("/p/:pasteName", handling.HandleUpdate)
@@ -76,6 +73,10 @@ func main() {
 
 	// for testing purposes
 	r.GET("/p/:pasteName/files/:fileName", handling.HandleFile)
+
+	r.GET("/u", handling.RedirectHome)
+	r.GET("/r", handling.RedirectHome)
+	r.GET("/e", handling.RedirectHome)
 
 	r.Run(config.Config.Port)
 }

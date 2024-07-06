@@ -39,6 +39,18 @@ func HandlePastePage(c *gin.Context) {
 	database.UpdateReadCount(pasteName)
 }
 
+func HandlePasteAuth(c *gin.Context) {
+	pasteName := c.Param("pasteName")
+	paste, err := database.GetPasteByName(pasteName)
+	if err != nil {
+		c.Redirect(http.StatusFound, "/")
+		return
+	}
+	golte.RenderPage(c.Writer, c.Request, "page/auth", map[string]any{
+		"paste": paste,
+	})
+}
+
 func HandlePasteJSON(c *gin.Context) {
 	pasteName := c.Param("pasteName")
 	paste, err := database.GetPasteByName(pasteName)
@@ -97,7 +109,7 @@ func RedirectHome(c *gin.Context) {
 	c.Redirect(http.StatusFound, "/")
 }
 
-func HandleRaw(c *gin.Context) {
+func HandlePasteRaw(c *gin.Context) {
 	pasteName := c.Param("pasteName")
 	paste, err := database.GetPasteByName(pasteName)
 	if err != nil {

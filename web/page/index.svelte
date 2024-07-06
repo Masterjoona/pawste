@@ -8,7 +8,7 @@
 </svelte:head>
 
 <center>
-    <h1>U-Undew devewopment ;;w;;</h1>
-    <p>have this c-cute giww in the meanwhile x3</p>
+    <h1>Under development</h1>
+    <p>Look at this girl in the meantime</p>
     <img src={suzume} alt="Cute girl" />
 </center>
