@@ -14,8 +14,7 @@
             "nanami",
         ];
         girl = girls[~~(girls.length * Math.random())];
-        const image = await import(`../../assets/${girl}.png`);
-        src = image.default;
+        src = (await import(`../../assets/${girl}.png`)).default;
     };
 
     onMount(() => {
