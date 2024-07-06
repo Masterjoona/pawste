@@ -45,32 +45,15 @@ func main() {
 	r.Use(wrapMiddleware(build.Golte))
 	r.Use(layout("layout/main"))
 
-	r.GET("/", page("page/index"))
-	r.GET("/new", page("page/new"))
+	r.GET("/", page("page/new"))
 	r.GET("/password", page("page/password"))
 	r.GET("/list", func(ctx *gin.Context) {
 		golte.RenderPage(ctx.Writer, ctx.Request, "page/list", map[string]any{
-			"pasteArr":    database.GetPublicPastes(),
-			"redirectArr": database.GetPublicRedirects(),
-		})
-	})
-	r.GET("/test", func(ctx *gin.Context) {
-		paste, _ := database.GetPasteByName("meerkat-meerkat-meerkat")
-		golte.RenderPage(ctx.Writer, ctx.Request, "page/paste", map[string]any{
-			"paste": paste,
+			"pastes": database.GetAllPublicPastes(),
 		})
 	})
 	r.GET("/about", page("page/about"))
 	r.GET("/guide", page("page/guide"))
-
-	r.LoadHTMLGlob("oldweb/templates/*")
-
-	r.Static("/css", "./oldweb/css")
-	r.Static("/js", "./oldweb/js")
-	r.Static("/fonts", "./oldweb/fonts")
-
-	r.StaticFile("/favicon.ico", "./oldweb/static/favicon.ico")
-	r.StaticFile("/static/suzume.png", "./oldweb/static/suzume.png")
 
 	r.GET("/p/:pasteName", handling.HandlePastePage)
 	r.GET("/p/:pasteName/json", handling.HandlePasteJSON)
@@ -92,7 +75,6 @@ func main() {
 	r.POST("/admin/reload-config", config.Config.ReloadConfig)
 
 	// for testing purposes
-	r.GET("/old", handling.HandlePage(gin.H{}, nil, ""))
 	r.GET("/p/:pasteName/files/:fileName", handling.HandleFile)
 
 	r.Run(config.Config.Port)

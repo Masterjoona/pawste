@@ -8,6 +8,7 @@ import (
 	"github.com/Masterjoona/pawste/pkg/shared"
 	"github.com/Masterjoona/pawste/pkg/shared/config"
 	"github.com/gin-gonic/gin"
+	"github.com/nichady/golte"
 	"github.com/romana/rlog"
 )
 
@@ -26,28 +27,26 @@ func HandlePage(
 }
 
 func HandlePastePage(c *gin.Context) {
-	paste, err := database.GetPasteByName(c.Param("pasteName"))
+	pasteName := c.Param("pasteName")
+	paste, err := database.GetPasteByName(pasteName)
 	if err != nil {
-		c.HTML(http.StatusNotFound, "main.html", gin.H{
-			"NotFound":      true,
-			"config.Config": config.Config,
-		})
+		c.Redirect(http.StatusFound, "/")
 		return
 	}
-	database.UpdateReadCount(c.Param("pasteName"))
-	c.HTML(http.StatusOK, "main.html", gin.H{
-		"Paste":         paste,
-		"config.Config": config.Config,
+	golte.RenderPage(c.Writer, c.Request, "page/paste", map[string]any{
+		"paste": paste,
 	})
+	database.UpdateReadCount(pasteName)
 }
 
 func HandlePasteJSON(c *gin.Context) {
-	paste, err := database.GetPasteByName(c.Param("pasteName"))
+	pasteName := c.Param("pasteName")
+	paste, err := database.GetPasteByName(pasteName)
 	if err != nil {
 		c.JSON(http.StatusNotFound, gin.H{"error": "paste not found"})
 		return
 	}
-	database.UpdateReadCount(c.Param("pasteName"))
+	database.UpdateReadCount(pasteName)
 	c.JSON(http.StatusOK, paste)
 }
 
@@ -99,12 +98,13 @@ func RedirectHome(c *gin.Context) {
 }
 
 func HandleRaw(c *gin.Context) {
-	paste, err := database.GetPasteByName(c.Param("pasteName"))
+	pasteName := c.Param("pasteName")
+	paste, err := database.GetPasteByName(pasteName)
 	if err != nil {
 		c.String(http.StatusNotFound, "Paste not found")
 		return
 	}
-	database.UpdateReadCount(c.Param("pasteName"))
+	database.UpdateReadCount(pasteName)
 	c.String(http.StatusOK, paste.Content)
 }
 
@@ -117,7 +117,7 @@ func Redirect(c *gin.Context) {
 	}
 	database.UpdateReadCount(pasteName)
 	if paste.UrlRedirect == 0 {
-		c.Redirect(http.StatusFound, "/p/"+paste.PasteName)
+		c.Redirect(http.StatusFound, "/p/"+pasteName)
 		return
 	}
 	c.Redirect(http.StatusFound, paste.Content)

@@ -1,6 +1,6 @@
 <center>
     <h1>pawste</h1>
-    <a href="/new">new</a>
+    <a href="/">new</a>
     <a href="/list">list</a>
     <a href="/about">about</a>
 </center>

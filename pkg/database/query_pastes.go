@@ -88,7 +88,20 @@ func GetPublicRedirects() []paste.Paste {
 			"Expire",
 			"Privacy",
 			"BurnAfter",
-			"Syntax",
+		},
+	)
+}
+
+func GetAllPublicPastes() []paste.Paste {
+	return queryPastes(
+		"where Privacy = 'public'",
+		[]string{},
+		[]string{
+			"PasteName",
+			"Expire",
+			"Privacy",
+			"BurnAfter",
+			"UrlRedirect",
 		},
 	)
 }
