@@ -1,42 +1,122 @@
+<script>
+    let selectedExpiration = "never";
+    let selectedBurnAfter = "never";
+    let selectedSyntax = "none";
+    let selectedPrivacy = "public";
+    let attachedFiles = [];
+
+    function handleAttachFiles(event) {
+        const files = event.target.files;
+        for (let file of files) {
+            attachedFiles = [
+                ...attachedFiles,
+                { name: file.name, size: file.size },
+            ];
+        }
+    }
+
+    function handleSave() {
+        const data = {
+            expiration: selectedExpiration,
+            burnAfter: selectedBurnAfter,
+            syntax: selectedSyntax,
+            privacy: selectedPrivacy,
+            files: attachedFiles,
+        };
+        console.log("Data saved:", data);
+        alert("Data saved successfully!");
+    }
+
+    function removeFile(index) {
+        attachedFiles = attachedFiles.filter((_, i) => i !== index);
+    }
+
+    function truncateFilename(filename, maxLength = 30) {
+        const extIndex = filename.lastIndexOf(".");
+        const name = filename.substring(0, extIndex);
+        const ext = filename.substring(extIndex);
+
+        if (name.length + ext.length <= maxLength) {
+            return filename;
+        }
+
+        const charsToShow = maxLength - ext.length - 3;
+        const startChars = Math.ceil(charsToShow / 2);
+        const endChars = Math.floor(charsToShow / 2);
+
+        return (
+            name.substring(0, startChars) +
+            "..." +
+            name.substring(name.length - endChars) +
+            ext
+        );
+    }
+</script>
+
 <div id="container">
     <div class="card">
         <div class="options">
             <div>
                 <label for="expiration">Expiration:</label>
-                <select id="expiration">
+                <select id="expiration" bind:value={selectedExpiration}>
                     <option value="never">Never</option>
                     <option value="1h">1 Hour</option>
                     <option value="6h">6 Hours</option>
                     <option value="1d">1 Day</option>
+                    <option value="3d">3 Days</option>
                     <option value="7d">7 Days</option>
                 </select>
             </div>
             <div>
                 <label for="burn-after">Burn After:</label>
-                <select id="burn-after">
+                <select id="burn-after" bind:value={selectedBurnAfter}>
                     <option value="never">Never</option>
                     <option value="1view">1 View</option>
                     <option value="10view">10 Views</option>
+                    <option value="100view">100 Views</option>
+                    <option value="1000view">1000 Views</option>
                 </select>
             </div>
             <div>
                 <label for="syntax">Syntax:</label>
-                <select id="syntax">
+                <select id="syntax" bind:value={selectedSyntax}>
                     <option value="none">None</option>
                 </select>
             </div>
             <div>
                 <label for="privacy">Privacy:</label>
-                <select id="privacy">
+                <select id="privacy" bind:value={selectedPrivacy}>
                     <option value="public">Public</option>
                     <option value="unlisted">Unlisted</option>
+                    <option value="readonly">Read-only</option>
+                    <option value="private">Private</option>
+                    <option value="secret">Secret</option>
                 </select>
             </div>
         </div>
-        <textarea></textarea>
+        <textarea placeholder="Pawste away"></textarea>
         <div class="buttons">
-            <button>Attach File</button>
-            <button>Save</button>
+            <input
+                type="file"
+                multiple
+                on:change={handleAttachFiles}
+                style="display: none;"
+                id="file-input" />
+            <button
+                on:click={() => document.getElementById("file-input").click()}
+                >Attach Files</button>
+            <button on:click={handleSave}>Save</button>
+        </div>
+        <div class="file-list">
+            {#each attachedFiles as file, index}
+                <div class="file-item">
+                    <span
+                        >{truncateFilename(file.name)} - {(
+                            file.size / 1024
+                        ).toFixed(2)} KB</span>
+                    <button on:click={() => removeFile(index)}>Remove</button>
+                </div>
+            {/each}
         </div>
     </div>
 </div>
@@ -98,6 +178,7 @@
     textarea {
         width: 99%;
         height: 200px;
+        min-height: 200px; /* Ensures a minimum height */
         font-family: var(--code-font);
         background-color: #1b1b22;
         color: white;
@@ -126,6 +207,47 @@
     }
 
     button:hover {
+        background-color: var(--main-color-dark);
+    }
+
+    .file-list {
+        display: flex;
+        flex-direction: column;
+        gap: 10px;
+        margin-top: 1%;
+    }
+
+    .file-item {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        background-color: #3a3a3a;
+        border-radius: 5px;
+        padding: 10px;
+        color: white;
+    }
+
+    .file-item span {
+        font-family: var(--code-font);
+        flex-grow: 1;
+        margin-right: 10px;
+        overflow: hidden;
+        white-space: nowrap;
+        text-overflow: ellipsis;
+    }
+
+    .file-item button {
+        background-color: var(--main-color);
+        color: white;
+        border: none;
+        padding: 5px 10px;
+        border-radius: 5px;
+        cursor: pointer;
+        font-family: var(--main-font);
+        font-size: var(--font-size);
+    }
+
+    .file-item button:hover {
         background-color: var(--main-color-dark);
     }
 
