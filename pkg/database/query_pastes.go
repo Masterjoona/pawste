@@ -99,8 +99,7 @@ func GetAllPublicPastes() []paste.Paste {
 		[]string{
 			"PasteName",
 			"Expire",
-			"Privacy",
-			"BurnAfter",
+			"ReadCount",
 			"UrlRedirect",
 		},
 	)

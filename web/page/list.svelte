@@ -1,5 +1,6 @@
 <script>
     export let pastes;
+    console.log(pastes);
 </script>
 
 <div id="spacemaker"></div>
@@ -9,13 +10,21 @@
             <tr>
                 <th>Name</th>
                 <th>Views</th>
+                <th>Expire</th>
                 <th><i class="fa-solid fa-maximize"></i></th>
             </tr>
-            {#each pastes as { ID, PasteName, ReadCount }}
+            {#each pastes as { PasteName, ReadCount, Expire, UrlRedirect }}
                 <tr>
                     <td>{PasteName}</td>
+                    <td>{Expire} <i class="fa-solid fa-clock"></i></td>
                     <td>{ReadCount} <i class="fa-solid fa-eye"></i></td>
-                    <td><a href="/p/{PasteName}">View</a></td>
+                    <td>
+                        {#if UrlRedirect === 1}
+                            <a href="/u/{UrlRedirect}">Go to URL</a>
+                        {:else}
+                            <a href="/p/{PasteName}">View</a>
+                        {/if}
+                    </td>
                 </tr>
             {/each}
         </table>
