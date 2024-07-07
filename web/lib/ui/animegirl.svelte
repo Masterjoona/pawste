@@ -32,4 +32,10 @@
         right: -2%;
         margin: 10px;
     }
+
+    @media (max-width: 600px) {
+        .anime-girl {
+            max-height: 13%;
+        }
+    }
 </style>

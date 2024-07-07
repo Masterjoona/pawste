@@ -60,12 +60,12 @@ func main() {
 	r.GET("/p/:pasteName/raw", handling.HandlePasteRaw)
 	r.GET("/p/:pasteName/json", handling.HandlePasteJSON)
 	r.GET("/p", handling.RedirectHome)
+	r.POST("/p", handling.HandleSubmit)
 
 	r.GET("/u/:pasteName", handling.Redirect)
 
 	r.GET("/e/:pasteName", handling.HandleEdit)
 
-	r.POST("/submit", handling.HandleSubmit)
 	r.PATCH("/p/:pasteName", handling.HandleUpdate)
 
 	r.GET("/admin", handling.HandlePage(gin.H{"Admin": true}, handling.AdminHandler, "PasteLists"))

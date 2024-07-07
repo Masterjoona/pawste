@@ -28,11 +28,20 @@ func HandlePage(
 
 func HandlePastePage(c *gin.Context) {
 	pasteName := c.Param("pasteName")
+	readIt := c.Query("read")
 	paste, err := database.GetPasteByName(pasteName)
 	if err != nil {
 		c.Redirect(http.StatusFound, "/")
 		return
 	}
+
+	if paste.BurnAfter == 1 && readIt == "" {
+		golte.RenderPage(c.Writer, c.Request, "page/oneview", map[string]any{
+			"pasteName": pasteName,
+		})
+		return
+	}
+
 	golte.RenderPage(c.Writer, c.Request, "page/paste", map[string]any{
 		"paste": paste,
 	})

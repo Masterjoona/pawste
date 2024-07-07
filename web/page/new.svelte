@@ -1,9 +1,13 @@
 <script>
+    import { toast } from "@zerodevx/svelte-toast";
+
     let selectedExpiration = "never";
     let selectedBurnAfter = "never";
     let selectedSyntax = "none";
     let selectedPrivacy = "public";
+    let content = "";
     let attachedFiles = [];
+    let password = "";
 
     function handleAttachFiles(event) {
         const files = event.target.files;
@@ -16,12 +20,39 @@
     }
 
     function handleSave() {
+        if (content === "" && attachedFiles.length === 0) {
+            toast.push("You must provide content or attach files!", {
+                theme: {
+                    "--toastColor": "mintcream",
+                    "--toastBackground": "rgba(255,0,0,0.9)",
+                    "--toastBarBackground": "red",
+                },
+            });
+            return;
+        }
+
+        const encrypted =
+            selectedPrivacy === "private" || selectedPrivacy === "secret";
+
+        if (encrypted && password === "") {
+            toast.push("You must provide a password for encrypted pastes!", {
+                theme: {
+                    "--toastColor": "mintcream",
+                    "--toastBackground": "rgba(255,0,0,0.9)",
+                    "--toastBarBackground": "red",
+                },
+            });
+
+            return;
+        }
         const data = {
             expiration: selectedExpiration,
             burnAfter: selectedBurnAfter,
             syntax: selectedSyntax,
             privacy: selectedPrivacy,
+            content: content,
             files: attachedFiles,
+            password: encrypted ? password : null,
         };
         console.log("Data saved:", data);
         alert("Data saved successfully!");
@@ -50,6 +81,16 @@
             name.substring(name.length - endChars) +
             ext
         );
+    }
+
+    function handlePrivacyChange(event) {
+        selectedPrivacy = event.target.value;
+        const passwordField = document.getElementById("password-field");
+        if (selectedPrivacy === "private" || selectedPrivacy === "secret") {
+            passwordField.style.display = "block";
+        } else {
+            passwordField.style.display = "none";
+        }
     }
 </script>
 
@@ -85,7 +126,10 @@
             </div>
             <div>
                 <label for="privacy">Privacy:</label>
-                <select id="privacy" bind:value={selectedPrivacy}>
+                <select
+                    id="privacy"
+                    bind:value={selectedPrivacy}
+                    on:change={handlePrivacyChange}>
                     <option value="public">Public</option>
                     <option value="unlisted">Unlisted</option>
                     <option value="readonly">Read-only</option>
@@ -93,8 +137,16 @@
                     <option value="secret">Secret</option>
                 </select>
             </div>
+            <div id="password-field">
+                <label for="password">Password:</label>
+                <input
+                    type="password"
+                    id="password"
+                    on:input={(e) => (password = e.target.value)} />
+            </div>
         </div>
-        <textarea placeholder="Pawste away"></textarea>
+
+        <textarea placeholder="Pawste away" bind:value={content}></textarea>
         <div class="buttons">
             <input
                 type="file"
@@ -178,7 +230,7 @@
     textarea {
         width: 99%;
         height: 200px;
-        min-height: 200px; /* Ensures a minimum height */
+        min-height: 200px;
         font-family: var(--code-font);
         background-color: #1b1b22;
         color: white;
@@ -251,15 +303,27 @@
         background-color: var(--main-color-dark);
     }
 
+    #password-field {
+        margin-top: -0.1%;
+        display: none;
+    }
+
+    #password {
+        width: 40%;
+        padding: 5px;
+        border-radius: 5px;
+        border: 1px solid #444;
+        background-color: #1e1e1e;
+        color: white;
+        font-family: var(--main-font);
+        font-size: var(--font-size);
+    }
+
     @media (min-width: 600px) {
         .options {
             flex-direction: row;
             flex-wrap: wrap;
             gap: 20px;
-        }
-
-        .options div {
-            flex: 1;
         }
 
         textarea {

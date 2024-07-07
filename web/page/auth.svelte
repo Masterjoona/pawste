@@ -34,7 +34,7 @@
             }
         } catch (error) {
             console.error("An error occurred during authentication:", error);
-            toast.push("Try again?", {
+            toast.push("Something went wrong... Try again?", {
                 theme: {
                     "--toastColor": "mintcream",
                     "--toastBackground": "rgba(255,0,0,0.9)",
