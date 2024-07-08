@@ -1,5 +1,6 @@
 <script>
     import { toast } from "@zerodevx/svelte-toast";
+    import { truncateFilename } from "../lib/utils.js";
 
     let selectedExpiration = "1w";
     let selectedBurnAfter = "0";
@@ -7,12 +8,22 @@
     let selectedPrivacy = "public";
     let content = "";
     let attachedFiles = [];
+    let imageSources = [];
     let password = "";
 
     function handleAttachFiles(event) {
         const files = event.target.files;
         for (let file of files) {
             attachedFiles = [...attachedFiles, file];
+            if (file.type.startsWith("image/")) {
+                const reader = new FileReader();
+                reader.onload = (e) => {
+                    imageSources = [...imageSources, e.target.result];
+                };
+                reader.readAsDataURL(file);
+            } else {
+                imageSources = [...imageSources, null];
+            }
         }
     }
 
@@ -99,28 +110,6 @@
     function removeFile(index) {
         attachedFiles = attachedFiles.filter((_, i) => i !== index);
     }
-
-    function truncateFilename(filename, maxLength = 30) {
-        const extIndex = filename.lastIndexOf(".");
-        const name = filename.substring(0, extIndex);
-        const ext = filename.substring(extIndex);
-
-        if (name.length + ext.length <= maxLength) {
-            return filename;
-        }
-
-        const charsToShow = maxLength - ext.length - 3;
-        const startChars = Math.ceil(charsToShow / 2);
-        const endChars = Math.floor(charsToShow / 2);
-
-        return (
-            name.substring(0, startChars) +
-            "..." +
-            name.substring(name.length - endChars) +
-            ext
-        );
-    }
-
     function handlePrivacyChange(event) {
         selectedPrivacy = event.target.value;
         const passwordField = document.getElementById("password-field");
@@ -200,10 +189,17 @@
         <div class="file-list">
             {#each attachedFiles as file, index}
                 <div class="file-item">
-                    <span
-                        >{truncateFilename(file.name)} - {(
+                    {#if file.type.startsWith("image/")}
+                        <img
+                            src={imageSources[index]}
+                            alt={file.name}
+                            class="thumbnail" />
+                    {/if}
+                    <span>
+                        {truncateFilename(file.name)} - {(
                             file.size / 1024
-                        ).toFixed(2)} KB</span>
+                        ).toFixed(2)} KB
+                    </span>
                     <button on:click={() => removeFile(index)}>Remove</button>
                 </div>
             {/each}
@@ -315,6 +311,12 @@
         border-radius: 5px;
         padding: 10px;
         color: white;
+    }
+
+    .file-item img.thumbnail {
+        max-width: 50px;
+        max-height: 50px;
+        margin-right: 10px;
     }
 
     .file-item span {

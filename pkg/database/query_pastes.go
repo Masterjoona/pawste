@@ -9,7 +9,7 @@ import (
 )
 
 func queryPastes(addQuery string, valueArgs []string, scanVariables []string) []paste.Paste {
-	CleanUpExpiredPastes()
+	cleanUpExpiredPastes()
 
 	valueInterfaces := make([]interface{}, len(valueArgs))
 	for i, v := range valueArgs {

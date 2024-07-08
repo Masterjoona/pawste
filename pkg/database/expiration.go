@@ -8,7 +8,7 @@ import (
 	"github.com/romana/rlog"
 )
 
-func CleanUpExpiredPastes() {
+func cleanUpExpiredPastes() {
 	pastes, err := PasteDB.Query(
 		"select PasteName from pastes where Expire < datetime('now') or BurnAfter <= ReadCount and BurnAfter > 0",
 	)

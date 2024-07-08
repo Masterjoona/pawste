@@ -83,18 +83,50 @@ func HandleUpdate(c *gin.Context) {
 		c.JSON(http.StatusNotFound, gin.H{"error": "paste not found"})
 		return
 	}
-	var newPaste utils.Submit
+	pasteFiles := database.GetFiles(paste.PasteName)
+	isEncrypted := paste.Privacy == "private" || paste.Privacy == "secret"
+	var newPaste utils.PasteUpdate
 	if err := c.Bind(&newPaste); err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
 	}
-	if paste.Password != "" {
-		if paste.Password != database.HashPassword(newPaste.Password) {
-			c.JSON(http.StatusUnauthorized, gin.H{"error": "wrong password"})
-			return
+
+	if isEncrypted && paste.Password != database.HashPassword(newPaste.Password) {
+		c.JSON(http.StatusUnauthorized, gin.H{"error": "wrong password"})
+		return
+	}
+
+	if config.Config.MaxContentLength > 0 && len(newPaste.Content) > config.Config.MaxContentLength {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "content too long"})
+		return
+	}
+
+	currentFileSizeTotal := 0
+	for _, file := range pasteFiles {
+		currentFileSizeTotal += file.Size
+	}
+	filesToBeRemoved := newPaste.RemovedFiles
+	for _, file := range pasteFiles {
+		if filesToBeRemoved == nil {
+			break
+		}
+		for _, fileName := range filesToBeRemoved {
+			if fileName == file.Name {
+				currentFileSizeTotal -= file.Size
+			}
 		}
 	}
-	paste.Content = newPaste.Text
+
+	for _, file := range newPaste.Files {
+		currentFileSizeTotal += int(file.Size)
+	}
+
+	if config.Config.MaxFileSize > 0 && currentFileSizeTotal > config.Config.MaxFileSize {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "file size too big"})
+		return
+	}
+
+	paste.Content = newPaste.Content
 	paste.UpdatedAt = utils.GetCurrentDate()
 	err = database.UpdatePaste(paste)
 	if err != nil {
@@ -108,16 +140,15 @@ func HandleUpdate(c *gin.Context) {
 func HandleEdit(c *gin.Context) {
 	paste, err := database.GetPasteByName(c.Param("pasteName"))
 	if err != nil {
-		c.HTML(http.StatusNotFound, "main.html", gin.H{
-			"NotFound":      true,
-			"config.Config": config.Config,
-		})
+		c.Redirect(http.StatusFound, "/")
 		return
 	}
-	c.HTML(http.StatusOK, "main.html", gin.H{
-		"Edit":          paste,
-		"config.Config": config.Config,
+
+	golte.RenderPage(c.Writer, c.Request, "page/edit", map[string]any{
+		"paste": paste,
+		"files": database.GetFiles(paste.PasteName),
 	})
+
 }
 
 func RedirectHome(c *gin.Context) {

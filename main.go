@@ -60,7 +60,6 @@ func main() {
 	r.POST("/p/:pasteName/auth", handling.HandlePastePostAuth)
 	r.GET("/p/:pasteName/raw", handling.HandlePasteRaw)
 	r.GET("/p/:pasteName/json", handling.HandlePasteJSON)
-	r.GET("/p", handling.RedirectHome)
 	r.POST("/p", handling.HandleSubmit)
 
 	r.GET("/u/:pasteName", handling.Redirect)
@@ -74,6 +73,7 @@ func main() {
 	r.GET("/p/:pasteName/f/:fileName", handling.HandleFile)
 	r.GET("/p/:pasteName/f/:fileName/json", handling.HandleFileJson)
 
+	r.GET("/p", handling.RedirectHome)
 	r.GET("/u", handling.RedirectHome)
 	r.GET("/r", handling.RedirectHome)
 	r.GET("/e", handling.RedirectHome)

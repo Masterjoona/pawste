@@ -1,6 +1,8 @@
 package database
 
-import "github.com/Masterjoona/pawste/pkg/paste"
+import (
+	"github.com/Masterjoona/pawste/pkg/paste"
+)
 
 func UpdateReadCount(pasteName string) {
 	_, err := PasteDB.Exec(
@@ -11,12 +13,10 @@ func UpdateReadCount(pasteName string) {
 		panic(err)
 	}
 
-	if isAtBurnAfter(pasteName) {
-		println(pasteName, "should be deleted")
-	}
+	burnIfNeeded(pasteName)
 }
 
-func isAtBurnAfter(pasteName string) bool {
+func burnIfNeeded(pasteName string) {
 	row := PasteDB.QueryRow(
 		"select case when BurnAfter <= ReadCount and BurnAfter > 0 then 1 else 0 end from pastes where PasteName = ?",
 		pasteName,
@@ -26,7 +26,9 @@ func isAtBurnAfter(pasteName string) bool {
 	if err != nil {
 		panic(err)
 	}
-	return burned == 1
+	if burned == 1 {
+		cleanUpExpiredPastes()
+	}
 }
 
 func updatePasteContent(paste paste.Paste) error {

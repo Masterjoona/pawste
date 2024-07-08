@@ -9,7 +9,7 @@ import (
 )
 
 func queryFiles(addQuery string, valueArgs []string, scanVariables []string) []paste.File {
-	CleanUpExpiredPastes()
+	cleanUpExpiredPastes()
 
 	valueInterfaces := make([]interface{}, len(valueArgs))
 	for i, v := range valueArgs {

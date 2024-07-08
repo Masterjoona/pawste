@@ -13,3 +13,10 @@ type Submit struct {
 	Privacy    string                  `form:"privacy,omitempty"`
 	Files      []*multipart.FileHeader `form:"file,omitempty"`
 }
+
+type PasteUpdate struct {
+	Content      string                  `form:"content,omitempty"`
+	Password     string                  `form:"password,omitempty"`
+	Files        []*multipart.FileHeader `form:"file,omitempty"`
+	RemovedFiles []string                `form:"removed_files,omitempty"`
+}
