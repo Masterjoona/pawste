@@ -1,6 +1,7 @@
 <script>
     import { toast } from "@zerodevx/svelte-toast";
     import { truncateFilename } from "../lib/utils.js";
+    import "../styles/paste.css";
 
     let selectedExpiration = "1w";
     let selectedBurnAfter = "0";
@@ -208,31 +209,6 @@
 </div>
 
 <style>
-    :root {
-        --font-size: 1.2em;
-    }
-
-    #container {
-        height: 100%;
-        width: 100%;
-        display: flex;
-        justify-content: center;
-        align-items: center;
-        font-family: var(--main-font);
-    }
-
-    .card {
-        width: 90%;
-        max-height: 90%;
-        display: flex;
-        justify-content: center;
-        align-items: center;
-        flex-direction: column;
-        background-color: #2a2a2a;
-        border-radius: 10px;
-        padding: 16px;
-    }
-
     .options {
         display: flex;
         justify-content: space-evenly;
@@ -259,88 +235,6 @@
         border-radius: 5px;
         font-family: var(--main-font);
         font-size: var(--font-size);
-    }
-
-    textarea {
-        width: 99%;
-        height: 200px;
-        min-height: 200px;
-        font-family: var(--code-font);
-        background-color: #1b1b22;
-        color: white;
-        border: none;
-        border-radius: 10px;
-        padding: 10px;
-        resize: vertical;
-        margin-bottom: 10px;
-    }
-
-    .buttons {
-        display: flex;
-        width: 100%;
-        justify-content: space-evenly;
-    }
-
-    button {
-        background-color: var(--main-color);
-        color: white;
-        border: none;
-        padding: 10px 20px;
-        border-radius: 5px;
-        cursor: pointer;
-        font-family: var(--main-font);
-        font-size: var(--font-size);
-    }
-
-    button:hover {
-        background-color: var(--main-color-dark);
-    }
-
-    .file-list {
-        display: flex;
-        flex-direction: column;
-        gap: 10px;
-        margin-top: 1%;
-    }
-
-    .file-item {
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-        background-color: #3a3a3a;
-        border-radius: 5px;
-        padding: 10px;
-        color: white;
-    }
-
-    .file-item img.thumbnail {
-        max-width: 50px;
-        max-height: 50px;
-        margin-right: 10px;
-    }
-
-    .file-item span {
-        font-family: var(--code-font);
-        flex-grow: 1;
-        margin-right: 10px;
-        overflow: hidden;
-        white-space: nowrap;
-        text-overflow: ellipsis;
-    }
-
-    .file-item button {
-        background-color: var(--main-color);
-        color: white;
-        border: none;
-        padding: 5px 10px;
-        border-radius: 5px;
-        cursor: pointer;
-        font-family: var(--main-font);
-        font-size: var(--font-size);
-    }
-
-    .file-item button:hover {
-        background-color: var(--main-color-dark);
     }
 
     #password-field {
