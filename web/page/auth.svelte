@@ -1,60 +1,21 @@
 <script>
-    import { toast } from "@zerodevx/svelte-toast";
     let password = "";
 
-    async function handleSubmit(event) {
+    function handleSubmit(event) {
         event.preventDefault();
-        const formData = new FormData();
-        formData.append("password", password);
+        const form = document.createElement("form");
+        form.method = "POST";
+        form.action = location.pathname.slice(0, -5);
+        form.style.display = "none";
 
-        try {
-            const response = await fetch(location.pathname, {
-                method: "POST",
-                body: formData,
-            });
+        const passwordInput = document.createElement("input");
+        passwordInput.type = "hidden";
+        passwordInput.name = "password";
+        passwordInput.value = password;
+        form.appendChild(passwordInput);
 
-            if (response.ok) {
-                console.log("Authentication successful");
-                toast.push("Redirecting shortly!", {
-                    theme: {
-                        "--toastColor": "mintcream",
-                        "--toastBackground": "rgba(72,187,120,0.9)",
-                        "--toastBarBackground": "#2F855A",
-                    },
-                });
-                const form = document.createElement("form");
-                form.method = "POST";
-                form.action = location.pathname.slice(0, -5);
-                form.style.display = "none";
-
-                const passwordInput = document.createElement("input");
-                passwordInput.type = "hidden";
-                passwordInput.name = "password";
-                passwordInput.value = password;
-                form.appendChild(passwordInput);
-
-                document.body.appendChild(form);
-                form.submit();
-            } else {
-                console.log("Authentication failed");
-                toast.push("Wrong password!", {
-                    theme: {
-                        "--toastColor": "mintcream",
-                        "--toastBackground": "rgba(255,0,0,0.9)",
-                        "--toastBarBackground": "red",
-                    },
-                });
-            }
-        } catch (error) {
-            console.error("An error occurred during authentication:", error);
-            toast.push("Something went wrong... Try again?", {
-                theme: {
-                    "--toastColor": "mintcream",
-                    "--toastBackground": "rgba(255,0,0,0.9)",
-                    "--toastBarBackground": "red",
-                },
-            });
-        }
+        document.body.appendChild(form);
+        form.submit();
     }
 </script>
 

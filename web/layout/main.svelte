@@ -1,6 +1,7 @@
 <script>
     import "@fontsource-variable/fira-code";
     import "@fontsource/short-stack";
+    import "@fortawesome/fontawesome-free/css/all.css";
     import { SvelteToast } from "@zerodevx/svelte-toast";
 
     import "../app.css";
