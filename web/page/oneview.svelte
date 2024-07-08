@@ -2,7 +2,7 @@
     export let isEncrypted;
     export let password;
     let onYes = () => {
-        if (isEncrypted) {
+        if (!isEncrypted) {
             location.href += "?read=true";
         } else {
             const form = document.createElement("form");

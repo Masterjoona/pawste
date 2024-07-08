@@ -77,10 +77,5 @@ func UpdatePaste(paste paste.Paste) error {
 		return err
 	}
 
-	err = updatePasteFiles(paste)
-	if err != nil {
-		return err
-	}
-
-	return nil
+	return updatePasteFiles(paste)
 }

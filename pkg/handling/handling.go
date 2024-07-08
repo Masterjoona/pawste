@@ -40,8 +40,8 @@ func HandlePastePage(c *gin.Context) {
 
 	if paste.BurnAfter == 1 && c.Query("read") == "" {
 		golte.RenderPage(c.Writer, c.Request, "page/oneview", map[string]any{
-			"encrypted": isEncrypted,
-			"password":  password,
+			"isEncrypted": isEncrypted,
+			"password":    password,
 		})
 		return
 	}

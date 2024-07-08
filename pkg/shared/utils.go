@@ -31,7 +31,7 @@ func SubmitToPaste(submit Submit, pasteName string, isRedirect int) paste.Paste 
 		IsEncrypted: TernaryInt((submit.Password != ""), 1, 0),
 		ReadCount:   0,
 		ReadLast:    GetCurrentDate(),
-		BurnAfter:   TernaryInt(config.Config.BurnAfter, 0, submit.BurnAfter),
+		BurnAfter:   TernaryInt(config.Config.BurnAfter, submit.BurnAfter, 0),
 		Content:     submit.Text,
 		Syntax:      submit.Syntax,
 		Password:    submit.Password,
