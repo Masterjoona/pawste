@@ -9,7 +9,7 @@ import (
 	"io"
 	"math"
 
-	"github.com/Masterjoona/pawste/pkg/shared/config"
+	"github.com/Masterjoona/pawste/pkg/config"
 	"golang.org/x/crypto/pbkdf2"
 )
 

@@ -3,7 +3,7 @@ package database
 import (
 	"database/sql"
 
-	"github.com/Masterjoona/pawste/pkg/shared/config"
+	"github.com/Masterjoona/pawste/pkg/config"
 	_ "github.com/mattn/go-sqlite3"
 )
 

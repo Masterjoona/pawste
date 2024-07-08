@@ -3,9 +3,9 @@ package handling
 import (
 	"net/http"
 
+	"github.com/Masterjoona/pawste/pkg/config"
 	"github.com/Masterjoona/pawste/pkg/database"
-	"github.com/Masterjoona/pawste/pkg/shared"
-	"github.com/Masterjoona/pawste/pkg/shared/config"
+	"github.com/Masterjoona/pawste/pkg/utils"
 	"github.com/gin-gonic/gin"
 	"github.com/nichady/golte"
 	"github.com/romana/rlog"
@@ -83,7 +83,7 @@ func HandleUpdate(c *gin.Context) {
 		c.JSON(http.StatusNotFound, gin.H{"error": "paste not found"})
 		return
 	}
-	var newPaste shared.Submit
+	var newPaste utils.Submit
 	if err := c.Bind(&newPaste); err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
@@ -95,7 +95,7 @@ func HandleUpdate(c *gin.Context) {
 		}
 	}
 	paste.Content = newPaste.Text
-	paste.UpdatedAt = shared.GetCurrentDate()
+	paste.UpdatedAt = utils.GetCurrentDate()
 	err = database.UpdatePaste(paste)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})

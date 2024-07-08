@@ -1,4 +1,4 @@
-package shared
+package utils
 
 import (
 	"io"
@@ -6,8 +6,8 @@ import (
 	"regexp"
 	"time"
 
+	"github.com/Masterjoona/pawste/pkg/config"
 	"github.com/Masterjoona/pawste/pkg/paste"
-	"github.com/Masterjoona/pawste/pkg/shared/config"
 )
 
 func SubmitToPaste(submit Submit, pasteName string, isRedirect int) paste.Paste {

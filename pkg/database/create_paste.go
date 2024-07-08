@@ -4,9 +4,9 @@ import (
 	"database/sql"
 	"os"
 
+	"github.com/Masterjoona/pawste/pkg/config"
 	"github.com/Masterjoona/pawste/pkg/paste"
-	"github.com/Masterjoona/pawste/pkg/shared"
-	"github.com/Masterjoona/pawste/pkg/shared/config"
+	"github.com/Masterjoona/pawste/pkg/utils"
 	_ "github.com/mattn/go-sqlite3"
 	"github.com/romana/rlog"
 )
@@ -36,7 +36,7 @@ func CreatePaste(paste paste.Paste) error {
 		}
 	}
 
-	NewPassword := shared.TernaryString(encrypt, HashPassword(paste.Password), "")
+	NewPassword := utils.TernaryString(encrypt, HashPassword(paste.Password), "")
 
 	_, err = stmt.Exec(
 		paste.PasteName,

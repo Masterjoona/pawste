@@ -5,9 +5,9 @@ import (
 	"net/http"
 	"strconv"
 
+	"github.com/Masterjoona/pawste/pkg/config"
 	"github.com/Masterjoona/pawste/pkg/database"
-	"github.com/Masterjoona/pawste/pkg/shared"
-	"github.com/Masterjoona/pawste/pkg/shared/config"
+	"github.com/Masterjoona/pawste/pkg/utils"
 	"github.com/gin-gonic/gin"
 )
 
@@ -23,10 +23,10 @@ func HandleSubmit(c *gin.Context) {
 		return
 	}
 
-	isRedirect := shared.IsContentJustUrl(submit.Text)
+	isRedirect := utils.IsContentJustUrl(submit.Text)
 	pasteName := database.CreatePasteName(isRedirect)
 
-	paste := shared.SubmitToPaste(submit, pasteName, isRedirect)
+	paste := utils.SubmitToPaste(submit, pasteName, isRedirect)
 	err = database.CreatePaste(paste)
 	if err != nil {
 		println(err.Error())
@@ -38,8 +38,8 @@ func HandleSubmit(c *gin.Context) {
 	})
 }
 
-func parseSubmitForm(c *gin.Context) (shared.Submit, error) {
-	var submit shared.Submit
+func parseSubmitForm(c *gin.Context) (utils.Submit, error) {
+	var submit utils.Submit
 	submit.Text = c.PostForm("content")
 	submit.Expiration = c.PostForm("expiration")
 	submit.Password = c.PostForm("password")
@@ -47,20 +47,20 @@ func parseSubmitForm(c *gin.Context) (shared.Submit, error) {
 	submit.Privacy = c.PostForm("privacy")
 	burnAfterInt, err := strconv.Atoi(c.PostForm("burnafter"))
 	if err != nil {
-		return shared.Submit{}, errors.New("burnafter must be an integer")
+		return utils.Submit{}, errors.New("burnafter must be an integer")
 	}
 	submit.BurnAfter = burnAfterInt
 
 	form, err := c.MultipartForm()
 	if err != nil {
-		return shared.Submit{}, errors.New("form error: " + err.Error())
+		return utils.Submit{}, errors.New("form error: " + err.Error())
 	}
 
 	submit.Files = form.File["files[]"]
 	return submit, nil
 }
 
-func validateSubmit(submit *shared.Submit) error {
+func validateSubmit(submit *utils.Submit) error {
 	hasFiles := len(submit.Files) > 0
 	if submit.Text == "" && !hasFiles {
 		return errors.New("text or file is required")
@@ -70,7 +70,7 @@ func validateSubmit(submit *shared.Submit) error {
 		return errors.New("password is required for private or secret pastes")
 	}
 
-	if shared.NotAllowedPrivacy(submit.Privacy) {
+	if utils.NotAllowedPrivacy(submit.Privacy) {
 		return errors.New("invalid privacy")
 	}
 

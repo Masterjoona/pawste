@@ -5,9 +5,9 @@ import (
 	"net/http"
 
 	"github.com/Masterjoona/pawste/pkg/build"
+	"github.com/Masterjoona/pawste/pkg/config"
 	"github.com/Masterjoona/pawste/pkg/database"
 	"github.com/Masterjoona/pawste/pkg/handling"
-	"github.com/Masterjoona/pawste/pkg/shared/config"
 
 	"github.com/gin-gonic/gin"
 	"github.com/nichady/golte"
