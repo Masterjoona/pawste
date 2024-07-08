@@ -2,6 +2,7 @@
     import { toast } from "@zerodevx/svelte-toast";
     import { copy } from "svelte-copy";
     export let paste;
+    export let files;
     const successToast = (msg) => {
         toast.push(msg, {
             theme: {
@@ -11,6 +12,31 @@
             },
         });
     };
+
+    function truncateFilename(filename, maxLength = 30) {
+        const extIndex = filename.lastIndexOf(".");
+        const name = filename.substring(0, extIndex);
+        const ext = filename.substring(extIndex);
+
+        if (name.length + ext.length <= maxLength) {
+            return filename;
+        }
+
+        const charsToShow = maxLength - ext.length - 3;
+        const startChars = Math.ceil(charsToShow / 2);
+        const endChars = Math.floor(charsToShow / 2);
+
+        return (
+            name.substring(0, startChars) +
+            "..." +
+            name.substring(name.length - endChars) +
+            ext
+        );
+    }
+
+    function viewFile(filename) {
+        window.open("/p/" + paste.PasteName + "/f/" + filename);
+    }
 </script>
 
 <div id="container">
@@ -43,6 +69,17 @@
                 on:svelte-copy={() => {
                     successToast("URL copied!");
                 }}>Copy URL</button>
+        </div>
+        <div class="file-list">
+            {#each files as file}
+                <div class="file-item">
+                    <span
+                        >{truncateFilename(file.Name)} - {(
+                            file.Size / 1024
+                        ).toFixed(2)} KB</span>
+                    <button on:click={() => viewFile(file.Name)}>View</button>
+                </div>
+            {/each}
         </div>
     </div>
 </div>

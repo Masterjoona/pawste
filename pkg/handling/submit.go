@@ -2,6 +2,7 @@ package handling
 
 import (
 	"errors"
+	"fmt"
 	"net/http"
 	"strconv"
 
@@ -18,7 +19,7 @@ func HandleSubmit(c *gin.Context) {
 		return
 	}
 
-	if err := validateSubmit(&submit); err != nil {
+	if err = validateSubmit(&submit); err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
 	}
@@ -26,48 +27,44 @@ func HandleSubmit(c *gin.Context) {
 	isRedirect := shared.IsContentJustUrl(submit.Text)
 	pasteName := database.CreatePasteName(isRedirect)
 
-	c.JSON(http.StatusOK, gin.H{
-		"text":       submit.Text,
-		"expiration": submit.Expiration,
-		"burn":       submit.BurnAfter,
-		"syntax":     submit.Syntax,
-		"privacy":    submit.Privacy,
-		"file":       "file",
-		"pasteUrl":   pasteName,
-	})
-
 	paste := shared.SubmitToPaste(submit, pasteName, isRedirect)
 	err = database.CreatePaste(paste)
 	if err != nil {
 		println(err.Error())
 		return
 	}
+
+	c.JSON(http.StatusOK, gin.H{
+		"pasteName": pasteName,
+	})
 }
 
 func parseSubmitForm(c *gin.Context) (shared.Submit, error) {
 	var submit shared.Submit
-	submit.Text = c.PostForm("text")
+	submit.Text = c.PostForm("content")
 	submit.Expiration = c.PostForm("expiration")
 	submit.Password = c.PostForm("password")
 	submit.Syntax = c.PostForm("syntax")
 	submit.Privacy = c.PostForm("privacy")
-	burnInt, err := strconv.Atoi(c.PostForm("burn"))
+	burnAfterInt, err := strconv.Atoi(c.PostForm("burnafter"))
 	if err != nil {
-		return shared.Submit{}, errors.New("burn must be an integer")
+		return shared.Submit{}, errors.New("burnafter must be an integer")
 	}
-	submit.BurnAfter = burnInt
+	submit.BurnAfter = burnAfterInt
 
 	form, err := c.MultipartForm()
 	if err != nil {
 		return shared.Submit{}, errors.New("form error: " + err.Error())
 	}
 
-	submit.Files = form.File["file"]
+	submit.Files = form.File["files[]"]
+	fmt.Println(form.File["files[]"])
 	return submit, nil
 }
 
 func validateSubmit(submit *shared.Submit) error {
-	if submit.Text == "" && len(submit.Files) == 0 {
+	hasFiles := len(submit.Files) > 0
+	if submit.Text == "" && !hasFiles {
 		return errors.New("text or file is required")
 	}
 	encrypt := (submit.Privacy == "private" || submit.Privacy == "secret")
@@ -79,7 +76,7 @@ func validateSubmit(submit *shared.Submit) error {
 		return errors.New("invalid privacy")
 	}
 
-	if config.Config.DisableEternalPaste && submit.Expiration == "never" {
+	if !config.Config.EternalPaste && submit.Expiration == "never" {
 		submit.Expiration = "1w"
 	}
 
@@ -87,7 +84,7 @@ func validateSubmit(submit *shared.Submit) error {
 		return errors.New("content is too long")
 	}
 
-	if config.Config.MaxFileSize > 0 && len(submit.Files) > 0 {
+	if !encrypt && hasFiles && config.Config.MaxFileSize > 0 {
 		totalSize := 0
 		for _, file := range submit.Files {
 			if file == nil {
@@ -100,7 +97,7 @@ func validateSubmit(submit *shared.Submit) error {
 		}
 	}
 
-	if config.Config.MaxEncryptionSize > 0 && encrypt && len(submit.Files) > 0 {
+	if encrypt && hasFiles && config.Config.MaxEncryptionSize > 0 {
 		totalSize := 0
 		for _, file := range submit.Files {
 			if file == nil {

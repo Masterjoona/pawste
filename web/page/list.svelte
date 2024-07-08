@@ -20,7 +20,7 @@
                     <td>{ReadCount} <i class="fa-solid fa-eye"></i></td>
                     <td>
                         {#if UrlRedirect === 1}
-                            <a href="/u/{UrlRedirect}">Go to URL</a>
+                            <a href="/u/{PasteName}">Go to URL</a>
                         {:else}
                             <a href="/p/{PasteName}">View</a>
                         {/if}

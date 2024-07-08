@@ -8,3 +8,4 @@ pkg/build/*
 *.upx
 pawste_data
 *.png
+.env

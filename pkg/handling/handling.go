@@ -28,22 +28,22 @@ func HandlePage(
 
 func HandlePastePage(c *gin.Context) {
 	pasteName := c.Param("pasteName")
-	readIt := c.Query("read")
 	paste, err := database.GetPasteByName(pasteName)
 	if err != nil {
 		c.Redirect(http.StatusFound, "/")
 		return
 	}
 
-	if paste.BurnAfter == 1 && readIt == "" {
-		golte.RenderPage(c.Writer, c.Request, "page/oneview", map[string]any{
-			"pasteName": pasteName,
-		})
+	fileMeta := database.GetFiles(pasteName)
+
+	if paste.BurnAfter == 1 && c.Query("read") == "" {
+		gin.WrapH(golte.Page("page/oneview"))
 		return
 	}
 
 	golte.RenderPage(c.Writer, c.Request, "page/paste", map[string]any{
 		"paste": paste,
+		"files": fileMeta,
 	})
 	database.UpdateReadCount(pasteName)
 }
@@ -144,7 +144,7 @@ func Redirect(c *gin.Context) {
 	c.Redirect(http.StatusFound, paste.Content)
 }
 
-func HandleFile(c *gin.Context) {
+func HandleFileJson(c *gin.Context) {
 	paste, err := database.GetPasteByName(c.Param("pasteName"))
 	if err != nil {
 		c.JSON(http.StatusNotFound, gin.H{"error": "paste not found"})
@@ -156,6 +156,20 @@ func HandleFile(c *gin.Context) {
 		return
 	}
 	c.JSON(http.StatusOK, file)
+}
+
+func HandleFile(c *gin.Context) {
+	paste, err := database.GetPasteByName(c.Param("pasteName"))
+	if err != nil {
+		c.JSON(http.StatusNotFound, gin.H{"error": "paste not found"})
+		return
+	}
+	fileDb, err := database.GetFile(paste.PasteName, c.Param("fileName"))
+	if err != nil {
+		c.JSON(http.StatusNotFound, gin.H{"error": "file not found"})
+		return
+	}
+	c.File(config.Config.DataDir + "/" + paste.PasteName + "/" + fileDb.Name)
 }
 
 // funny

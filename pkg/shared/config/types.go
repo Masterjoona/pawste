@@ -10,12 +10,12 @@ type ConfigEnv struct {
 	PublicURL  string
 
 	DefaultExpiryTime     string
-	NoFileUpload          bool
+	FileUpload            bool
 	MaxFileSize           int
 	MaxEncryptionSize     int
 	MaxContentLength      int
 	UploadingPassword     string
-	DisableEternalPaste   bool
+	EternalPaste          bool
 	DisableReadCount      bool
 	DisableBurnAfter      bool
 	DefaultExpiry         string

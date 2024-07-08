@@ -1,8 +1,8 @@
 <script>
     import { toast } from "@zerodevx/svelte-toast";
 
-    let selectedExpiration = "never";
-    let selectedBurnAfter = "never";
+    let selectedExpiration = "1w";
+    let selectedBurnAfter = "0";
     let selectedSyntax = "none";
     let selectedPrivacy = "public";
     let content = "";
@@ -12,14 +12,11 @@
     function handleAttachFiles(event) {
         const files = event.target.files;
         for (let file of files) {
-            attachedFiles = [
-                ...attachedFiles,
-                { name: file.name, size: file.size },
-            ];
+            attachedFiles = [...attachedFiles, file];
         }
     }
 
-    function handleSave() {
+    async function handleSave() {
         if (content === "" && attachedFiles.length === 0) {
             toast.push("You must provide content or attach files!", {
                 theme: {
@@ -45,7 +42,7 @@
 
             return;
         }
-        const data = {
+        /*const data = {
             expiration: selectedExpiration,
             burnAfter: selectedBurnAfter,
             syntax: selectedSyntax,
@@ -55,7 +52,47 @@
             password: encrypted ? password : null,
         };
         console.log("Data saved:", data);
-        alert("Data saved successfully!");
+        alert("Data saved successfully!");*/
+        const formData = new FormData();
+        formData.append("expire", selectedExpiration);
+        formData.append("burnafter", selectedBurnAfter);
+        formData.append("syntax", selectedSyntax);
+        formData.append("privacy", selectedPrivacy);
+        formData.append("content", content);
+        formData.append("password", password);
+        console.log(attachedFiles);
+        for (let file of attachedFiles) {
+            formData.append("files[]", file);
+        }
+
+        const response = await (
+            await fetch("/p", {
+                method: "POST",
+                body: formData,
+            })
+        ).json();
+
+        if (response?.error) {
+            toast.push(response.error, {
+                theme: {
+                    "--toastColor": "mintcream",
+                    "--toastBackground": "rgba(255,0,0,0.9)",
+                    "--toastBarBackground": "red",
+                },
+            });
+        } else {
+            toast.push("Paste saved successfully! Redirecting...", {
+                theme: {
+                    "--toastColor": "mintcream",
+                    "--toastBackground": "rgba(0,255,0,0.9)",
+                    "--toastBarBackground": "green",
+                },
+            });
+
+            setTimeout(() => {
+                window.location.href = `/p/${response.pasteName}`;
+            }, 500);
+        }
     }
 
     function removeFile(index) {
@@ -105,17 +142,17 @@
                     <option value="6h">6 Hours</option>
                     <option value="1d">1 Day</option>
                     <option value="3d">3 Days</option>
-                    <option value="7d">7 Days</option>
+                    <option value="1w">1 week</option>
                 </select>
             </div>
             <div>
                 <label for="burn-after">Burn After:</label>
                 <select id="burn-after" bind:value={selectedBurnAfter}>
-                    <option value="never">Never</option>
-                    <option value="1view">1 View</option>
-                    <option value="10view">10 Views</option>
-                    <option value="100view">100 Views</option>
-                    <option value="1000view">1000 Views</option>
+                    <option value="0">Never</option>
+                    <option value="1">1 View</option>
+                    <option value="10">10 Views</option>
+                    <option value="100">100 Views</option>
+                    <option value="1000">1000 Views</option>
                 </select>
             </div>
             <div>

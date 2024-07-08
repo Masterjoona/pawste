@@ -72,7 +72,8 @@ func main() {
 	r.POST("/admin/reload-config", config.Config.ReloadConfig)
 
 	// for testing purposes
-	r.GET("/p/:pasteName/files/:fileName", handling.HandleFile)
+	r.GET("/p/:pasteName/f/:fileName", handling.HandleFile)
+	r.GET("/p/:pasteName/f/:fileName/json", handling.HandleFileJson)
 
 	r.GET("/u", handling.RedirectHome)
 	r.GET("/r", handling.RedirectHome)

@@ -6,10 +6,8 @@
             target="_blank">GitHub</a
         >! The backend (<a href="https://masterjoona.dev" target="_blank"
             >Joona</a
-        >) is written in Go and the frontend (<a
-            href="https://taro.tf"
-            target="_blank">Taro</a
-        >) is written in Svelte.
+        >) is written in Go and the frontend what is mostly written by my friend
+        is done in Svelte.
     </p>
     <p>
         Send us an email at <a href="mailto:team@pawst.eu">team@pawst.eu</a>!
