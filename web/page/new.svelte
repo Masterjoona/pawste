@@ -90,7 +90,8 @@
             });
 
             setTimeout(() => {
-                window.location.href = `/p/${response.pasteName}`;
+                window.location.href =
+                    `/p/${response.pasteName}` + (encrypted ? "/auth" : "");
             }, 500);
         }
     }

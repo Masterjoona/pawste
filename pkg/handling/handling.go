@@ -12,20 +12,6 @@ import (
 	"github.com/romana/rlog"
 )
 
-func HandlePage(
-	settings map[string]interface{},
-	function func() interface{},
-	value string,
-) gin.HandlerFunc {
-	settings["config.Config"] = config.Config
-	return func(c *gin.Context) {
-		if function != nil {
-			settings[value] = function()
-		}
-		c.HTML(http.StatusOK, "main.html", settings)
-	}
-}
-
 func HandlePastePage(c *gin.Context) {
 	pasteName := c.Param("pasteName")
 	paste, err := database.GetPasteByName(pasteName)
@@ -33,8 +19,25 @@ func HandlePastePage(c *gin.Context) {
 		c.Redirect(http.StatusFound, "/")
 		return
 	}
+	password := c.PostForm("password")
+	isEncrypted := paste.Privacy == "private" || paste.Privacy == "secret"
 
-	fileMeta := database.GetFiles(pasteName)
+	if isEncrypted && password == "" {
+		c.Redirect(http.StatusFound, "/p/"+pasteName+"/auth")
+		return
+	}
+
+	if isEncrypted && paste.Password != database.HashPassword(password) {
+		c.Redirect(http.StatusFound, "/p/"+pasteName+"/auth")
+		return
+	}
+
+	if isEncrypted {
+		println("decrypting")
+		println(paste.Content)
+		paste.Content = paste.DecryptText(password)
+		println(paste.Content)
+	}
 
 	if paste.BurnAfter == 1 && c.Query("read") == "" {
 		gin.WrapH(golte.Page("page/oneview"))
@@ -43,21 +46,22 @@ func HandlePastePage(c *gin.Context) {
 
 	golte.RenderPage(c.Writer, c.Request, "page/paste", map[string]any{
 		"paste": paste,
-		"files": fileMeta,
+		"files": database.GetFiles(pasteName),
 	})
 	database.UpdateReadCount(pasteName)
 }
 
-func HandlePasteAuth(c *gin.Context) {
-	pasteName := c.Param("pasteName")
-	paste, err := database.GetPasteByName(pasteName)
+func HandlePastePostAuth(c *gin.Context) {
+	paste, err := database.GetPasteByName(c.Param("pasteName"))
 	if err != nil {
 		c.Redirect(http.StatusFound, "/")
 		return
 	}
-	golte.RenderPage(c.Writer, c.Request, "page/auth", map[string]any{
-		"paste": paste,
-	})
+	if paste.Password != database.HashPassword(c.PostForm("password")) {
+		c.JSON(http.StatusUnauthorized, gin.H{"error": "wrong password"})
+		return
+	}
+	c.JSON(http.StatusOK, gin.H{"password": "correct"})
 }
 
 func HandlePasteJSON(c *gin.Context) {

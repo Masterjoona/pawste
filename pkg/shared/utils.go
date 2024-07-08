@@ -25,10 +25,10 @@ func SubmitToPaste(submit Submit, pasteName string, isRedirect int) paste.Paste 
 
 	return paste.Paste{
 		PasteName:   pasteName,
-		Expire:      HumanTimeToSQLTime(submit.Expiration),
+		Expire:      humanTimeToSQLTime(submit.Expiration),
 		Privacy:     submit.Privacy,
-		IsEncrypted: 0,
-		ReadCount:   1,
+		IsEncrypted: TernaryInt((submit.Password != ""), 1, 0),
+		ReadCount:   0,
 		ReadLast:    GetCurrentDate(),
 		BurnAfter:   submit.BurnAfter,
 		Content:     submit.Text,
@@ -55,7 +55,7 @@ func convertMultipartFile(file *multipart.FileHeader) (string, int, []byte) {
 	return file.Filename, len(fileBlob), fileBlob
 }
 
-func HumanTimeToSQLTime(humanTime string) string {
+func humanTimeToSQLTime(humanTime string) string {
 	var duration time.Duration
 	duration = 7 * 24 * time.Hour
 	switch humanTime {
@@ -99,6 +99,13 @@ func NotAllowedPrivacy(x string) bool {
 }
 
 func TernaryString(condition bool, trueVal, falseVal string) string {
+	if condition {
+		return trueVal
+	}
+	return falseVal
+}
+
+func TernaryInt(condition bool, trueVal, falseVal int) int {
 	if condition {
 		return trueVal
 	}

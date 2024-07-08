@@ -82,8 +82,8 @@ func Decrypt(password string, fileBlob []byte) ([]byte, error) {
 	return fileBlob[:len(decryptedFileBytes)], nil
 }
 
-func (p *Paste) EncryptText() error {
-	key := deriveKey(p.Password)
+func (p *Paste) EncryptText(password string) error {
+	key := deriveKey(password)
 	nonce := make([]byte, 12)
 
 	if _, err := io.ReadFull(rand.Reader, nonce); err != nil {
@@ -109,13 +109,13 @@ func (p *Paste) EncryptText() error {
 	return nil
 }
 
-func (p *Paste) DecryptText() string {
+func (p *Paste) DecryptText(password string) string {
 	ciphertext, err := hex.DecodeString(p.Content)
 	if err != nil {
 		panic(err)
 	}
 
-	key := deriveKey(p.Password)
+	key := deriveKey(password)
 	salt := ciphertext[len(ciphertext)-12:]
 	str := hex.EncodeToString(salt)
 

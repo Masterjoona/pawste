@@ -46,7 +46,6 @@ func main() {
 	r.Use(layout("layout/main"))
 
 	r.GET("/", page("page/new"))
-	r.GET("/password", page("page/password"))
 	r.GET("/list", func(ctx *gin.Context) {
 		golte.RenderPage(ctx.Writer, ctx.Request, "page/list", map[string]any{
 			"pastes": database.GetAllPublicPastes(),
@@ -56,7 +55,9 @@ func main() {
 	r.GET("/guide", page("page/guide"))
 
 	r.GET("/p/:pasteName", handling.HandlePastePage)
-	r.GET("/p/auth/:pasteName", handling.HandlePasteAuth)
+	r.POST("/p/:pasteName", handling.HandlePastePage) // for auth
+	r.GET("/p/:pasteName/auth", page("page/auth"))
+	r.POST("/p/:pasteName/auth", handling.HandlePastePostAuth)
 	r.GET("/p/:pasteName/raw", handling.HandlePasteRaw)
 	r.GET("/p/:pasteName/json", handling.HandlePasteJSON)
 	r.GET("/p", handling.RedirectHome)
@@ -68,10 +69,8 @@ func main() {
 
 	r.PATCH("/p/:pasteName", handling.HandleUpdate)
 
-	r.GET("/admin", handling.HandlePage(gin.H{"Admin": true}, handling.AdminHandler, "PasteLists"))
 	r.POST("/admin/reload-config", config.Config.ReloadConfig)
 
-	// for testing purposes
 	r.GET("/p/:pasteName/f/:fileName", handling.HandleFile)
 	r.GET("/p/:pasteName/f/:fileName/json", handling.HandleFileJson)
 

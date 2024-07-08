@@ -2,7 +2,6 @@ package handling
 
 import (
 	"errors"
-	"fmt"
 	"net/http"
 	"strconv"
 
@@ -58,7 +57,6 @@ func parseSubmitForm(c *gin.Context) (shared.Submit, error) {
 	}
 
 	submit.Files = form.File["files[]"]
-	fmt.Println(form.File["files[]"])
 	return submit, nil
 }
 

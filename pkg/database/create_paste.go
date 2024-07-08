@@ -30,7 +30,7 @@ func CreatePaste(paste paste.Paste) error {
 	encrypt := (paste.Privacy == "private" || paste.Privacy == "secret") &&
 		paste.Password != ""
 	if encrypt {
-		err = paste.EncryptText()
+		err = paste.EncryptText(paste.Password)
 		if err != nil {
 			return err
 		}

@@ -8,7 +8,7 @@
         formData.append("password", password);
 
         try {
-            const response = await fetch("/p/auth/thing", {
+            const response = await fetch(location.pathname, {
                 method: "POST",
                 body: formData,
             });
@@ -22,6 +22,19 @@
                         "--toastBarBackground": "#2F855A",
                     },
                 });
+                const form = document.createElement("form");
+                form.method = "POST";
+                form.action = location.pathname.slice(0, -5);
+                form.style.display = "none";
+
+                const passwordInput = document.createElement("input");
+                passwordInput.type = "hidden";
+                passwordInput.name = "password";
+                passwordInput.value = password;
+                form.appendChild(passwordInput);
+
+                document.body.appendChild(form);
+                form.submit();
             } else {
                 console.log("Authentication failed");
                 toast.push("Wrong password!", {
