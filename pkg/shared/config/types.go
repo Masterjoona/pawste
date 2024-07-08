@@ -21,5 +21,6 @@ type ConfigEnv struct {
 	DefaultExpiry         string
 	ShortPasteNames       bool
 	ShortenRedirectPastes bool
+	CountFileUsage        bool
 	IUnderstandTheRisks   bool
 }

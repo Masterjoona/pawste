@@ -1,8 +1,26 @@
 <script>
-    export let onYes = () => {
-        location.href += "?read=true";
+    export let isEncrypted;
+    export let password;
+    let onYes = () => {
+        if (isEncrypted) {
+            location.href += "?read=true";
+        } else {
+            const form = document.createElement("form");
+            form.method = "POST";
+            form.action = location.pathname + "?read=true";
+            form.style.display = "none";
+
+            const passwordInput = document.createElement("input");
+            passwordInput.type = "hidden";
+            passwordInput.name = "password";
+            passwordInput.value = password;
+            form.appendChild(passwordInput);
+
+            document.body.appendChild(form);
+            form.submit();
+        }
     };
-    export let onNo = () => {
+    let onNo = () => {
         location.href = "/";
     };
 </script>

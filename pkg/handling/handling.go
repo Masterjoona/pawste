@@ -4,7 +4,6 @@ import (
 	"net/http"
 
 	"github.com/Masterjoona/pawste/pkg/database"
-	"github.com/Masterjoona/pawste/pkg/paste"
 	"github.com/Masterjoona/pawste/pkg/shared"
 	"github.com/Masterjoona/pawste/pkg/shared/config"
 	"github.com/gin-gonic/gin"
@@ -40,7 +39,10 @@ func HandlePastePage(c *gin.Context) {
 	}
 
 	if paste.BurnAfter == 1 && c.Query("read") == "" {
-		gin.WrapH(golte.Page("page/oneview"))
+		golte.RenderPage(c.Writer, c.Request, "page/oneview", map[string]any{
+			"encrypted": isEncrypted,
+			"password":  password,
+		})
 		return
 	}
 
@@ -173,17 +175,9 @@ func HandleFile(c *gin.Context) {
 		c.JSON(http.StatusNotFound, gin.H{"error": "file not found"})
 		return
 	}
-	c.File(config.Config.DataDir + "/" + paste.PasteName + "/" + fileDb.Name)
-}
 
-// funny
-func AdminHandler() interface{} {
-	return database.GetAllPastes()
-}
-
-func ListHandler() interface{} {
-	return paste.PasteLists{
-		Pastes:    database.GetPublicPastes(),
-		Redirects: database.GetPublicRedirects(),
+	if config.Config.CountFileUsage {
+		database.UpdateReadCount(paste.PasteName)
 	}
+	c.File(config.Config.DataDir + "/" + paste.PasteName + "/" + fileDb.Name)
 }
