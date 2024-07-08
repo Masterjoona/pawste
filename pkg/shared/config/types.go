@@ -16,8 +16,8 @@ type ConfigEnv struct {
 	MaxContentLength      int
 	UploadingPassword     string
 	EternalPaste          bool
-	DisableReadCount      bool
-	DisableBurnAfter      bool
+	ReadCount             bool
+	BurnAfter             bool
 	DefaultExpiry         string
 	ShortPasteNames       bool
 	ShortenRedirectPastes bool

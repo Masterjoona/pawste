@@ -7,6 +7,7 @@ import (
 	"time"
 
 	"github.com/Masterjoona/pawste/pkg/paste"
+	"github.com/Masterjoona/pawste/pkg/shared/config"
 )
 
 func SubmitToPaste(submit Submit, pasteName string, isRedirect int) paste.Paste {
@@ -30,7 +31,7 @@ func SubmitToPaste(submit Submit, pasteName string, isRedirect int) paste.Paste 
 		IsEncrypted: TernaryInt((submit.Password != ""), 1, 0),
 		ReadCount:   0,
 		ReadLast:    GetCurrentDate(),
-		BurnAfter:   submit.BurnAfter,
+		BurnAfter:   TernaryInt(config.Config.BurnAfter, 0, submit.BurnAfter),
 		Content:     submit.Text,
 		Syntax:      submit.Syntax,
 		Password:    submit.Password,

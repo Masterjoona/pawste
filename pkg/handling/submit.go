@@ -107,6 +107,5 @@ func validateSubmit(submit *shared.Submit) error {
 			return errors.New("file size is too large for encryption")
 		}
 	}
-
 	return nil
 }
