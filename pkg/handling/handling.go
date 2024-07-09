@@ -15,34 +15,28 @@ import (
 
 func HandlePastePage(c *gin.Context) {
 	pasteName := c.Param("pasteName")
-	paste, err := database.GetPasteByName(pasteName)
+	queriedPaste, err := database.GetPasteByName(pasteName)
 	if err != nil {
 		c.Redirect(http.StatusFound, "/")
 		return
 	}
 
-	password := c.PostForm("password")
-	isEncrypted := paste.IsEncrypted == 1
-	if isEncrypted && (password == "" || !isValidPassword(password, paste.Password)) {
-		c.Redirect(http.StatusFound, "/p/"+pasteName+"/auth")
-		return
-	}
-
+	isEncrypted := queriedPaste.IsEncrypted == 1
 	if isEncrypted {
-		paste.Content = paste.DecryptText(password)
-	}
-
-	if paste.BurnAfter == 1 && c.Query("read") == "" {
-		golte.RenderPage(c.Writer, c.Request, "page/oneview", map[string]any{
-			"isEncrypted": isEncrypted,
-			"password":    password,
+		golte.RenderPage(c.Writer, c.Request, "page/paste", map[string]any{
+			"isEncrypted": true,
+			"paste":       paste.Paste{},
 		})
 		return
 	}
 
+	if queriedPaste.BurnAfter == 1 && c.Query("read") == "" {
+		golte.RenderPage(c.Writer, c.Request, "page/oneview", nil)
+		return
+	}
+	queriedPaste.Files = database.GetFiles(pasteName)
 	golte.RenderPage(c.Writer, c.Request, "page/paste", map[string]any{
-		"paste": paste,
-		"files": database.GetFiles(pasteName),
+		"paste": queriedPaste,
 	})
 	database.UpdateReadCount(pasteName)
 }
@@ -76,6 +70,8 @@ func HandlePasteJSON(c *gin.Context) {
 	if isEncrypted {
 		paste.Content = paste.DecryptText(reqPassword)
 	}
+
+	paste.Files = database.GetFiles(pasteName)
 
 	database.UpdateReadCount(pasteName)
 	c.JSON(http.StatusOK, paste)

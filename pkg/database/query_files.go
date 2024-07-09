@@ -45,7 +45,6 @@ func GetFiles(pasteName string) []paste.File {
 		"where PasteName = ?",
 		[]string{pasteName},
 		[]string{
-			"ID",
 			"Name",
 			"Size",
 			"ContentType",
@@ -58,7 +57,6 @@ func GetFile(pasteName string, fileName string) (paste.File, error) {
 		"where PasteName = ? and Name = ?",
 		[]string{pasteName, fileName},
 		[]string{
-			"ID",
 			"Name",
 			"Size",
 			"ContentType",

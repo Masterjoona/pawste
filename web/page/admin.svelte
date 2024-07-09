@@ -1,38 +1,9 @@
 <script>
-    import { prettifyFileSize } from "../lib/utils";
-    import { toast } from "@zerodevx/svelte-toast";
+    import { deletePaste, prettifyFileSize, successToast } from "../lib/utils";
     import "../styles/buttons.css";
 
     export let config;
     export let pastes;
-    export let password;
-    console.log(pastes);
-    console.log(password);
-
-    async function deletePaste(pasteName) {
-        const resp = await fetch(`/p/${pasteName}`, {
-            method: "DELETE",
-            body: JSON.stringify({ password }),
-        });
-        if (!resp.ok) {
-            toast.push("Failed to delete!", {
-                theme: {
-                    "--toastColor": "mintcream",
-                    "--toastBackground": "rgba(255,0,0,0.9)",
-                    "--toastBarBackground": "red",
-                },
-            });
-        } else {
-            toast.push(msg, {
-                theme: {
-                    "--toastColor": "mintcream",
-                    "--toastBackground": "rgba(72,187,120,0.9)",
-                    "--toastBarBackground": "#2F855A",
-                },
-            });
-            // todo remove from the table
-        }
-    }
 </script>
 
 <div id="admin-container">
@@ -89,8 +60,11 @@
                             on:click={() =>
                                 (window.location.href = "/e/" + PasteName)}
                             >Edit</button
-                        ><button on:click={() => deletePaste(PasteName)}
-                            >Delete</button
+                        ><button
+                            on:click={() =>
+                                deletePaste(PasteName, () =>
+                                    successToast(`Deleted ${PasteName}!`),
+                                )}>Delete</button
                         ></td>
                 </tr>
             {/each}
@@ -140,8 +114,6 @@
         flex: 1 1 calc(50% - 20px);
     }
 
-    #uploads-section,
-    #url-redirects-section,
     #env-vars-section {
         flex: 1 1 100%;
         margin-top: 20px;

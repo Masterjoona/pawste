@@ -1,48 +1,66 @@
 <script>
-    import { toast } from "@zerodevx/svelte-toast";
     import { copy } from "svelte-copy";
+
     import {
+        failToast,
+        prettifyFileSize,
+        successToast,
+        timeDifference,
         truncateFilename,
         viewFile,
-        timeDifference,
-        prettifyFileSize,
+        deletePaste,
     } from "../lib/utils.js";
-    import "../styles/paste.css";
-    import "../styles/file.css";
-    import "../styles/buttons.css";
 
+    import "../styles/buttons.css";
+    import "../styles/file.css";
+    import "../styles/password.css";
+    import "../styles/paste.css";
+
+    export let isEncrypted;
     export let paste;
-    export let files;
-    export let password;
-    const successToast = (msg) => {
-        toast.push(msg, {
-            theme: {
-                "--toastColor": "mintcream",
-                "--toastBackground": "rgba(72,187,120,0.9)",
-                "--toastBarBackground": "#2F855A",
-            },
-        });
-    };
-    async function deletePaste() {
-        const resp = await fetch(`/p/${paste.PasteName}`, {
-            method: "DELETE",
-            body: JSON.stringify({ password }),
-        });
-        if (!resp.ok) {
-            toast.push("Failed to delete!", {
-                theme: {
-                    "--toastColor": "mintcream",
-                    "--toastBackground": "rgba(255,0,0,0.9)",
-                    "--toastBarBackground": "red",
-                },
-            });
+    let inputPassword = "";
+    let showContent = !isEncrypted;
+    const triedPasswds = [];
+
+    async function fetchPaste() {
+        if (inputPassword === "") {
+            failToast("Password cannot be empty!");
+            return;
+        } else if (triedPasswds.includes(inputPassword)) {
+            failToast("Password already tried!");
+            return;
         } else {
-            location.href = "/";
+            const resp = await fetch(
+                `/p/${window?.location?.pathname?.split("/").pop()}/json`,
+                {
+                    method: "GET",
+                    headers: {
+                        password: inputPassword,
+                    },
+                },
+            );
+            if (resp.ok) {
+                const data = await resp.json();
+                paste = { ...data };
+                showContent = true;
+            } else {
+                failToast("Incorrect password!");
+                triedPasswds.push(inputPassword);
+            }
         }
     }
 </script>
 
-<div id="container">
+{#if isEncrypted && !showContent}
+    <div class="overlay"></div>
+    <div class="password-prompt">
+        <label for="password">Enter password:</label>
+        <input type="password" id="password" bind:value={inputPassword} />
+        <button on:click={fetchPaste}>Submit</button>
+    </div>
+{/if}
+
+<div id="container" class:blur={isEncrypted && !showContent}>
     <div class="card">
         <div class="properties">
             <h>{paste.PasteName}</h>
@@ -75,10 +93,13 @@
                 on:svelte-copy={() => {
                     successToast("URL copied!");
                 }}>Copy URL</button>
-            <button on:click={deletePaste}>Delete</button>
+            <button
+                on:click={() =>
+                    deletePaste(paste.PasteName, () => (location.href = "/"))}
+                >Delete</button>
         </div>
         <div class="file-list">
-            {#each files as file}
+            {#each paste.Files as file}
                 <div class="file-item">
                     <span
                         >{truncateFilename(file.Name)} - {prettifyFileSize(

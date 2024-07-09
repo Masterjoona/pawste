@@ -1,9 +1,13 @@
 <script>
-    import { toast } from "@zerodevx/svelte-toast";
-    import { truncateFilename, prettifyFileSize } from "../lib/utils.js";
-    import "../styles/paste.css";
+    import {
+        prettifyFileSize,
+        truncateFilename,
+        failToast,
+        successToast,
+    } from "../lib/utils.js";
     import "../styles/buttons.css";
     import "../styles/file.css";
+    import "../styles/paste.css";
 
     let selectedExpiration = "1w";
     let selectedBurnAfter = "0";
@@ -32,13 +36,7 @@
 
     async function handleSave() {
         if (content === "" && attachedFiles.length === 0) {
-            toast.push("You must provide content or attach files!", {
-                theme: {
-                    "--toastColor": "mintcream",
-                    "--toastBackground": "rgba(255,0,0,0.9)",
-                    "--toastBarBackground": "red",
-                },
-            });
+            failToast("You must provide content or attach files!");
             return;
         }
 
@@ -46,14 +44,7 @@
             selectedPrivacy === "private" || selectedPrivacy === "secret";
 
         if (encrypted && password === "") {
-            toast.push("You must provide a password for encrypted pastes!", {
-                theme: {
-                    "--toastColor": "mintcream",
-                    "--toastBackground": "rgba(255,0,0,0.9)",
-                    "--toastBarBackground": "red",
-                },
-            });
-
+            failToast("You must provide a password for encrypted pastes!");
             return;
         }
 
@@ -77,22 +68,9 @@
         ).json();
 
         if (response?.error) {
-            toast.push(response.error, {
-                theme: {
-                    "--toastColor": "mintcream",
-                    "--toastBackground": "rgba(255,0,0,0.9)",
-                    "--toastBarBackground": "red",
-                },
-            });
+            failToast(response?.error);
         } else {
-            toast.push("Paste saved successfully! Redirecting...", {
-                theme: {
-                    "--toastColor": "mintcream",
-                    "--toastBackground": "rgba(0,255,0,0.9)",
-                    "--toastBarBackground": "green",
-                },
-            });
-
+            successToast("Paste saved successfully!");
             setTimeout(() => {
                 window.location.href =
                     `/p/${response.pasteName}` + (encrypted ? "/auth" : "");

@@ -1,14 +1,14 @@
 <script>
     import {
+        failToast,
+        prettifyFileSize,
+        timeDifference,
         truncateFilename,
         viewFile,
-        timeDifference,
-        prettifyFileSize,
     } from "../lib/utils.js";
-    import { toast } from "@zerodevx/svelte-toast";
-    import "../styles/paste.css";
     import "../styles/buttons.css";
     import "../styles/file.css";
+    import "../styles/paste.css";
 
     export let paste;
     export let files;
@@ -59,13 +59,7 @@
         const noNewFiles = !newFiles.length;
         console.log(files, removedFiles, newFiles, newContent);
         if (!files.length && noNewFiles && !newContent) {
-            toast.push("You must provide content or attach files!", {
-                theme: {
-                    "--toastColor": "mintcream",
-                    "--toastBackground": "rgba(255,0,0,0.9)",
-                    "--toastBarBackground": "red",
-                },
-            });
+            failToast("You must provide content or attach files!");
             return;
         }
         if (
@@ -73,24 +67,12 @@
             noNewFiles &&
             !removedFiles.length
         ) {
-            toast.push("No changes detected!", {
-                theme: {
-                    "--toastColor": "mintcream",
-                    "--toastBackground": "rgba(255,0,0,0.9)",
-                    "--toastBarBackground": "red",
-                },
-            });
+            failToast("No changes detected!");
             return;
         }
 
         if (filenamesConflict()) {
-            toast.push("Filenames conflict!", {
-                theme: {
-                    "--toastColor": "mintcream",
-                    "--toastBackground": "rgba(255,0,0,0.9)",
-                    "--toastBarBackground": "red",
-                },
-            });
+            failToast("Filenames conflict!");
             return;
         }
 
@@ -110,13 +92,7 @@
         });
 
         if (!resp.ok) {
-            toast.push("Failed to save!", {
-                theme: {
-                    "--toastColor": "mintcream",
-                    "--toastBackground": "rgba(255,0,0,0.9)",
-                    "--toastBarBackground": "red",
-                },
-            });
+            failToast("Failed to save!");
         } else {
             location.href = `/p/${paste.PasteName}`;
         }

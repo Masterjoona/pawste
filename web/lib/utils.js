@@ -1,3 +1,5 @@
+import { toast } from "@zerodevx/svelte-toast";
+
 export function truncateFilename(filename, maxLength = 30) {
     const extIndex = filename.lastIndexOf(".");
     const name = filename.substring(0, extIndex);
@@ -74,4 +76,36 @@ export function prettifyFileSize(size) {
     if (size < 1024 * 1024 * 1024)
         return (size / (1024 * 1024)).toFixed(2) + " MB";
     return (size / (1024 * 1024 * 1024)).toFixed(2) + " GB";
+}
+
+export const successToast = (msg) => {
+    toast.push(msg, {
+        theme: {
+            "--toastColor": "mintcream",
+            "--toastBackground": "rgba(72,187,120,0.9)",
+            "--toastBarBackground": "#2F855A",
+        },
+    });
+};
+
+export const failToast = (msg) => {
+    toast.push(msg, {
+        theme: {
+            "--toastColor": "mintcream",
+            "--toastBackground": "rgba(255,0,0,0.9)",
+            "--toastBarBackground": "red",
+        },
+    });
+};
+
+export async function deletePaste(pasteName, successFunc) {
+    const resp = await fetch(`/p/${pasteName}`, {
+        method: "DELETE",
+        body: JSON.stringify({ password }),
+    });
+    if (!resp.ok) {
+        failToast("Failed to delete paste!");
+    } else {
+        successFunc();
+    }
 }
