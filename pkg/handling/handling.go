@@ -270,5 +270,27 @@ func HandleFile(c *gin.Context) {
 		database.UpdateReadCount(queriedPaste.PasteName)
 	}
 	c.File(filePath)
+}
 
+func HandlePasteDelete(c *gin.Context) {
+	queriedPaste, err := database.GetPasteByName(c.Param("pasteName"))
+	if err != nil {
+		c.JSON(http.StatusNotFound, gin.H{"error": "paste not found"})
+		return
+	}
+
+	reqPassword := c.Param("password")
+	isEncrypted := (queriedPaste.Privacy == "private" || queriedPaste.Privacy == "secret")
+	if verifyAccess(isEncrypted, reqPassword, queriedPaste.Password) {
+		c.JSON(http.StatusUnauthorized, gin.H{"error": "wrong password"})
+		return
+	}
+
+	err = database.DeletePaste(queriedPaste.PasteName)
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		return
+	}
+
+	c.JSON(http.StatusOK, gin.H{"message": "paste deleted"})
 }

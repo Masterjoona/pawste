@@ -11,6 +11,7 @@
 
     export let paste;
     export let files;
+    export let password;
     const successToast = (msg) => {
         toast.push(msg, {
             theme: {
@@ -20,6 +21,24 @@
             },
         });
     };
+
+    async function deletePaste() {
+        // I think its fine to have password in the URL since it's a delete request
+        const resp = await fetch(`/p/${paste.PasteName}?password=${password}`, {
+            method: "DELETE",
+        });
+        if (!resp.ok) {
+            toast.push("Failed to delete!", {
+                theme: {
+                    "--toastColor": "mintcream",
+                    "--toastBackground": "rgba(255,0,0,0.9)",
+                    "--toastBarBackground": "red",
+                },
+            });
+        } else {
+            location.href = "/";
+        }
+    }
 </script>
 
 <div id="container">
@@ -55,6 +74,7 @@
                 on:svelte-copy={() => {
                     successToast("URL copied!");
                 }}>Copy URL</button>
+            <button on:click={deletePaste}>Delete</button>
         </div>
         <div class="file-list">
             {#each files as file}

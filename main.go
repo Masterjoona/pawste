@@ -13,7 +13,6 @@ import (
 	"github.com/romana/rlog"
 )
 
-
 var wrapMiddleware = func(middleware func(http.Handler) http.Handler) func(ctx *gin.Context) {
 	return func(ctx *gin.Context) {
 		middleware(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
@@ -62,6 +61,7 @@ func main() {
 	r.POST("/p/:pasteName/auth", handling.HandlePastePostAuth)
 	r.GET("/p/:pasteName/raw", handling.HandlePasteRaw)
 	r.GET("/p/:pasteName/json", handling.HandlePasteJSON)
+	r.DELETE("/p/:pasteName", handling.HandlePasteDelete)
 	r.POST("/p", handling.HandleSubmit)
 
 	r.GET("/u/:pasteName", handling.Redirect)
