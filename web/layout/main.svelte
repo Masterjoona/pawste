@@ -19,7 +19,7 @@
         <slot />
     </main>
 
-    <div id="footer">
+    <div>
         <Animegirl />
         <Footer />
     </div>
@@ -32,11 +32,6 @@
         display: flex;
         flex-direction: column;
         align-items: center;
-    }
-    #footer {
-        position: absolute;
-        bottom: 0px;
-        right: 0px;
     }
     main {
         width: 80vw;

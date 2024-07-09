@@ -20,10 +20,10 @@ func HandlePastePage(c *gin.Context) {
 		c.Redirect(http.StatusFound, "/")
 		return
 	}
-	password := c.PostForm("password")
-	isEncrypted := paste.Privacy == "private" || paste.Privacy == "secret"
 
-	if isEncrypted && (password == "" || paste.Password != database.HashPassword(password)) {
+	password := c.PostForm("password")
+	isEncrypted := paste.IsEncrypted == 1
+	if isEncrypted && (password == "" || !isValidPassword(password, paste.Password)) {
 		c.Redirect(http.StatusFound, "/p/"+pasteName+"/auth")
 		return
 	}
@@ -68,8 +68,8 @@ func HandlePasteJSON(c *gin.Context) {
 		return
 	}
 	reqPassword := c.Request.Header.Get("password")
-	isEncrypted := (paste.Privacy == "private" || paste.Privacy == "secret")
-	if verifyAccess(isEncrypted, reqPassword, paste.Password) {
+	isEncrypted := paste.IsEncrypted == 1
+	if isEncrypted && !isValidPassword(reqPassword, paste.Password) {
 		c.JSON(http.StatusUnauthorized, gin.H{"error": "wrong password"})
 		return
 	}
@@ -182,8 +182,8 @@ func HandlePasteRaw(c *gin.Context) {
 	}
 
 	reqPassword := c.Request.Header.Get("password")
-	isEncrypted := (paste.Privacy == "private" || paste.Privacy == "secret")
-	if verifyAccess(isEncrypted, reqPassword, paste.Password) {
+	isEncrypted := paste.IsEncrypted == 1
+	if isEncrypted && !isValidPassword(reqPassword, paste.Password) {
 		c.JSON(http.StatusUnauthorized, gin.H{"error": "wrong password"})
 		return
 	}
@@ -218,8 +218,8 @@ func HandleFileJson(c *gin.Context) {
 	}
 
 	reqPassword := c.Request.Header.Get("password")
-	isEncrypted := (paste.Privacy == "private" || paste.Privacy == "secret")
-	if verifyAccess(isEncrypted, reqPassword, paste.Password) {
+	isEncrypted := paste.IsEncrypted == 1
+	if isEncrypted && !isValidPassword(reqPassword, paste.Password) {
 		c.JSON(http.StatusUnauthorized, gin.H{"error": "wrong password"})
 		return
 	}
@@ -240,8 +240,9 @@ func HandleFile(c *gin.Context) {
 	}
 
 	reqPassword := c.Request.Header.Get("password")
-	isEncrypted := (queriedPaste.Privacy == "private" || queriedPaste.Privacy == "secret")
-	if verifyAccess(isEncrypted, reqPassword, queriedPaste.Password) {
+
+	isEncrypted := queriedPaste.IsEncrypted == 1
+	if isEncrypted && !isValidPassword(reqPassword, queriedPaste.Password) {
 		c.JSON(http.StatusUnauthorized, gin.H{"error": "wrong password"})
 		return
 	}
@@ -271,26 +272,39 @@ func HandleFile(c *gin.Context) {
 	}
 	c.File(filePath)
 }
-
 func HandlePasteDelete(c *gin.Context) {
-	queriedPaste, err := database.GetPasteByName(c.Param("pasteName"))
+	pasteName := c.Param("pasteName")
+	queriedPaste, err := database.GetPasteByName(pasteName)
 	if err != nil {
 		c.JSON(http.StatusNotFound, gin.H{"error": "paste not found"})
 		return
 	}
 
-	reqPassword := c.Param("password")
-	isEncrypted := (queriedPaste.Privacy == "private" || queriedPaste.Privacy == "secret")
-	if verifyAccess(isEncrypted, reqPassword, queriedPaste.Password) {
-		c.JSON(http.StatusUnauthorized, gin.H{"error": "wrong password"})
-		return
+	if queriedPaste.IsEncrypted == 1 {
+		var deletePasswd utils.PasswordJSON
+		if err := c.ShouldBindJSON(&deletePasswd); err != nil {
+			c.JSON(http.StatusBadRequest, gin.H{"error": "no password"})
+			return
+		}
+
+		if !isValidPassword(deletePasswd.Password, queriedPaste.Password) && deletePasswd.Password != config.Config.AdminPassword {
+			c.JSON(http.StatusUnauthorized, gin.H{"error": "wrong password"})
+			return
+		}
 	}
 
-	err = database.DeletePaste(queriedPaste.PasteName)
-	if err != nil {
+	if err := database.DeletePaste(pasteName); err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 		return
 	}
 
 	c.JSON(http.StatusOK, gin.H{"message": "paste deleted"})
+}
+
+func HandleAdmin(c *gin.Context) {
+	golte.RenderPage(c.Writer, c.Request, "page/admin", map[string]any{
+		"config":   config.Config,
+		"pastes":   database.GetAllPastes(),
+		"password": "admin",
+	})
 }

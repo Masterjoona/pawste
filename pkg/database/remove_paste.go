@@ -5,7 +5,6 @@ import (
 
 	"github.com/Masterjoona/pawste/pkg/config"
 	_ "github.com/mattn/go-sqlite3"
-	"github.com/romana/rlog"
 )
 
 func removePaste(pasteName string) error {
@@ -26,7 +25,7 @@ func removePaste(pasteName string) error {
 	if err != nil {
 		return err
 	}
-	rlog.Info("Removed paste from database", pasteName)
+	//rlog.Info("Removed paste from database", pasteName)
 	return nil
 }
 
@@ -48,7 +47,7 @@ func removeFiles(pasteName string) error {
 	if err != nil {
 		return err
 	}
-	rlog.Info("Removed files from db for paste", pasteName)
+	//rlog.Info("Removed files from db for paste", pasteName)
 
 	return os.RemoveAll(config.Config.DataDir + pasteName)
 }

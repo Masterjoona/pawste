@@ -5,9 +5,11 @@
         truncateFilename,
         viewFile,
         timeDifference,
+        prettifyFileSize,
     } from "../lib/utils.js";
     import "../styles/paste.css";
     import "../styles/file.css";
+    import "../styles/buttons.css";
 
     export let paste;
     export let files;
@@ -21,11 +23,10 @@
             },
         });
     };
-
     async function deletePaste() {
-        // I think its fine to have password in the URL since it's a delete request
-        const resp = await fetch(`/p/${paste.PasteName}?password=${password}`, {
+        const resp = await fetch(`/p/${paste.PasteName}`, {
             method: "DELETE",
+            body: JSON.stringify({ password }),
         });
         if (!resp.ok) {
             toast.push("Failed to delete!", {
@@ -80,9 +81,9 @@
             {#each files as file}
                 <div class="file-item">
                     <span
-                        >{truncateFilename(file.Name)} - {(
-                            file.Size / 1024
-                        ).toFixed(2)} KB</span>
+                        >{truncateFilename(file.Name)} - {prettifyFileSize(
+                            file.Size,
+                        )}</span>
                     <button
                         on:click={() => viewFile(paste.PasteName, file.Name)}
                         >View</button>

@@ -24,22 +24,22 @@ func SubmitToPaste(submit Submit, pasteName string, isRedirect int) paste.Paste 
 			ContentType: file.Header.Get("Content-Type"),
 		})
 	}
-
+	todaysDate := GetCurrentDate()
 	return paste.Paste{
 		PasteName:   pasteName,
 		Expire:      humanTimeToSQLTime(submit.Expiration),
 		Privacy:     submit.Privacy,
 		IsEncrypted: TernaryInt((submit.Password != ""), 1, 0),
 		ReadCount:   0,
-		ReadLast:    GetCurrentDate(),
+		ReadLast:    todaysDate,
 		BurnAfter:   TernaryInt(config.Config.BurnAfter, submit.BurnAfter, 0),
 		Content:     submit.Text,
 		Syntax:      submit.Syntax,
 		Password:    submit.Password,
 		Files:       files,
 		UrlRedirect: isRedirect,
-		CreatedAt:   GetCurrentDate(),
-		UpdatedAt:   GetCurrentDate(),
+		CreatedAt:   todaysDate,
+		UpdatedAt:   todaysDate,
 	}
 }
 

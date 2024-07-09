@@ -70,6 +70,7 @@ func main() {
 
 	r.PATCH("/p/:pasteName", handling.HandleUpdate)
 
+	r.GET("/admin", handling.HandleAdmin)
 	r.POST("/admin/reload-config", config.Config.ReloadConfig)
 
 	r.GET("/p/:pasteName/f/:fileName", handling.HandleFile)

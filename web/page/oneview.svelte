@@ -1,5 +1,6 @@
 <script>
     import "../styles/paste.css";
+    import "../styles/buttons.css";
 
     export let isEncrypted;
     export let password;

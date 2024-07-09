@@ -1,7 +1,8 @@
 <script>
     import { toast } from "@zerodevx/svelte-toast";
-    import { truncateFilename } from "../lib/utils.js";
+    import { truncateFilename, prettifyFileSize } from "../lib/utils.js";
     import "../styles/paste.css";
+    import "../styles/buttons.css";
     import "../styles/file.css";
 
     let selectedExpiration = "1w";
@@ -188,9 +189,9 @@
                             class="thumbnail" />
                     {/if}
                     <span>
-                        {truncateFilename(file.name)} - {(
-                            file.size / 1024
-                        ).toFixed(2)} KB
+                        {truncateFilename(file.name)} - {prettifyFileSize(
+                            file.size,
+                        )}
                     </span>
                     <button on:click={() => removeFile(index)}>Remove</button>
                 </div>

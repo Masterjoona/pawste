@@ -1,6 +1,5 @@
 <script>
     export let pastes;
-    console.log(pastes);
 </script>
 
 <div id="spacemaker"></div>

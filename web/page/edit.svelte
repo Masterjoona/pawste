@@ -3,9 +3,11 @@
         truncateFilename,
         viewFile,
         timeDifference,
+        prettifyFileSize,
     } from "../lib/utils.js";
     import { toast } from "@zerodevx/svelte-toast";
     import "../styles/paste.css";
+    import "../styles/buttons.css";
     import "../styles/file.css";
 
     export let paste;
@@ -156,9 +158,9 @@
             {#each files as file}
                 <div class="file-item">
                     <span
-                        >{truncateFilename(file.Name)} - {(
-                            file.Size / 1024
-                        ).toFixed(2)} KB</span>
+                        >{truncateFilename(file.Name)} - {prettifyFileSize(
+                            file.Size,
+                        )}</span>
                     <button on:click={() => removeOldFile(file.Name)}
                         >Remove</button>
                     <button
@@ -176,9 +178,9 @@
                             class="thumbnail" />
                     {/if}
                     <span
-                        >{truncateFilename(file.name)} - {(
-                            file.size / 1024
-                        ).toFixed(2)} KB</span>
+                        >{truncateFilename(file.name)} - {prettifyFileSize(
+                            file.size,
+                        )}</span>
                     <button on:click={() => removeNewFile(file.name)}
                         >Remove</button>
                 </div>

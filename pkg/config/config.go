@@ -18,14 +18,12 @@ const (
 )
 
 func (ConfigEnv) InitConfig() {
-	port := getEnv("PORT", ":9454")
 	Config = ConfigEnv{
 		Salt:                  getEnv("SALT", "banana"),
-		Port:                  port,
+		Port:                  getEnv("PORT", ":9454"),
 		DataDir:               getEnv("DATA_DIR", "pawste_data/"),
 		AdminPassword:         getEnv("ADMIN_PASSWORD", "admin"),
 		PublicList:            getEnv("PUBLIC_LIST", "true") == "true",
-		PublicURL:             getEnv("PUBLIC_URL", "http://localhost"+port),
 		FileUpload:            getEnv("FILE_UPLOAD", "true") == "true",
 		MaxFileSize:           getEnvInt("MAX_FILE_SIZE", "1024 * 1024 * 10"),
 		MaxEncryptionSize:     getEnvInt("MAX_ENCRYPTION_SIZE", "1024 * 1024 * 10"),

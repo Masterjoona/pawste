@@ -1,15 +1,11 @@
 package config
 
 type ConfigEnv struct {
-	Salt          string
-	Port          string
-	DataDir       string
-	AdminPassword string
-
-	PublicList bool
-	PublicURL  string
-
-	DefaultExpiryTime     string
+	Salt                  string
+	Port                  string
+	DataDir               string
+	AdminPassword         string
+	PublicList            bool
 	FileUpload            bool
 	MaxFileSize           int
 	MaxEncryptionSize     int
