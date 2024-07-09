@@ -82,20 +82,28 @@ func HandlePasteJSON(c *gin.Context) {
 }
 
 func HandleUpdate(c *gin.Context) {
-	paste, err := database.GetPasteByName(c.Param("pasteName"))
+	queriedPaste, err := database.GetPasteByName(c.Param("pasteName"))
 	if err != nil {
 		c.JSON(http.StatusNotFound, gin.H{"error": "paste not found"})
 		return
 	}
-	pasteFiles := database.GetFiles(paste.PasteName)
-	isEncrypted := paste.Privacy == "private" || paste.Privacy == "secret"
+	pasteFiles := database.GetFiles(queriedPaste.PasteName)
+	isEncrypted := queriedPaste.Privacy == "private" || queriedPaste.Privacy == "secret"
 	var newPaste utils.PasteUpdate
 	if err := c.Bind(&newPaste); err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
 	}
 
-	if isEncrypted && paste.Password != database.HashPassword(newPaste.Password) {
+	form, err := c.MultipartForm()
+	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "form error: " + err.Error()})
+		return
+	}
+
+	newPaste.FilesMultiPart = form.File["files[]"]
+
+	if isEncrypted && queriedPaste.Password != database.HashPassword(newPaste.Password) {
 		c.JSON(http.StatusUnauthorized, gin.H{"error": "wrong password"})
 		return
 	}
@@ -120,9 +128,15 @@ func HandleUpdate(c *gin.Context) {
 			}
 		}
 	}
-
-	for _, file := range newPaste.Files {
+	for _, file := range newPaste.FilesMultiPart {
 		currentFileSizeTotal += int(file.Size)
+		fileName, fileSize, fileBlob := utils.ConvertMultipartFile(file)
+		newPaste.Files = append(newPaste.Files, paste.File{
+			Name:        fileName,
+			Size:        fileSize,
+			Blob:        fileBlob,
+			ContentType: file.Header.Get("Content-Type"),
+		})
 	}
 
 	if config.Config.MaxFileSize > 0 && currentFileSizeTotal > config.Config.MaxFileSize {
@@ -130,15 +144,15 @@ func HandleUpdate(c *gin.Context) {
 		return
 	}
 
-	paste.Content = newPaste.Content
-	paste.UpdatedAt = utils.GetCurrentDate()
-	err = database.UpdatePaste(paste)
+	queriedPaste.Content = newPaste.Content
+	queriedPaste.UpdatedAt = utils.GetCurrentDate()
+	err = database.UpdatePaste(queriedPaste.PasteName, newPaste)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 		rlog.Errorf("Failed to update paste: %s", err)
 		return
 	}
-	c.JSON(http.StatusOK, paste)
+	c.JSON(http.StatusOK, queriedPaste)
 }
 
 func HandleEdit(c *gin.Context) {

@@ -16,8 +16,7 @@ func SubmitToPaste(submit Submit, pasteName string, isRedirect int) paste.Paste 
 		if file == nil {
 			continue
 		}
-		fileName, fileSize, fileBlob := convertMultipartFile(file)
-		println(file.Header.Get("Content-Type"))
+		fileName, fileSize, fileBlob := ConvertMultipartFile(file)
 		files = append(files, paste.File{
 			Name:        fileName,
 			Size:        fileSize,
@@ -44,7 +43,7 @@ func SubmitToPaste(submit Submit, pasteName string, isRedirect int) paste.Paste 
 	}
 }
 
-func convertMultipartFile(file *multipart.FileHeader) (string, int, []byte) {
+func ConvertMultipartFile(file *multipart.FileHeader) (string, int, []byte) {
 	src, err := file.Open()
 	if err != nil {
 		panic(err)

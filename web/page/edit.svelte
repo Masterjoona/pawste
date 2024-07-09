@@ -10,6 +10,7 @@
 
     export let paste;
     export let files;
+    export let password;
 
     let removedFiles = [];
     let newFiles = [];
@@ -52,7 +53,7 @@
         return false;
     }
 
-    function handleSave() {
+    async function handleSave() {
         const noNewFiles = !newFiles.length;
         console.log(files, removedFiles, newFiles, newContent);
         if (!files.length && noNewFiles && !newContent) {
@@ -91,13 +92,32 @@
             return;
         }
 
-        toast.push("Changes saved!", {
-            theme: {
-                "--toastColor": "mintcream",
-                "--toastBackground": "rgba(72,187,120,0.9)",
-                "--toastBarBackground": "#2F855A",
-            },
+        const formData = new FormData();
+        formData.append("content", newContent);
+        for (let file of newFiles) {
+            formData.append("files[]", file);
+        }
+        removedFiles.forEach((file) => {
+            formData.append("removed_files", file);
         });
+        formData.append("password", password);
+
+        const resp = await fetch(`/p/${paste.PasteName}`, {
+            method: "PATCH",
+            body: formData,
+        });
+
+        if (!resp.ok) {
+            toast.push("Failed to save!", {
+                theme: {
+                    "--toastColor": "mintcream",
+                    "--toastBackground": "rgba(255,0,0,0.9)",
+                    "--toastBarBackground": "red",
+                },
+            });
+        } else {
+            location.href = `/p/${paste.PasteName}`;
+        }
     }
 </script>
 

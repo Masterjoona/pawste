@@ -1,7 +1,12 @@
 package database
 
 import (
+	"database/sql"
+	"os"
+
+	"github.com/Masterjoona/pawste/pkg/config"
 	"github.com/Masterjoona/pawste/pkg/paste"
+	"github.com/Masterjoona/pawste/pkg/utils"
 )
 
 func UpdateReadCount(pasteName string) {
@@ -31,7 +36,7 @@ func burnIfNeeded(pasteName string) {
 	}
 }
 
-func updatePasteContent(paste paste.Paste) error {
+func updatePasteContent(pasteName, content string) error {
 	tx, err := PasteDB.Begin()
 	if err != nil {
 		return err
@@ -60,24 +65,106 @@ func updatePasteContent(paste paste.Paste) error {
 	defer stmt.Close()
 
 	_, err = stmt.Exec(
-		paste.Content,
-		paste.PasteName,
+		content,
+		pasteName,
 	)
-	if err != nil {
-		return err
-	}
-	return nil
+	return err
 }
 
-func updatePasteFiles(paste paste.Paste) error {
-	return nil
-}
-
-func UpdatePaste(paste paste.Paste) error {
-	err := updatePasteContent(paste)
+func updatePasteFiles(pasteName string, newPaste utils.PasteUpdate) error {
+	tx, err := PasteDB.Begin()
 	if err != nil {
 		return err
 	}
 
-	return updatePasteFiles(paste)
+	defer func() {
+		if err != nil {
+			tx.Rollback()
+			return
+		}
+		err = tx.Commit()
+		if err != nil {
+			panic(err)
+		}
+	}()
+
+	for _, file := range newPaste.RemovedFiles {
+		err = deleteFile(tx, pasteName, file)
+		if err != nil {
+			return err
+		}
+	}
+
+	if len(newPaste.Files) > 0 {
+		err = os.MkdirAll(config.Config.DataDir+pasteName, 0755)
+		if err != nil {
+			return err
+		}
+	}
+
+	for _, file := range newPaste.Files {
+		err = insertFile(tx, pasteName, file)
+		if err != nil {
+			return err
+		}
+	}
+	return nil
+}
+
+func deleteFile(tx *sql.Tx, pasteName, fileName string) error {
+	stmt, err := tx.Prepare(`
+		delete from files where PasteName = ? and Name = ?
+	`)
+	if err != nil {
+		return err
+	}
+	defer stmt.Close()
+
+	_, err = stmt.Exec(
+		pasteName,
+		fileName,
+	)
+
+	if err != nil {
+		return err
+	}
+
+	return os.Remove(config.Config.DataDir + pasteName + "/" + fileName)
+}
+
+func insertFile(tx *sql.Tx, pasteName string, file paste.File) error {
+	stmt, err := tx.Prepare(`
+		insert into files(PasteName, Name, Size, ContentType)
+		values (?, ?, ?, ?)
+	`)
+	if err != nil {
+		return err
+	}
+	defer stmt.Close()
+
+	_, err = stmt.Exec(
+		pasteName,
+		file.Name,
+		file.Size,
+		file.ContentType,
+	)
+
+	if err != nil {
+		return err
+	}
+
+	return os.WriteFile(
+		config.Config.DataDir+pasteName+"/"+file.Name,
+		file.Blob,
+		0644,
+	)
+}
+
+func UpdatePaste(pasteName string, newPaste utils.PasteUpdate) error {
+	err := updatePasteContent(pasteName, newPaste.Content)
+	if err != nil {
+		return err
+	}
+
+	return updatePasteFiles(pasteName, newPaste)
 }

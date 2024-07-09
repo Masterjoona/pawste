@@ -2,6 +2,8 @@ package utils
 
 import (
 	"mime/multipart"
+
+	"github.com/Masterjoona/pawste/pkg/paste"
 )
 
 type Submit struct {
@@ -15,8 +17,9 @@ type Submit struct {
 }
 
 type PasteUpdate struct {
-	Content      string                  `form:"content,omitempty"`
-	Password     string                  `form:"password,omitempty"`
-	Files        []*multipart.FileHeader `form:"file,omitempty"`
-	RemovedFiles []string                `form:"removed_files,omitempty"`
+	Content        string                  `form:"content,omitempty"`
+	Password       string                  `form:"password,omitempty"`
+	RemovedFiles   []string                `form:"removed_files,omitempty"`
+	FilesMultiPart []*multipart.FileHeader `form:"file,omitempty"`
+	Files          []paste.File
 }
