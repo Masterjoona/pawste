@@ -22,5 +22,4 @@ type ConfigEnv struct {
 	ShortPasteNames       bool
 	ShortenRedirectPastes bool
 	CountFileUsage        bool
-	IUnderstandTheRisks   bool
 }

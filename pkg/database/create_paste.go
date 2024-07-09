@@ -19,8 +19,8 @@ func CreatePaste(paste paste.Paste) error {
 	defer rollbackAndClose(tx, &err)
 
 	stmt, err := tx.Prepare(`
-		INSERT INTO pastes(PasteName, Expire, Privacy, ReadCount, ReadLast, BurnAfter, Content, UrlRedirect, Syntax, Password, CreatedAt, UpdatedAt)
-		VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+		INSERT INTO pastes(PasteName, Expire, Privacy, IsEncrypted, ReadCount, ReadLast, BurnAfter, Content, UrlRedirect, Syntax, Password, CreatedAt, UpdatedAt)
+		VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
 	`)
 	if err != nil {
 		return err
@@ -42,6 +42,7 @@ func CreatePaste(paste paste.Paste) error {
 		paste.PasteName,
 		paste.Expire,
 		paste.Privacy,
+		paste.IsEncrypted,
 		paste.ReadCount,
 		paste.ReadLast,
 		paste.BurnAfter,
@@ -81,8 +82,8 @@ func saveFiles(tx *sql.Tx, paste *paste.Paste, encrypt bool) error {
 		}
 
 		stmt, err := tx.Prepare(`
-            INSERT INTO files(PasteName, Name, Size)
-            VALUES (?, ?, ?)
+            INSERT INTO files(PasteName, Name, Size, ContentType)
+            VALUES (?, ?, ?, ?)
         `)
 		if err != nil {
 			return err
@@ -93,6 +94,7 @@ func saveFiles(tx *sql.Tx, paste *paste.Paste, encrypt bool) error {
 			paste.PasteName,
 			file.Name,
 			file.Size,
+			file.ContentType,
 		)
 		if err != nil {
 			return err

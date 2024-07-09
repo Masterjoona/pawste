@@ -2,14 +2,15 @@ package database
 
 import (
 	"database/sql"
-	"fmt"
 	"os"
 
 	_ "github.com/mattn/go-sqlite3"
 	"github.com/romana/rlog"
 )
 
-func CreateOrLoadDatabase(deleteOld bool) *sql.DB {
+var PasteDB *sql.DB
+
+func CreateOrLoadDatabase() {
 	createPasteTable := `
 	create table pastes 
 		(ID integer not null primary key, 
@@ -34,23 +35,20 @@ func CreateOrLoadDatabase(deleteOld bool) *sql.DB {
 		(ID integer not null primary key,
 		PasteName text,
 		Name text,
-		Size integer
+		Size integer,
+		ContentType text
 	);
 	`
-	if deleteOld {
-		os.Remove("./pastes.db")
-	}
-	newDb := false
+
 	sqldb, err := sql.Open("sqlite3", "./pastes.db")
 	if err != nil {
 		rlog.Critical("Could not open database", err)
 	}
-	if deleteOld || newDb {
-		res, err := sqldb.Exec(createPasteTable)
+	if _, err := os.Stat("./pastes.db"); os.IsNotExist(err) {
+		_, err := sqldb.Exec(createPasteTable)
 		if err != nil {
 			rlog.Critical("Could not create pastes table", err)
 		}
-		fmt.Println(res)
 		_, err = sqldb.Exec(createFileTable)
 		if err != nil {
 			rlog.Critical("Could not create files table", err)
@@ -59,5 +57,5 @@ func CreateOrLoadDatabase(deleteOld bool) *sql.DB {
 	} else {
 		rlog.Info("Loaded existing database")
 	}
-	return sqldb
+	PasteDB = sqldb
 }

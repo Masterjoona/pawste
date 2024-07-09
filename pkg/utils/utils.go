@@ -17,10 +17,12 @@ func SubmitToPaste(submit Submit, pasteName string, isRedirect int) paste.Paste 
 			continue
 		}
 		fileName, fileSize, fileBlob := convertMultipartFile(file)
+		println(file.Header.Get("Content-Type"))
 		files = append(files, paste.File{
-			Name: fileName,
-			Size: fileSize,
-			Blob: fileBlob,
+			Name:        fileName,
+			Size:        fileSize,
+			Blob:        fileBlob,
+			ContentType: file.Header.Get("Content-Type"),
 		})
 	}
 

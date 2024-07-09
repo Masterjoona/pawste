@@ -38,7 +38,6 @@ func (ConfigEnv) InitConfig() {
 		ShortPasteNames:       getEnv("SHORT_PASTE_NAMES", "false") == "true",
 		ShortenRedirectPastes: getEnv("SHORTEN_REDIRECT_PASTES", "false") == "true",
 		CountFileUsage:        getEnv("COUNT_FILE_USAGE", "true") == "true",
-		IUnderstandTheRisks:   getEnv("I_UNDERSTAND_THE_RISKS", "false") == "true",
 	}
 
 	if _, err := os.Stat(Config.DataDir); os.IsNotExist(err) {

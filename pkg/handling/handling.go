@@ -2,9 +2,11 @@ package handling
 
 import (
 	"net/http"
+	"os"
 
 	"github.com/Masterjoona/pawste/pkg/config"
 	"github.com/Masterjoona/pawste/pkg/database"
+	"github.com/Masterjoona/pawste/pkg/paste"
 	"github.com/Masterjoona/pawste/pkg/utils"
 	"github.com/gin-gonic/gin"
 	"github.com/nichady/golte"
@@ -21,21 +23,13 @@ func HandlePastePage(c *gin.Context) {
 	password := c.PostForm("password")
 	isEncrypted := paste.Privacy == "private" || paste.Privacy == "secret"
 
-	if isEncrypted && password == "" {
-		c.Redirect(http.StatusFound, "/p/"+pasteName+"/auth")
-		return
-	}
-
-	if isEncrypted && paste.Password != database.HashPassword(password) {
+	if isEncrypted && (password == "" || paste.Password != database.HashPassword(password)) {
 		c.Redirect(http.StatusFound, "/p/"+pasteName+"/auth")
 		return
 	}
 
 	if isEncrypted {
-		println("decrypting")
-		println(paste.Content)
 		paste.Content = paste.DecryptText(password)
-		println(paste.Content)
 	}
 
 	if paste.BurnAfter == 1 && c.Query("read") == "" {
@@ -73,6 +67,16 @@ func HandlePasteJSON(c *gin.Context) {
 		c.JSON(http.StatusNotFound, gin.H{"error": "paste not found"})
 		return
 	}
+	reqPassword := c.Request.Header.Get("password")
+	isEncrypted := (paste.Privacy == "private" || paste.Privacy == "secret")
+	if verifyAccess(isEncrypted, reqPassword, paste.Password) {
+		c.JSON(http.StatusUnauthorized, gin.H{"error": "wrong password"})
+		return
+	}
+	if isEncrypted {
+		paste.Content = paste.DecryptText(reqPassword)
+	}
+
 	database.UpdateReadCount(pasteName)
 	c.JSON(http.StatusOK, paste)
 }
@@ -162,6 +166,17 @@ func HandlePasteRaw(c *gin.Context) {
 		c.String(http.StatusNotFound, "Paste not found")
 		return
 	}
+
+	reqPassword := c.Request.Header.Get("password")
+	isEncrypted := (paste.Privacy == "private" || paste.Privacy == "secret")
+	if verifyAccess(isEncrypted, reqPassword, paste.Password) {
+		c.JSON(http.StatusUnauthorized, gin.H{"error": "wrong password"})
+		return
+	}
+	if isEncrypted {
+		paste.Content = paste.DecryptText(reqPassword)
+	}
+
 	database.UpdateReadCount(pasteName)
 	c.String(http.StatusOK, paste.Content)
 }
@@ -187,6 +202,14 @@ func HandleFileJson(c *gin.Context) {
 		c.JSON(http.StatusNotFound, gin.H{"error": "paste not found"})
 		return
 	}
+
+	reqPassword := c.Request.Header.Get("password")
+	isEncrypted := (paste.Privacy == "private" || paste.Privacy == "secret")
+	if verifyAccess(isEncrypted, reqPassword, paste.Password) {
+		c.JSON(http.StatusUnauthorized, gin.H{"error": "wrong password"})
+		return
+	}
+
 	file, err := database.GetFile(paste.PasteName, c.Param("fileName"))
 	if err != nil {
 		c.JSON(http.StatusNotFound, gin.H{"error": "file not found"})
@@ -196,19 +219,42 @@ func HandleFileJson(c *gin.Context) {
 }
 
 func HandleFile(c *gin.Context) {
-	paste, err := database.GetPasteByName(c.Param("pasteName"))
+	queriedPaste, err := database.GetPasteByName(c.Param("pasteName"))
 	if err != nil {
 		c.JSON(http.StatusNotFound, gin.H{"error": "paste not found"})
 		return
 	}
-	fileDb, err := database.GetFile(paste.PasteName, c.Param("fileName"))
+
+	reqPassword := c.Request.Header.Get("password")
+	isEncrypted := (queriedPaste.Privacy == "private" || queriedPaste.Privacy == "secret")
+	if verifyAccess(isEncrypted, reqPassword, queriedPaste.Password) {
+		c.JSON(http.StatusUnauthorized, gin.H{"error": "wrong password"})
+		return
+	}
+
+	fileDb, err := database.GetFile(queriedPaste.PasteName, c.Param("fileName"))
 	if err != nil {
 		c.JSON(http.StatusNotFound, gin.H{"error": "file not found"})
 		return
 	}
-
-	if config.Config.CountFileUsage {
-		database.UpdateReadCount(paste.PasteName)
+	filePath := config.Config.DataDir + "/" + queriedPaste.PasteName + "/" + fileDb.Name
+	if isEncrypted {
+		fileBlob, err := os.ReadFile(filePath)
+		if err != nil {
+			c.JSON(http.StatusInternalServerError, gin.H{"error": "failed to read file"})
+			return
+		}
+		fileBytes, err := paste.Decrypt(reqPassword, fileBlob)
+		if err != nil {
+			c.JSON(http.StatusInternalServerError, gin.H{"error": "failed to decrypt file"})
+			return
+		}
+		c.Data(http.StatusOK, fileDb.ContentType, fileBytes)
+		return
 	}
-	c.File(config.Config.DataDir + "/" + paste.PasteName + "/" + fileDb.Name)
+	if config.Config.CountFileUsage {
+		database.UpdateReadCount(queriedPaste.PasteName)
+	}
+	c.File(filePath)
+
 }

@@ -1,10 +1,11 @@
 package paste
 
 type File struct {
-	ID   int
-	Name string
-	Size int
-	Blob []byte
+	ID          int
+	Name        string
+	Size        int
+	ContentType string
+	Blob        []byte
 }
 
 type Paste struct {

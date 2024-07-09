@@ -48,6 +48,7 @@ func GetFiles(pasteName string) []paste.File {
 			"ID",
 			"Name",
 			"Size",
+			"ContentType",
 		},
 	)
 }
@@ -60,6 +61,7 @@ func GetFile(pasteName string, fileName string) (paste.File, error) {
 			"ID",
 			"Name",
 			"Size",
+			"ContentType",
 		},
 	)
 	if len(files) == 0 {

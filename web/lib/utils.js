@@ -19,6 +19,51 @@ export function truncateFilename(filename, maxLength = 30) {
     );
 }
 
-export function viewFile(filename) {
-    window.open("/p/" + paste.PasteName + "/f/" + filename);
+export function viewFile(pastename, filename) {
+    window.open("/p/" + pastename + "/f/" + filename);
+}
+
+export function timeDifference(timestamp) {
+    const now = new Date();
+    const target = new Date(timestamp);
+    const diff = target - now;
+
+    const seconds = Math.floor(diff / 1000);
+    const minutes = Math.floor(seconds / 60);
+    const hours = Math.floor(minutes / 60);
+    const days = Math.floor(hours / 24);
+    const weeks = Math.floor(days / 7);
+
+    if (weeks > 0)
+        return (
+            weeks +
+            (weeks === 1 ? " week" : " weeks") +
+            (diff > 0 ? " from now" : " ago")
+        );
+    if (days > 0)
+        return (
+            days +
+            (days === 1 ? " day" : " days") +
+            (diff > 0 ? " from now" : " ago")
+        );
+    if (hours > 0)
+        return (
+            hours +
+            (hours === 1 ? " hour" : " hours") +
+            (diff > 0 ? " from now" : " ago")
+        );
+    if (minutes > 0)
+        return (
+            minutes +
+            (minutes === 1 ? " minute" : " minutes") +
+            (diff > 0 ? " from now" : " ago")
+        );
+    if (seconds > 0)
+        return (
+            seconds +
+            (seconds === 1 ? " second" : " seconds") +
+            (diff > 0 ? " from now" : " ago")
+        );
+
+    return "just now";
 }

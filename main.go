@@ -1,7 +1,6 @@
 package main
 
 import (
-	"database/sql"
 	"net/http"
 
 	"github.com/Masterjoona/pawste/pkg/build"
@@ -14,7 +13,6 @@ import (
 	"github.com/romana/rlog"
 )
 
-var PasteDB *sql.DB
 
 var wrapMiddleware = func(middleware func(http.Handler) http.Handler) func(ctx *gin.Context) {
 	return func(ctx *gin.Context) {
@@ -31,7 +29,7 @@ var wrapMiddleware = func(middleware func(http.Handler) http.Handler) func(ctx *
 func main() {
 	config.Config.InitConfig()
 	rlog.Info("Starting Pawste " + config.PawsteVersion)
-	PasteDB = database.CreateOrLoadDatabase(config.Config.IUnderstandTheRisks)
+	database.CreateOrLoadDatabase()
 
 	page := func(c string) gin.HandlerFunc {
 		return gin.WrapH(golte.Page(c))
@@ -56,7 +54,11 @@ func main() {
 
 	r.GET("/p/:pasteName", handling.HandlePastePage)
 	r.POST("/p/:pasteName", handling.HandlePastePage) // for auth
-	r.GET("/p/:pasteName/auth", page("page/auth"))
+	r.GET("/p/:pasteName/auth", func(ctx *gin.Context) {
+		golte.RenderPage(ctx.Writer, ctx.Request, "page/auth", map[string]any{
+			"pasteRedir": ctx.Param("pasteName"),
+		})
+	})
 	r.POST("/p/:pasteName/auth", handling.HandlePastePostAuth)
 	r.GET("/p/:pasteName/raw", handling.HandlePasteRaw)
 	r.GET("/p/:pasteName/json", handling.HandlePasteJSON)

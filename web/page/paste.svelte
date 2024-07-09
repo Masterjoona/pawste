@@ -1,7 +1,11 @@
 <script>
     import { toast } from "@zerodevx/svelte-toast";
     import { copy } from "svelte-copy";
-    import { truncateFilename, viewFile } from "../lib/utils.js";
+    import {
+        truncateFilename,
+        viewFile,
+        timeDifference,
+    } from "../lib/utils.js";
     import "../styles/paste.css";
     import "../styles/file.css";
 
@@ -29,7 +33,10 @@
                     {paste.Content.length}
                     <i class="fa-solid fa-file-lines"></i>
                 </p>
-                <p>{paste.Expire} <i class="fa-solid fa-clock"></i></p>
+                <p>
+                    {timeDifference(paste.Expire)}
+                    <i class="fa-solid fa-clock"></i>
+                </p>
             </div>
         </div>
         <textarea readonly>{paste.Content}</textarea>
@@ -56,7 +63,9 @@
                         >{truncateFilename(file.Name)} - {(
                             file.Size / 1024
                         ).toFixed(2)} KB</span>
-                    <button on:click={() => viewFile(file.Name)}>View</button>
+                    <button
+                        on:click={() => viewFile(paste.PasteName, file.Name)}
+                        >View</button>
                 </div>
             {/each}
         </div>

@@ -2,6 +2,7 @@
     import { toast } from "@zerodevx/svelte-toast";
     import { truncateFilename } from "../lib/utils.js";
     import "../styles/paste.css";
+    import "../styles/file.css";
 
     let selectedExpiration = "1w";
     let selectedBurnAfter = "0";
@@ -54,17 +55,7 @@
 
             return;
         }
-        /*const data = {
-            expiration: selectedExpiration,
-            burnAfter: selectedBurnAfter,
-            syntax: selectedSyntax,
-            privacy: selectedPrivacy,
-            content: content,
-            files: attachedFiles,
-            password: encrypted ? password : null,
-        };
-        console.log("Data saved:", data);
-        alert("Data saved successfully!");*/
+
         const formData = new FormData();
         formData.append("expire", selectedExpiration);
         formData.append("burnafter", selectedBurnAfter);

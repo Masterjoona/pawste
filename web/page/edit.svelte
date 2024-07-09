@@ -1,5 +1,9 @@
 <script>
-    import { truncateFilename, viewFile } from "../lib/utils.js";
+    import {
+        truncateFilename,
+        viewFile,
+        timeDifference,
+    } from "../lib/utils.js";
     import { toast } from "@zerodevx/svelte-toast";
     import "../styles/paste.css";
     import "../styles/file.css";
@@ -35,6 +39,19 @@
     function removeNewFile(filename) {
         newFiles = newFiles.filter((file) => file.name !== filename);
     }
+
+    function filenamesConflict() {
+        for (let file of newFiles) {
+            if (
+                files.some((f) => f.Name === file.name) &&
+                !removedFiles.includes(file.name)
+            ) {
+                return true;
+            }
+        }
+        return false;
+    }
+
     function handleSave() {
         const noNewFiles = !newFiles.length;
         console.log(files, removedFiles, newFiles, newContent);
@@ -62,6 +79,18 @@
             });
             return;
         }
+
+        if (filenamesConflict()) {
+            toast.push("Filenames conflict!", {
+                theme: {
+                    "--toastColor": "mintcream",
+                    "--toastBackground": "rgba(255,0,0,0.9)",
+                    "--toastBarBackground": "red",
+                },
+            });
+            return;
+        }
+
         toast.push("Changes saved!", {
             theme: {
                 "--toastColor": "mintcream",
@@ -83,7 +112,10 @@
                     {paste.Content.length}
                     <i class="fa-solid fa-file-lines"></i>
                 </p>
-                <p>{paste.Expire} <i class="fa-solid fa-clock"></i></p>
+                <p>
+                    {timeDifference(paste.Expire)}
+                    <i class="fa-solid fa-clock"></i>
+                </p>
             </div>
         </div>
         <textarea bind:value={newContent}></textarea>
@@ -109,7 +141,9 @@
                         ).toFixed(2)} KB</span>
                     <button on:click={() => removeOldFile(file.Name)}
                         >Remove</button>
-                    <button on:click={() => viewFile(file.Name)}>View</button>
+                    <button
+                        on:click={() => viewFile(paste.PasteName, file.Name)}
+                        >View</button>
                 </div>
             {/each}
             <p>New Files:</p>

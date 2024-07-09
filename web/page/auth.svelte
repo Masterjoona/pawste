@@ -1,31 +1,26 @@
-<script>
-    let password = "";
-
-    function handleSubmit(event) {
-        event.preventDefault();
-        const form = document.createElement("form");
-        form.method = "POST";
-        form.action = location.pathname.slice(0, -5);
-        form.style.display = "none";
-
-        const passwordInput = document.createElement("input");
-        passwordInput.type = "hidden";
-        passwordInput.name = "password";
-        passwordInput.value = password;
-        form.appendChild(passwordInput);
-
-        document.body.appendChild(form);
-        form.submit();
-    }
-</script>
-
 <main>
     <h1>Authentication</h1>
-    <form on:submit={handleSubmit}>
+    <form
+        id="auth-form"
+        method="POST"
+        action={"/"}
+        enctype="multipart/form-data">
         <label for="password">Password:</label>
-        <input type="password" id="password" bind:value={password} />
+        <input
+            id="password-field"
+            placeholder="Password"
+            name="password"
+            type="password"
+            autocomplete="off" />
         <button type="submit">Submit</button>
     </form>
+    <script>
+        document
+            .getElementById("auth-form")
+            .addEventListener("submit", function (event) {
+                this.action = window.location.href.slice(0, -5);
+            });
+    </script>
 </main>
 
 <style>
