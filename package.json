@@ -18,13 +18,13 @@
     "@sveltejs/adapter-auto": "^3.2.2",
     "@sveltejs/kit": "^2.5.17",
     "@sveltejs/vite-plugin-svelte": "^3.1.1",
+    "@zerodevx/svelte-toast": "^0.9.5",
     "golte": "^0.0.4",
-    "svelte": "^4.2.18"
+    "svelte": "^4.2.18",
+    "svelte-copy": "^1.4.2"
   },
   "devDependencies": {
-    "@zerodevx/svelte-toast": "^0.9.5",
     "prettier": "^3.3.2",
-    "prettier-plugin-svelte": "^3.2.5",
-    "svelte-copy": "^1.4.2"
+    "prettier-plugin-svelte": "^3.2.5"
   }
 }
