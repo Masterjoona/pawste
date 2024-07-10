@@ -1,9 +1,9 @@
-<script>
+<script lang="ts">
+    import NewFileList from "../lib/ui/NewFileList.svelte";
     import {
+        failToast,
         prettifyFileSize,
         truncateFilename,
-        failToast,
-        successToast,
     } from "../lib/utils.js";
     import "../styles/buttons.css";
     import "../styles/file.css";
@@ -18,7 +18,7 @@
     let imageSources = [];
     let password = "";
 
-    function handleAttachFiles(event) {
+    function handleAttachFiles(event: any) {
         const files = event.target.files;
         for (let file of files) {
             attachedFiles = [...attachedFiles, file];
@@ -32,6 +32,10 @@
                 imageSources = [...imageSources, null];
             }
         }
+    }
+
+    function handlePasswordChange(event: any) {
+        password = event.target.value;
     }
 
     async function handleSave() {
@@ -70,21 +74,23 @@
         if (response?.error) {
             failToast(response?.error);
         } else {
-            successToast("Paste saved successfully!");
             setTimeout(() => {
-                window.location.href =
-                    `/p/${response.pasteName}` + (encrypted ? "/auth" : "");
+                window.location.href = `/p/${response.pasteName}`;
             }, 500);
         }
     }
 
-    function removeFile(index) {
-        attachedFiles = attachedFiles.filter((_, i) => i !== index);
+    function removeFile(filename: string) {
+        attachedFiles = attachedFiles.filter((file) => file.name !== filename);
     }
-    function handlePrivacyChange(event) {
+    function handlePrivacyChange(event: any) {
         selectedPrivacy = event.target.value;
         const passwordField = document.getElementById("password-field");
-        if (selectedPrivacy === "private" || selectedPrivacy === "secret") {
+        if (
+            selectedPrivacy === "private" ||
+            selectedPrivacy === "secret" ||
+            selectedPrivacy === "readonly"
+        ) {
             passwordField.style.display = "block";
         } else {
             passwordField.style.display = "none";
@@ -140,7 +146,7 @@
                 <input
                     type="password"
                     id="password"
-                    on:input={(e) => (password = e.target.value)} />
+                    on:input={handlePasswordChange} />
             </div>
         </div>
 
@@ -157,24 +163,12 @@
                 >Attach Files</button>
             <button on:click={handleSave}>Save</button>
         </div>
-        <div class="file-list">
-            {#each attachedFiles as file, index}
-                <div class="file-item">
-                    {#if file.type.startsWith("image/")}
-                        <img
-                            src={imageSources[index]}
-                            alt={file.name}
-                            class="thumbnail" />
-                    {/if}
-                    <span>
-                        {truncateFilename(file.name)} - {prettifyFileSize(
-                            file.size,
-                        )}
-                    </span>
-                    <button on:click={() => removeFile(index)}>Remove</button>
-                </div>
-            {/each}
-        </div>
+        <NewFileList
+            files={attachedFiles}
+            {imageSources}
+            {removeFile}
+            {truncateFilename}
+            {prettifyFileSize} />
     </div>
 </div>
 

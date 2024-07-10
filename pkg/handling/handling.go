@@ -22,15 +22,17 @@ func HandlePastePage(c *gin.Context) {
 	}
 
 	isEncrypted := queriedPaste.IsEncrypted == 1
+	burnAfter := queriedPaste.BurnAfter == 1
 	if isEncrypted {
 		golte.RenderPage(c.Writer, c.Request, "page/paste", map[string]any{
 			"isEncrypted": true,
 			"paste":       paste.Paste{},
+			"burnAfter":   burnAfter,
 		})
 		return
 	}
 
-	if queriedPaste.BurnAfter == 1 && c.Query("read") == "" {
+	if burnAfter && c.Query("read") == "" {
 		golte.RenderPage(c.Writer, c.Request, "page/oneview", nil)
 		return
 	}
@@ -39,19 +41,6 @@ func HandlePastePage(c *gin.Context) {
 		"paste": queriedPaste,
 	})
 	database.UpdateReadCount(pasteName)
-}
-
-func HandlePastePostAuth(c *gin.Context) {
-	paste, err := database.GetPasteByName(c.Param("pasteName"))
-	if err != nil {
-		c.Redirect(http.StatusFound, "/")
-		return
-	}
-	if paste.Password != database.HashPassword(c.PostForm("password")) {
-		c.JSON(http.StatusUnauthorized, gin.H{"error": "wrong password"})
-		return
-	}
-	c.JSON(http.StatusOK, gin.H{"password": "correct"})
 }
 
 func HandlePasteJSON(c *gin.Context) {
@@ -152,15 +141,23 @@ func HandleUpdate(c *gin.Context) {
 }
 
 func HandleEdit(c *gin.Context) {
-	paste, err := database.GetPasteByName(c.Param("pasteName"))
+	queriedPaste, err := database.GetPasteByName(c.Param("pasteName"))
 	if err != nil {
 		c.Redirect(http.StatusFound, "/")
 		return
 	}
-
+	if queriedPaste.IsEncrypted == 1 {
+		tmpPaste := paste.Paste{}
+		tmpPaste.Files = []paste.File{}
+		golte.RenderPage(c.Writer, c.Request, "page/edit", map[string]any{
+			"isEncrypted": queriedPaste.IsEncrypted == 1,
+			"paste":       tmpPaste,
+		})
+		return
+	}
+	queriedPaste.Files = database.GetFiles(queriedPaste.PasteName)
 	golte.RenderPage(c.Writer, c.Request, "page/edit", map[string]any{
-		"paste": paste,
-		"files": database.GetFiles(paste.PasteName),
+		"paste": queriedPaste,
 	})
 
 }
@@ -198,11 +195,11 @@ func Redirect(c *gin.Context) {
 		c.Redirect(http.StatusFound, "/")
 		return
 	}
-	database.UpdateReadCount(pasteName)
 	if paste.UrlRedirect == 0 {
 		c.Redirect(http.StatusFound, "/p/"+pasteName)
 		return
 	}
+	database.UpdateReadCount(pasteName)
 	c.Redirect(http.StatusFound, paste.Content)
 }
 
@@ -277,9 +274,9 @@ func HandlePasteDelete(c *gin.Context) {
 	}
 
 	if queriedPaste.IsEncrypted == 1 {
-		var deletePasswd utils.PasswordJSON
+		var deletePasswd config.PasswordJSON
 		if err := c.ShouldBindJSON(&deletePasswd); err != nil {
-			c.JSON(http.StatusBadRequest, gin.H{"error": "no password"})
+			c.JSON(http.StatusBadRequest, gin.H{"error": "password required"})
 			return
 		}
 
@@ -299,8 +296,16 @@ func HandlePasteDelete(c *gin.Context) {
 
 func HandleAdmin(c *gin.Context) {
 	golte.RenderPage(c.Writer, c.Request, "page/admin", map[string]any{
-		"config":   config.Config,
-		"pastes":   database.GetAllPastes(),
-		"password": "admin",
+		"config": config.ConfigEnv{},
+		"pastes": []paste.Paste{},
 	})
+}
+
+func HandleAdminJSON(c *gin.Context) {
+	passwd := c.Request.Header.Get("password")
+	if passwd == "" || passwd != config.Config.AdminPassword {
+		c.JSON(http.StatusUnauthorized, gin.H{"error": "wrong password"})
+		return
+	}
+	c.JSON(http.StatusOK, gin.H{"config": config.Config, "pastes": database.GetAllPastes()})
 }

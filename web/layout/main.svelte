@@ -1,13 +1,14 @@
 <script>
+    import { SvelteToast } from "@zerodevx/svelte-toast";
+
+    import Animegirl from "../lib/ui/Animegirl.svelte";
+    import Footer from "../lib/ui/Footer.svelte";
+    import Header from "../lib/ui/Header.svelte";
+
     import "@fontsource-variable/fira-code";
     import "@fontsource/short-stack";
     import "@fortawesome/fontawesome-free/css/all.css";
-    import { SvelteToast } from "@zerodevx/svelte-toast";
-
     import "../app.css";
-    import Animegirl from "../lib/ui/animegirl.svelte";
-    import Footer from "../lib/ui/footer.svelte";
-    import Header from "../lib/ui/header.svelte";
 </script>
 
 <div id="container">

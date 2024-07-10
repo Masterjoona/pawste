@@ -1,6 +1,6 @@
 import { toast } from "@zerodevx/svelte-toast";
 
-export function truncateFilename(filename, maxLength = 30) {
+export function truncateFilename(filename: string, maxLength = 30) {
     const extIndex = filename.lastIndexOf(".");
     const name = filename.substring(0, extIndex);
     const ext = filename.substring(extIndex);
@@ -21,56 +21,54 @@ export function truncateFilename(filename, maxLength = 30) {
     );
 }
 
-export function viewFile(pastename, filename) {
+export function viewFile(pastename:string, filename: string) {
     window.open("/p/" + pastename + "/f/" + filename);
 }
 
-export function timeDifference(timestamp) {
+export function timeDifference(timestamp: number) {
+    timestamp *= 1000;
+
     const now = new Date();
     const target = new Date(timestamp);
-    const diff = target - now;
+    const diff = target.getTime() - now.getTime();
 
-    const seconds = Math.floor(diff / 1000);
+    const absDiff = Math.abs(diff);
+
+    const seconds = Math.floor(absDiff / 1000);
     const minutes = Math.floor(seconds / 60);
     const hours = Math.floor(minutes / 60);
     const days = Math.floor(hours / 24);
     const weeks = Math.floor(days / 7);
 
-    if (weeks > 0)
-        return (
-            weeks +
-            (weeks === 1 ? " week" : " weeks") +
-            (diff > 0 ? " from now" : " ago")
-        );
-    if (days > 0)
-        return (
-            days +
-            (days === 1 ? " day" : " days") +
-            (diff > 0 ? " from now" : " ago")
-        );
-    if (hours > 0)
-        return (
-            hours +
-            (hours === 1 ? " hour" : " hours") +
-            (diff > 0 ? " from now" : " ago")
-        );
-    if (minutes > 0)
-        return (
-            minutes +
-            (minutes === 1 ? " minute" : " minutes") +
-            (diff > 0 ? " from now" : " ago")
-        );
-    if (seconds > 0)
-        return (
-            seconds +
-            (seconds === 1 ? " second" : " seconds") +
-            (diff > 0 ? " from now" : " ago")
-        );
+    let timeUnit: string;
+    let timeValue: number;
 
-    return "just now";
+    if (weeks > 0) {
+        timeUnit = weeks === 1 ? "week" : "weeks";
+        timeValue = weeks;
+    } else if (days > 0) {
+        timeUnit = days === 1 ? "day" : "days";
+        timeValue = days;
+    } else if (hours > 0) {
+        timeUnit = hours === 1 ? "hour" : "hours";
+        timeValue = hours;
+    } else if (minutes > 0) {
+        timeUnit = minutes === 1 ? "minute" : "minutes";
+        timeValue = minutes;
+    } else if (seconds > 0) {
+        timeUnit = seconds === 1 ? "second" : "seconds";
+        timeValue = seconds;
+    } else {
+        return "just now";
+    }
+
+    const suffix = diff > 0 ? "" : "ago";
+
+    return `${timeValue} ${timeUnit} ${suffix}`;
 }
 
-export function prettifyFileSize(size) {
+
+export function prettifyFileSize(size: number) {
     if (size < 1024) return size + " B";
     if (size < 1024 * 1024) return (size / 1024).toFixed(2) + " KB";
     if (size < 1024 * 1024 * 1024)
@@ -78,7 +76,7 @@ export function prettifyFileSize(size) {
     return (size / (1024 * 1024 * 1024)).toFixed(2) + " GB";
 }
 
-export const successToast = (msg) => {
+export const successToast = (msg: string) => {
     toast.push(msg, {
         theme: {
             "--toastColor": "mintcream",
@@ -88,7 +86,7 @@ export const successToast = (msg) => {
     });
 };
 
-export const failToast = (msg) => {
+export const failToast = (msg: string) => {
     toast.push(msg, {
         theme: {
             "--toastColor": "mintcream",
@@ -97,15 +95,3 @@ export const failToast = (msg) => {
         },
     });
 };
-
-export async function deletePaste(pasteName, successFunc) {
-    const resp = await fetch(`/p/${pasteName}`, {
-        method: "DELETE",
-        body: JSON.stringify({ password }),
-    });
-    if (!resp.ok) {
-        failToast("Failed to delete paste!");
-    } else {
-        successFunc();
-    }
-}

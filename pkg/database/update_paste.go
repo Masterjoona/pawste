@@ -7,18 +7,20 @@ import (
 	"github.com/Masterjoona/pawste/pkg/config"
 	"github.com/Masterjoona/pawste/pkg/paste"
 	"github.com/Masterjoona/pawste/pkg/utils"
+	"github.com/romana/rlog"
 )
 
 func UpdateReadCount(pasteName string) {
-	_, err := PasteDB.Exec(
+	/*_, err := PasteDB.Exec(
 		"update pastes set ReadCount = ReadCount + 1, ReadLast = datetime('now') where PasteName = ?",
 		pasteName,
 	)
 	if err != nil {
-		panic(err)
+		rlog.Error(err)
 	}
 
-	burnIfNeeded(pasteName)
+	burnIfNeeded(pasteName)*/
+	return
 }
 
 func burnIfNeeded(pasteName string) {
@@ -29,7 +31,7 @@ func burnIfNeeded(pasteName string) {
 	var burned int
 	err := row.Scan(&burned)
 	if err != nil {
-		panic(err)
+		rlog.Error(err)
 	}
 	if burned == 1 {
 		cleanUpExpiredPastes()
@@ -45,11 +47,11 @@ func updatePasteContent(pasteName, content string) error {
 	defer func() {
 		if err != nil {
 			tx.Rollback()
-			return
+			rlog.Error(err)
 		}
 		err = tx.Commit()
 		if err != nil {
-			panic(err)
+			rlog.Error(err)
 		}
 	}()
 
@@ -80,11 +82,11 @@ func updatePasteFiles(pasteName string, newPaste utils.PasteUpdate) error {
 	defer func() {
 		if err != nil {
 			tx.Rollback()
-			return
+			rlog.Error(err)
 		}
 		err = tx.Commit()
 		if err != nil {
-			panic(err)
+			rlog.Error(err)
 		}
 	}()
 

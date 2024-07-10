@@ -23,7 +23,3 @@ type PasteUpdate struct {
 	FilesMultiPart []*multipart.FileHeader `form:"file,omitempty"`
 	Files          []paste.File
 }
-
-type PasswordJSON struct {
-	Password string `json:"password"`
-}

@@ -15,18 +15,18 @@ func CreateOrLoadDatabase() {
 	create table pastes 
 		(ID integer not null primary key, 
 		PasteName text,
-		Expire datetime, 
+		Expire integer, 
 		Privacy text, 
 		IsEncrypted integer,
 		ReadCount integer, 
-		ReadLast datetime,
+		ReadLast integer,
 		BurnAfter integer, 
 		Content text,
 		Syntax text,
 		Password text,
 		UrlRedirect integer,
-		CreatedAt datetime, 
-		UpdatedAt datetime
+		CreatedAt integer, 
+		UpdatedAt integer
 	);
 	`
 

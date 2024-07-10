@@ -1,10 +1,46 @@
-<script>
-    import { deletePaste, prettifyFileSize, successToast } from "../lib/utils";
+<script lang="ts">
+    import Password from "../lib/ui/Password.svelte";
+    import { Paste, Config } from "../lib/types";
+    import { prettifyFileSize, successToast, failToast } from "../lib/utils";
     import "../styles/buttons.css";
 
-    export let config;
-    export let pastes;
+    export let config: Config;
+    export let pastes: Paste[];
+    let adminPassword = "";
+
+    async function deletePaste(pasteName: string) {
+        const resp = await fetch(`/p/${pasteName}`, {
+            method: "DELETE",
+            body: JSON.stringify({ adminPassword }), // cursed but whatever
+        });
+        if (!resp.ok) {
+            failToast("Failed to delete paste!");
+        } else {
+            successToast(`Deleted ${pasteName}!`);
+        }
+    }
+
+    async function fetchConfigAndPastes(password: string) {
+        const resp = await fetch(location.pathname + "/json", {
+            method: "GET",
+            headers: { password },
+        });
+        if (resp.ok) {
+            const data = await resp.json();
+            config = data.config;
+            pastes = data.pastes;
+            adminPassword = password;
+        } else {
+            failToast("Incorrect password!");
+        }
+    }
 </script>
+
+{#if !adminPassword}
+    <Password
+        question={"Admin login password"}
+        onSubmit={fetchConfigAndPastes} />
+{/if}
 
 <div id="admin-container">
     <h2>pawste admin</h2>
@@ -60,11 +96,8 @@
                             on:click={() =>
                                 (window.location.href = "/e/" + PasteName)}
                             >Edit</button
-                        ><button
-                            on:click={() =>
-                                deletePaste(PasteName, () =>
-                                    successToast(`Deleted ${PasteName}!`),
-                                )}>Delete</button
+                        ><button on:click={() => deletePaste(PasteName)}
+                            >Delete</button
                         ></td>
                 </tr>
             {/each}

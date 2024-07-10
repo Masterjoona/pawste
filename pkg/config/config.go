@@ -71,12 +71,8 @@ func calculateIntFromString(s string) int {
 	return result
 }
 
-type PasswordSubmission struct {
-	Password string `json:"password"`
-}
-
 func (ConfigEnv) ReloadConfig(c *gin.Context) {
-	var password PasswordSubmission
+	var password PasswordJSON
 	if err := c.Bind(&password); err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": "give a password dumbass"})
 		return

@@ -1,82 +1,73 @@
-<script>
+<script lang="ts">
     import { copy } from "svelte-copy";
 
-    import {
-        failToast,
-        prettifyFileSize,
-        successToast,
-        timeDifference,
-        truncateFilename,
-        viewFile,
-        deletePaste,
-    } from "../lib/utils.js";
+    import Currentfiles from "../lib/ui/CurrentFileList.svelte";
+    import Password from "../lib/ui/Password.svelte";
+    import Properties from "../lib/ui/Properties.svelte";
+
+    import { Paste } from "../lib/types";
+    import { failToast, successToast } from "../lib/utils";
 
     import "../styles/buttons.css";
     import "../styles/file.css";
     import "../styles/password.css";
     import "../styles/paste.css";
 
-    export let isEncrypted;
-    export let paste;
-    let inputPassword = "";
-    let showContent = !isEncrypted;
-    const triedPasswds = [];
+    export let isEncrypted: boolean;
+    export let paste: Paste;
+    export let burnAfter: boolean;
 
-    async function fetchPaste() {
-        if (inputPassword === "") {
-            failToast("Password cannot be empty!");
-            return;
-        } else if (triedPasswds.includes(inputPassword)) {
-            failToast("Password already tried!");
-            return;
-        } else {
-            const resp = await fetch(
-                `/p/${window?.location?.pathname?.split("/").pop()}/json`,
-                {
-                    method: "GET",
-                    headers: {
-                        password: inputPassword,
-                    },
+    let password: string;
+    let showContent = !isEncrypted;
+    let question = "Enter password:";
+
+    question = burnAfter
+        ? (question += " (Will be burned after read)")
+        : question;
+
+    async function fetchPaste(password: string) {
+        const resp = await fetch(
+            `/p/${window?.location?.pathname?.split("/").pop()}/json`,
+            {
+                method: "GET",
+                headers: {
+                    password: password,
                 },
-            );
-            if (resp.ok) {
-                const data = await resp.json();
-                paste = { ...data };
-                showContent = true;
-            } else {
-                failToast("Incorrect password!");
-                triedPasswds.push(inputPassword);
-            }
+            },
+        );
+        if (resp.ok) {
+            paste = await resp.json();
+            showContent = true;
+        } else {
+            failToast("Incorrect password!");
+        }
+    }
+
+    async function deletePaste(pasteName: string) {
+        if (paste.Privacy === "readonly") {
+            showContent = false;
+            isEncrypted = true;
+            question = "Password needed to delete paste:";
+        }
+        const resp = await fetch(`/p/${pasteName}`, {
+            method: "DELETE",
+            body: JSON.stringify({ password }),
+        });
+        if (!resp.ok) {
+            failToast("Failed to delete paste!");
+        } else {
+            location.href = "/";
         }
     }
 </script>
 
 {#if isEncrypted && !showContent}
-    <div class="overlay"></div>
-    <div class="password-prompt">
-        <label for="password">Enter password:</label>
-        <input type="password" id="password" bind:value={inputPassword} />
-        <button on:click={fetchPaste}>Submit</button>
-    </div>
+    <Password {question} onSubmit={fetchPaste} />
 {/if}
 
-<div id="container" class:blur={isEncrypted && !showContent}>
+<div id="container">
     <div class="card">
-        <div class="properties">
-            <h>{paste.PasteName}</h>
-            <div class="spacer"></div>
-            <div class="icon-container">
-                <p>{paste.ReadCount} <i class="fa-solid fa-eye"></i></p>
-                <p>
-                    {paste.Content.length}
-                    <i class="fa-solid fa-file-lines"></i>
-                </p>
-                <p>
-                    {timeDifference(paste.Expire)}
-                    <i class="fa-solid fa-clock"></i>
-                </p>
-            </div>
-        </div>
+        <Properties {paste} />
         <textarea readonly>{paste.Content}</textarea>
         <div class="buttons">
             <button
@@ -93,23 +84,9 @@
                 on:svelte-copy={() => {
                     successToast("URL copied!");
                 }}>Copy URL</button>
-            <button
-                on:click={() =>
-                    deletePaste(paste.PasteName, () => (location.href = "/"))}
+            <button on:click={() => deletePaste(paste.PasteName)}
                 >Delete</button>
         </div>
-        <div class="file-list">
-            {#each paste.Files as file}
-                <div class="file-item">
-                    <span
-                        >{truncateFilename(file.Name)} - {prettifyFileSize(
-                            file.Size,
-                        )}</span>
-                    <button
-                        on:click={() => viewFile(paste.PasteName, file.Name)}
-                        >View</button>
-                </div>
-            {/each}
-        </div>
+        <Currentfiles files={paste.Files} pasteName={paste.PasteName} />
     </div>
 </div>

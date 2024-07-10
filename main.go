@@ -53,12 +53,6 @@ func main() {
 
 	r.GET("/p/:pasteName", handling.HandlePastePage)
 	r.POST("/p/:pasteName", handling.HandlePastePage) // for auth
-	r.GET("/p/:pasteName/auth", func(ctx *gin.Context) {
-		golte.RenderPage(ctx.Writer, ctx.Request, "page/auth", map[string]any{
-			"pasteRedir": ctx.Param("pasteName"),
-		})
-	})
-	r.POST("/p/:pasteName/auth", handling.HandlePastePostAuth)
 	r.GET("/p/:pasteName/raw", handling.HandlePasteRaw)
 	r.GET("/p/:pasteName/json", handling.HandlePasteJSON)
 	r.DELETE("/p/:pasteName", handling.HandlePasteDelete)
@@ -71,6 +65,7 @@ func main() {
 	r.PATCH("/p/:pasteName", handling.HandleUpdate)
 
 	r.GET("/admin", handling.HandleAdmin)
+	r.GET("/admin/json", handling.HandleAdminJSON)
 	r.POST("/admin/reload-config", config.Config.ReloadConfig)
 
 	r.GET("/p/:pasteName/f/:fileName", handling.HandleFile)

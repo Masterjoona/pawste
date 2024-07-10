@@ -19,3 +19,7 @@ type ConfigEnv struct {
 	ShortenRedirectPastes bool
 	CountFileUsage        bool
 }
+
+type PasswordJSON struct {
+	Password string `json:"password"`
+}

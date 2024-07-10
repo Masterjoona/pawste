@@ -1,25 +1,31 @@
-<script>
+<script lang="ts">
+    import Currentfiles from "../lib/ui/CurrentFileList.svelte";
+    import NewFileList from "../lib/ui/NewFileList.svelte";
+    import Password from "../lib/ui/Password.svelte";
+    import Properties from "../lib/ui/Properties.svelte";
+
+    import { Paste } from "../lib/types";
     import {
         failToast,
         prettifyFileSize,
-        timeDifference,
         truncateFilename,
-        viewFile,
-    } from "../lib/utils.js";
+    } from "../lib/utils";
     import "../styles/buttons.css";
     import "../styles/file.css";
     import "../styles/paste.css";
 
-    export let paste;
-    export let files;
-    export let password;
+    export let paste: Paste;
+    export let isEncrypted: boolean;
 
-    let removedFiles = [];
-    let newFiles = [];
+    let pastePassword: string;
+    let showContent = !isEncrypted;
+    let removedFiles: string[] = [];
+    let newFiles: File[] = [];
     let imageSources = [];
     let newContent = paste.Content;
+    const question = "Password needed to edit";
 
-    function handleAttachFiles(event) {
+    function handleAttachFiles(event: any) {
         const files = event.target.files;
         for (let file of files) {
             newFiles = [...newFiles, file];
@@ -35,18 +41,18 @@
         }
     }
 
-    function removeOldFile(filename) {
+    function removeOldFile(filename: string) {
         removedFiles = [...removedFiles, filename];
-        files = files.filter((file) => file.Name !== filename);
+        paste.Files = paste.Files.filter((file) => file.Name !== filename);
     }
-    function removeNewFile(filename) {
+    function removeNewFile(filename: string) {
         newFiles = newFiles.filter((file) => file.name !== filename);
     }
 
     function filenamesConflict() {
         for (let file of newFiles) {
             if (
-                files.some((f) => f.Name === file.name) &&
+                paste.Files.some((f) => f.Name === file.name) &&
                 !removedFiles.includes(file.name)
             ) {
                 return true;
@@ -55,18 +61,23 @@
         return false;
     }
 
+    const noChanges = (noNewFiles: boolean) => {
+        return (
+            newContent === paste.Content && noNewFiles && !removedFiles.length
+        );
+    };
+
+    const emptyPaste = (noNewFiles: boolean) => {
+        return !paste.Files.length && !paste.Content && noNewFiles;
+    };
+
     async function handleSave() {
         const noNewFiles = !newFiles.length;
-        console.log(files, removedFiles, newFiles, newContent);
-        if (!files.length && noNewFiles && !newContent) {
+        if (emptyPaste(noNewFiles)) {
             failToast("You must provide content or attach files!");
             return;
         }
-        if (
-            newContent === paste.Content &&
-            noNewFiles &&
-            !removedFiles.length
-        ) {
+        if (noChanges(noNewFiles)) {
             failToast("No changes detected!");
             return;
         }
@@ -84,7 +95,7 @@
         removedFiles.forEach((file) => {
             formData.append("removed_files", file);
         });
-        formData.append("password", password);
+        formData.append("password", pastePassword);
 
         const resp = await fetch(`/p/${paste.PasteName}`, {
             method: "PATCH",
@@ -97,25 +108,34 @@
             location.href = `/p/${paste.PasteName}`;
         }
     }
+
+    async function fetchPaste(password: string) {
+        const resp = await fetch(
+            `/p/${window?.location?.pathname?.split("/").pop()}/json`,
+            {
+                method: "GET",
+                headers: {
+                    password: password,
+                },
+            },
+        );
+        if (resp.ok) {
+            paste = await resp.json();
+            newContent = paste.Content;
+            showContent = true;
+        } else {
+            failToast("Something went wrong!");
+        }
+    }
 </script>
+
+{#if isEncrypted && !showContent}
+    <Password {question} onSubmit={fetchPaste} />
+{/if}
 
 <div id="container">
     <div class="card">
-        <div class="properties">
-            <h>{paste.PasteName}</h>
-            <div class="spacer"></div>
-            <div class="icon-container">
-                <p>{paste.ReadCount} <i class="fa-solid fa-eye"></i></p>
-                <p>
-                    {paste.Content.length}
-                    <i class="fa-solid fa-file-lines"></i>
-                </p>
-                <p>
-                    {timeDifference(paste.Expire)}
-                    <i class="fa-solid fa-clock"></i>
-                </p>
-            </div>
-        </div>
+        <Properties {paste} />
         <textarea bind:value={newContent}></textarea>
         <div class="buttons">
             <input
@@ -129,38 +149,21 @@
                 >Attach Files</button>
             <button on:click={handleSave}>Save</button>
         </div>
+        <p>Current Files:</p>
+        {#if paste.Files}
+            <Currentfiles
+                files={paste.Files}
+                pasteName={paste.PasteName}
+                removeFile={removeOldFile} />
+        {/if}
         <div class="file-list">
-            <p>Current Files:</p>
-            {#each files as file}
-                <div class="file-item">
-                    <span
-                        >{truncateFilename(file.Name)} - {prettifyFileSize(
-                            file.Size,
-                        )}</span>
-                    <button on:click={() => removeOldFile(file.Name)}
-                        >Remove</button>
-                    <button
-                        on:click={() => viewFile(paste.PasteName, file.Name)}
-                        >View</button>
-                </div>
-            {/each}
             <p>New Files:</p>
-            {#each newFiles as file, index}
-                <div class="file-item">
-                    {#if file.type.startsWith("image/")}
-                        <img
-                            src={imageSources[index]}
-                            alt={file.name}
-                            class="thumbnail" />
-                    {/if}
-                    <span
-                        >{truncateFilename(file.name)} - {prettifyFileSize(
-                            file.size,
-                        )}</span>
-                    <button on:click={() => removeNewFile(file.name)}
-                        >Remove</button>
-                </div>
-            {/each}
+            <NewFileList
+                files={newFiles}
+                {imageSources}
+                removeFile={removeNewFile}
+                {truncateFilename}
+                {prettifyFileSize} />
         </div>
     </div>
 </div>

@@ -57,7 +57,7 @@ func ConvertMultipartFile(file *multipart.FileHeader) (string, int, []byte) {
 	return file.Filename, len(fileBlob), fileBlob
 }
 
-func humanTimeToSQLTime(humanTime string) string {
+func humanTimeToSQLTime(humanTime string) int64 {
 	var duration time.Duration
 	duration = 7 * 24 * time.Hour
 	switch humanTime {
@@ -77,7 +77,7 @@ func humanTimeToSQLTime(humanTime string) string {
 		duration = 100 * 365 * 24 * time.Hour // cope if you're still using this in 100 years
 	}
 
-	return time.Now().Add(duration).Format("2006-01-02 15:04:05")
+	return time.Now().Add(duration).Unix()
 }
 
 func IsContentJustUrl(content string) int {
@@ -87,8 +87,8 @@ func IsContentJustUrl(content string) int {
 	return 0
 }
 
-func GetCurrentDate() string {
-	return time.Now().Format("2006-01-02 15:04:05")
+func GetCurrentDate() int64 {
+	return time.Now().Unix()
 }
 
 func NotAllowedPrivacy(x string) bool {

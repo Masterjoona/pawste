@@ -100,7 +100,6 @@ func GetPasteByName(pasteName string) (paste.Paste, error) {
 		"where PasteName = ?",
 		[]string{pasteName},
 		[]string{
-			"ID",
 			"PasteName",
 			"Expire",
 			"Privacy",

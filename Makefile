@@ -5,7 +5,7 @@ run:
 	pnpm dlx golte dev && go run .
 
 runnoweb:
-	 go run .
+	go run .
 
 clean:
 	rm $(binary_name)
