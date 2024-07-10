@@ -13,21 +13,24 @@ FROM base AS build
 RUN --mount=type=cache,id=pnpm,target=/pnpm/store pnpm install --prod
 RUN pnpm dlx golte
 
-FROM golang:1.22.5 AS go-build
+FROM golang:1.22.5-alpine AS go-build
 
 WORKDIR /app
 ENV GOCACHE=/root/.cache/go-build
+ENV CGO_ENABLED=1
+
+RUN apk add gcc musl-dev
+
 COPY --from=build /app/pkg/build /app/pkg/build
 COPY ./pkg /app/pkg/
 COPY main.go ./
 COPY go.mod go.sum ./
 
 RUN --mount=type=cache,target="/root/.cache/go-build" go build -o pawste "-ldflags=-s -w"
-#RUN go build -o pawste "-ldflags=-s -w"
 
 FROM alpine:latest
 
 WORKDIR /app
-COPY --from=go-build /app/pawste .
+COPY --from=go-build /app/pawste /app/pawste
 
-ENTRYPOINT ["./pawste"]
+ENTRYPOINT [ "./pawste" ] 
