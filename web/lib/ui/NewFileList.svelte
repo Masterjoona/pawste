@@ -1,4 +1,3 @@
-<!-- FileList.svelte -->
 <script lang="ts">
     import "../../styles/file.css";
     export let files: File[] = [];

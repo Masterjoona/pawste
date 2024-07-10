@@ -21,7 +21,7 @@ export function truncateFilename(filename: string, maxLength = 30) {
     );
 }
 
-export function viewFile(pastename:string, filename: string) {
+export function viewFile(pastename: string, filename: string) {
     window.open("/p/" + pastename + "/f/" + filename);
 }
 
@@ -66,7 +66,6 @@ export function timeDifference(timestamp: number) {
 
     return `${timeValue} ${timeUnit} ${suffix}`;
 }
-
 
 export function prettifyFileSize(size: number) {
     if (size < 1024) return size + " B";

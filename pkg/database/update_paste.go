@@ -11,16 +11,15 @@ import (
 )
 
 func UpdateReadCount(pasteName string) {
-	/*_, err := PasteDB.Exec(
-		"update pastes set ReadCount = ReadCount + 1, ReadLast = datetime('now') where PasteName = ?",
+	_, err := PasteDB.Exec(
+		"update pastes set ReadCount = ReadCount + 1, ReadLast = strftime('%s', 'now') where PasteName = ?",
 		pasteName,
 	)
 	if err != nil {
 		rlog.Error(err)
 	}
 
-	burnIfNeeded(pasteName)*/
-	return
+	burnIfNeeded(pasteName)
 }
 
 func burnIfNeeded(pasteName string) {
@@ -54,11 +53,10 @@ func updatePasteContent(pasteName, content string) error {
 			rlog.Error(err)
 		}
 	}()
-
 	stmt, err := tx.Prepare(`
 		update pastes set
 			Content = ?,
-			UpdatedAt = datetime('now')
+			UpdatedAt = ?
 		where PasteName = ?
 	`)
 	if err != nil {
@@ -68,6 +66,7 @@ func updatePasteContent(pasteName, content string) error {
 
 	_, err = stmt.Exec(
 		content,
+		utils.GetCurrentDate(),
 		pasteName,
 	)
 	return err
