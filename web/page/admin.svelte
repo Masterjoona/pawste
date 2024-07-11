@@ -1,16 +1,12 @@
 <script lang="ts">
+    import FileSizeInput from "../lib/ui/FileSizeInput.svelte";
     import Password from "../lib/ui/Password.svelte";
     import StringInput from "../lib/ui/StringInput.svelte";
     import Switch from "../lib/ui/Switch.svelte";
-    import FileSizeInput from "../lib/ui/FileSizeInput.svelte";
 
     import { Config, Paste } from "../lib/types";
-    import {
-        failToast,
-        prettifyFileSize,
-        successToast,
-        timeDifference,
-    } from "../lib/utils";
+    import PasteList from "../lib/ui/PasteList.svelte";
+    import { failToast, prettifyFileSize, successToast } from "../lib/utils";
     import "../styles/buttons.css";
 
     export let config: Config;
@@ -20,7 +16,7 @@
     async function deletePaste(pasteName: string) {
         const resp = await fetch(`/p/${pasteName}`, {
             method: "DELETE",
-            body: JSON.stringify({ adminPassword }), // cursed but whatever
+            body: JSON.stringify({ password: adminPassword }), // cursed but whatever
         });
         if (!resp.ok) {
             failToast("Failed to delete paste!");
@@ -49,14 +45,9 @@
         }
     }
 
-    function toggleConfigBool(key: string, value: boolean) {
+    function updateConfigValue(key: string, value: string | boolean) {
         config = { ...config, [key]: !value };
     }
-
-    function updateConfigString(key: string, newValue: string) {
-        config = { ...config, [key]: newValue };
-    }
-
     function updateConfigNumber(key: string, event: Event) {
         const newValue = parseInt((event.target as HTMLInputElement).value);
         config = { ...config, [key]: newValue };
@@ -98,51 +89,18 @@
 
     <div id="pastes-section">
         <h3>Pastes</h3>
-        <table id="pastes-table">
-            <tr>
-                <th>Name</th>
-                <th>Expire</th>
-                <th>Last Read</th>
-                <th>Privacy</th>
-                <th>Views</th>
-                <th>Link</th>
-                <th>Actions</th>
-            </tr>
-            {#if pastes === null || pastes.length === 0}
-                <tr>
-                    <td colspan="7">No pastes</td>
-                </tr>
-            {:else}
-                {#each pastes as { PasteName, ReadCount, ReadLast, Privacy, Expire, UrlRedirect }}
-                    <tr>
-                        <td>{PasteName}</td>
-                        <td
-                            >{timeDifference(Expire)}
-                            <i class="fa-solid fa-clock"></i></td>
-                        <td
-                            >{timeDifference(ReadLast)}
-                            <i class="fa-solid fa-clock"></i></td>
-                        <td>{Privacy} <i class="fa-solid fa-lock"></i></td>
-                        <td>{ReadCount} <i class="fa-solid fa-eye"></i></td>
-                        <td>
-                            {#if UrlRedirect === 1}
-                                <a href="/u/{PasteName}">Go to URL</a>
-                            {:else}
-                                <a href="/p/{PasteName}">View</a>
-                            {/if}
-                        </td>
-                        <td>
-                            <button
-                                on:click={() =>
-                                    (window.location.href = "/e/" + PasteName)}
-                                >Edit</button>
-                            <button on:click={() => deletePaste(PasteName)}
-                                >Delete</button>
-                        </td>
-                    </tr>
-                {/each}
-            {/if}
-        </table>
+        <PasteList
+            {pastes}
+            tableHeaders={[
+                "Name",
+                "Expire",
+                "Read Last",
+                "Privacy",
+                "Views",
+                "",
+                "Actions",
+            ]}
+            {deletePaste} />
     </div>
 
     <div id="env-vars-section">
@@ -161,7 +119,8 @@
                         <td>
                             <Switch
                                 checked={value}
-                                onChange={() => toggleConfigBool(key, value)} />
+                                onChange={() =>
+                                    updateConfigValue(key, value)} />
                         </td>
                     </tr>
                 {:else if typeof value === "string"}
@@ -172,7 +131,7 @@
                             <StringInput
                                 {value}
                                 onInput={(newValue) =>
-                                    updateConfigString(key, newValue)} />
+                                    updateConfigValue(key, newValue)} />
                         </td>
                     </tr>
                 {:else if key === "MaxEncryptionSize" || key === "MaxFileSize"}
@@ -219,11 +178,6 @@
         text-align: center;
     }
 
-    #links-section,
-    #info-section {
-        flex: 1 1 calc(50% - 20px);
-    }
-
     #pastes-section {
         flex: 1 1 100%;
         margin-top: 20px;
@@ -233,13 +187,12 @@
     }
 
     #env-vars-section {
-        flex: 1 1 100%;
         margin-top: 20px;
+        margin-bottom: 10%;
     }
 
     #env-vars-table,
-    #info-table,
-    #pastes-table {
+    #info-table {
         width: 80%;
         border-collapse: collapse;
         margin-top: 10px;

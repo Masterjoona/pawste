@@ -4,10 +4,10 @@
         This project is open source and you can find the source code on <a
             href="https://github.com/Masterjoona/pawste "
             target="_blank">GitHub</a
-        >! The backend (<a href="https://masterjoona.dev" target="_blank"
-            >Joona</a
-        >) is written in Go and the frontend what is mostly written by my friend
-        is done in Svelte.
+        >! The backend is done by
+        <a href="https://masterjoona.dev" target="_blank">Joona</a>
+        and is written in Go and the frontend is done in Svelte by
+        <a href="https://taro.tf/" target="_blank">Taro</a>.
     </p>
     <p>
         Send us an email at <a href="mailto:team@pawst.eu">team@pawst.eu</a>!
