@@ -150,12 +150,7 @@
                 pasteName={paste.PasteName}
                 removeFile={removeOldFile} />
         {/if}
-        <div class="file-list">
-            <p>New Files:</p>
-            <FileList
-                files={newFiles}
-                {imageSources}
-                removeFile={removeNewFile} />
-        </div>
+        <p>New Files:</p>
+        <FileList files={newFiles} {imageSources} removeFile={removeNewFile} />
     </div>
 </div>
