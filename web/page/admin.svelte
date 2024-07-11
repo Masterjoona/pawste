@@ -57,7 +57,8 @@
         config = { ...config, [key]: newValue };
     }
 
-    function updateConfigNumber(key: string, newValue: number) {
+    function updateConfigNumber(key: string, event: Event) {
+        const newValue = parseInt((event.target as HTMLInputElement).value);
         config = { ...config, [key]: newValue };
     }
 </script>
@@ -194,8 +195,7 @@
                             <input
                                 type="number"
                                 {value}
-                                on:input={(e) =>
-                                    updateConfigNumber(key, e.target.value)} />
+                                on:input={(e) => updateConfigNumber(key, e)} />
                         </td>
                     </tr>
                 {/if}
