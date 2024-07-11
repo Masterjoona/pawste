@@ -1,10 +1,6 @@
 <script lang="ts">
-    import NewFileList from "../lib/ui/NewFileList.svelte";
-    import {
-        failToast,
-        prettifyFileSize,
-        truncateFilename,
-    } from "../lib/utils.js";
+    import FileList from "../lib/ui/FileList.svelte";
+    import { failToast } from "../lib/utils.js";
     import "../styles/buttons.css";
     import "../styles/file.css";
     import "../styles/paste.css";
@@ -163,12 +159,7 @@
                 >Attach Files</button>
             <button on:click={handleSave}>Save</button>
         </div>
-        <NewFileList
-            files={attachedFiles}
-            {imageSources}
-            {removeFile}
-            {truncateFilename}
-            {prettifyFileSize} />
+        <FileList files={attachedFiles} {imageSources} {removeFile} />
     </div>
 </div>
 

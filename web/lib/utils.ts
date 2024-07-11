@@ -1,4 +1,5 @@
 import { toast } from "@zerodevx/svelte-toast";
+import { FileDb, FileType } from "./types";
 
 export function truncateFilename(filename: string, maxLength = 30) {
     const extIndex = filename.lastIndexOf(".");
@@ -23,6 +24,10 @@ export function truncateFilename(filename: string, maxLength = 30) {
 
 export function viewFile(pastename: string, filename: string) {
     window.open("/p/" + pastename + "/f/" + filename);
+}
+
+export function isFileDb(file: FileType): file is FileDb {
+    return (file as FileDb)?.Name !== undefined;
 }
 
 export function timeDifference(timestamp: number) {

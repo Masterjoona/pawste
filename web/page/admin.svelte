@@ -1,7 +1,16 @@
 <script lang="ts">
     import Password from "../lib/ui/Password.svelte";
-    import { Paste, Config } from "../lib/types";
-    import { prettifyFileSize, successToast, failToast } from "../lib/utils";
+    import StringInput from "../lib/ui/StringInput.svelte";
+    import Switch from "../lib/ui/Switch.svelte";
+    import FileSizeInput from "../lib/ui/FileSizeInput.svelte";
+
+    import { Config, Paste } from "../lib/types";
+    import {
+        failToast,
+        prettifyFileSize,
+        successToast,
+        timeDifference,
+    } from "../lib/utils";
     import "../styles/buttons.css";
 
     export let config: Config;
@@ -27,6 +36,11 @@
         });
         if (resp.ok) {
             const data = await resp.json();
+
+            delete data.config.AdminPassword;
+            delete data.config.Salt;
+            delete data.config.Port;
+
             config = data.config;
             pastes = data.pastes;
             adminPassword = password;
@@ -34,12 +48,22 @@
             failToast("Incorrect password!");
         }
     }
+
+    function toggleConfigBool(key: string, value: boolean) {
+        config = { ...config, [key]: !value };
+    }
+
+    function updateConfigString(key: string, newValue: string) {
+        config = { ...config, [key]: newValue };
+    }
+
+    function updateConfigNumber(key: string, newValue: number) {
+        config = { ...config, [key]: newValue };
+    }
 </script>
 
 {#if !adminPassword}
-    <Password
-        question={"Admin login password"}
-        onSubmit={fetchConfigAndPastes} />
+    <Password question={"Admin password"} onSubmit={fetchConfigAndPastes} />
 {/if}
 
 <div id="admin-container">
@@ -48,10 +72,16 @@
     <div id="links-section">
         <h3>Links</h3>
         <ul>
-            <li><a href="/docs">Documentation and Help</a></li>
-            <li><a href="/source">Source Code</a></li>
-            <li><a href="/issues">Feedback</a></li>
-            <li><a href="/donate">Donate and Sponsor</a></li>
+            <li>
+                <a href="https://github.com/Masterjoona/pawste">Source Code</a>
+            </li>
+            <li>
+                <a href="https://github.com/Masterjoona/pawste/issues"
+                    >Feedback</a>
+            </li>
+            <li>
+                <a href="https://github.com/sponsors/Masterjoona/">Sponsor</a>
+            </li>
         </ul>
     </div>
 
@@ -77,30 +107,40 @@
                 <th>Link</th>
                 <th>Actions</th>
             </tr>
-            {#each pastes as { PasteName, ReadCount, ReadLast, Privacy, Expire, UrlRedirect }}
+            {#if pastes === null || pastes.length === 0}
                 <tr>
-                    <td>{PasteName}</td>
-                    <td>{Expire} <i class="fa-solid fa-clock"></i></td>
-                    <td>{ReadLast} <i class="fa-solid fa-clock"></i></td>
-                    <td>{Privacy} <i class="fa-solid fa-lock"></i></td>
-                    <td>{ReadCount} <i class="fa-solid fa-eye"></i></td>
-                    <td>
-                        {#if UrlRedirect === 1}
-                            <a href="/u/{PasteName}">Go to URL</a>
-                        {:else}
-                            <a href="/p/{PasteName}">View</a>
-                        {/if}
-                    </td>
-                    <td
-                        ><button
-                            on:click={() =>
-                                (window.location.href = "/e/" + PasteName)}
-                            >Edit</button
-                        ><button on:click={() => deletePaste(PasteName)}
-                            >Delete</button
-                        ></td>
+                    <td colspan="7">No pastes</td>
                 </tr>
-            {/each}
+            {:else}
+                {#each pastes as { PasteName, ReadCount, ReadLast, Privacy, Expire, UrlRedirect }}
+                    <tr>
+                        <td>{PasteName}</td>
+                        <td
+                            >{timeDifference(Expire)}
+                            <i class="fa-solid fa-clock"></i></td>
+                        <td
+                            >{timeDifference(ReadLast)}
+                            <i class="fa-solid fa-clock"></i></td>
+                        <td>{Privacy} <i class="fa-solid fa-lock"></i></td>
+                        <td>{ReadCount} <i class="fa-solid fa-eye"></i></td>
+                        <td>
+                            {#if UrlRedirect === 1}
+                                <a href="/u/{PasteName}">Go to URL</a>
+                            {:else}
+                                <a href="/p/{PasteName}">View</a>
+                            {/if}
+                        </td>
+                        <td>
+                            <button
+                                on:click={() =>
+                                    (window.location.href = "/e/" + PasteName)}
+                                >Edit</button>
+                            <button on:click={() => deletePaste(PasteName)}
+                                >Delete</button>
+                        </td>
+                    </tr>
+                {/each}
+            {/if}
         </table>
     </div>
 
@@ -110,17 +150,53 @@
             <tr>
                 <th>Argument</th>
                 <th>Value</th>
+                <th>Toggle</th>
             </tr>
             {#each Object.entries(config) as [key, value]}
-                {#if key === "MaxEncryptionSize" || key === "MaxFileSize"}
-                    <tr>
-                        <td>{key}</td>
-                        <td>{prettifyFileSize(value)}</td>
-                    </tr>
-                {:else}
+                {#if typeof value === "boolean"}
                     <tr>
                         <td>{key}</td>
                         <td>{value}</td>
+                        <td>
+                            <Switch
+                                checked={value}
+                                onChange={() => toggleConfigBool(key, value)} />
+                        </td>
+                    </tr>
+                {:else if typeof value === "string"}
+                    <tr>
+                        <td>{key}</td>
+                        <td>{value}</td>
+                        <td>
+                            <StringInput
+                                {value}
+                                onInput={(newValue) =>
+                                    updateConfigString(key, newValue)} />
+                        </td>
+                    </tr>
+                {:else if key === "MaxEncryptionSize" || key === "MaxFileSize"}
+                    <tr>
+                        <td>{key}</td>
+                        <td>
+                            {prettifyFileSize(value)}
+                        </td>
+                        <td
+                            ><FileSizeInput
+                                {value}
+                                onInput={(newValue) =>
+                                    updateConfigNumber(key, newValue)} /></td>
+                    </tr>
+                {:else if typeof value === "number"}
+                    <tr>
+                        <td>{key}</td>
+                        <td>{value}</td>
+                        <td>
+                            <input
+                                type="number"
+                                {value}
+                                on:input={(e) =>
+                                    updateConfigNumber(key, e.target.value)} />
+                        </td>
                     </tr>
                 {/if}
             {/each}
@@ -135,6 +211,7 @@
         gap: 20px;
         font-family: var(--main-font);
         margin-top: 20px;
+        justify-content: center;
     }
 
     #admin-container h2 {
@@ -147,17 +224,23 @@
         flex: 1 1 calc(50% - 20px);
     }
 
+    #pastes-section {
+        flex: 1 1 100%;
+        margin-top: 20px;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+    }
+
     #env-vars-section {
         flex: 1 1 100%;
         margin-top: 20px;
     }
 
-    #env-vars-table {
-        font-family: var(--code-font);
-    }
-
-    table {
-        width: 100%;
+    #env-vars-table,
+    #info-table,
+    #pastes-table {
+        width: 80%;
         border-collapse: collapse;
         margin-top: 10px;
     }

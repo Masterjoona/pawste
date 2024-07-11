@@ -1,4 +1,5 @@
 <script>
+    import { timeDifference } from "../lib/utils";
     export let pastes;
 </script>
 
@@ -8,14 +9,16 @@
         <table id="pastes">
             <tr>
                 <th>Name</th>
-                <th>Views</th>
                 <th>Expire</th>
+                <th>Views</th>
                 <th><i class="fa-solid fa-maximize"></i></th>
             </tr>
             {#each pastes as { PasteName, ReadCount, Expire, UrlRedirect }}
                 <tr>
                     <td>{PasteName}</td>
-                    <td>{Expire} <i class="fa-solid fa-clock"></i></td>
+                    <td
+                        >{timeDifference(Expire)}
+                        <i class="fa-solid fa-clock"></i></td>
                     <td>{ReadCount} <i class="fa-solid fa-eye"></i></td>
                     <td>
                         {#if UrlRedirect === 1}

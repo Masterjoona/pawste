@@ -10,18 +10,20 @@ export interface Paste {
     UrlRedirect: number;
     Syntax: string;
     Password: string;
-    Files: File[];
+    Files: FileDb[];
     CreatedAt: number;
     UpdatedAt: number;
 }
 
-export interface File {
+export interface FileDb {
     ID: number;
     Name: string;
     Size: number;
     ContentType: string;
     Blob: any;
 }
+
+export type FileType = FileDb | File;
 
 export interface Config {
     Salt: string;
@@ -30,8 +32,8 @@ export interface Config {
     AdminPassword: string;
     PublicList: boolean;
     FileUpload: boolean;
-    MaxFileSize: number;
-    MaxEncryptionSize: number;
+    MaxFileSize: number | string;
+    MaxEncryptionSize: number | string;
     MaxContentLength: number;
     UploadingPassword: string;
     EternalPaste: boolean;

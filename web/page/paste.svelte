@@ -1,7 +1,7 @@
 <script lang="ts">
     import { copy } from "svelte-copy";
 
-    import Currentfiles from "../lib/ui/CurrentFileList.svelte";
+    import FileList from "../lib/ui/FileList.svelte";
     import Password from "../lib/ui/Password.svelte";
     import Properties from "../lib/ui/Properties.svelte";
 
@@ -87,6 +87,6 @@
             <button on:click={() => deletePaste(paste.PasteName)}
                 >Delete</button>
         </div>
-        <Currentfiles files={paste.Files} pasteName={paste.PasteName} />
+        <FileList files={paste.Files} pasteName={paste.PasteName} />
     </div>
 </div>

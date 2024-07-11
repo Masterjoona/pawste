@@ -1,19 +1,13 @@
 <script lang="ts">
-    import Currentfiles from "../lib/ui/CurrentFileList.svelte";
-    import NewFileList from "../lib/ui/NewFileList.svelte";
+    import FileList from "../lib/ui/FileList.svelte";
     import Password from "../lib/ui/Password.svelte";
     import Properties from "../lib/ui/Properties.svelte";
 
     import { Paste } from "../lib/types";
-    import {
-        failToast,
-        prettifyFileSize,
-        truncateFilename,
-    } from "../lib/utils";
+    import { failToast } from "../lib/utils";
     import "../styles/buttons.css";
     import "../styles/file.css";
     import "../styles/paste.css";
-
     export let paste: Paste;
     export let isEncrypted: boolean;
 
@@ -151,19 +145,17 @@
         </div>
         <p>Current Files:</p>
         {#if paste.Files}
-            <Currentfiles
+            <FileList
                 files={paste.Files}
                 pasteName={paste.PasteName}
                 removeFile={removeOldFile} />
         {/if}
         <div class="file-list">
             <p>New Files:</p>
-            <NewFileList
+            <FileList
                 files={newFiles}
                 {imageSources}
-                removeFile={removeNewFile}
-                {truncateFilename}
-                {prettifyFileSize} />
+                removeFile={removeNewFile} />
         </div>
     </div>
 </div>
