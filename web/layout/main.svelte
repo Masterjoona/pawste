@@ -1,4 +1,4 @@
-<script>
+<script lang="ts">
     import { SvelteToast } from "@zerodevx/svelte-toast";
 
     import Animegirl from "../lib/ui/Animegirl.svelte";
@@ -9,6 +9,8 @@
     import "@fontsource/short-stack";
     import "@fortawesome/fontawesome-free/css/all.css";
     import "../app.css";
+
+    export let AnimeGirls: boolean;
 </script>
 
 <div id="container">
@@ -21,7 +23,9 @@
     </main>
 
     <div>
-        <Animegirl />
+        {#if !AnimeGirls}
+            <Animegirl />
+        {/if}
         <Footer />
     </div>
 </div>

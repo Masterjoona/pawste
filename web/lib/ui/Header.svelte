@@ -4,6 +4,7 @@
     <a href="/">new</a>
     <a href="/list">list</a>
     <a href="/about">about</a>
+    <a href="https://github.com/sponsors/Masterjoona/">Sponsor!</a>
 </center>
 
 <style>
