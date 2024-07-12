@@ -26,10 +26,6 @@ type ConfigEnv struct {
 	CountFileUsage        bool
 }
 
-type PasswordJSON struct {
-	Password string `json:"password"`
-}
-
 var TimeRegex = regexp.MustCompile(`^(\d+)([smhdwMy])$`)
 
 const OneWeek = time.Hour * 24 * 7

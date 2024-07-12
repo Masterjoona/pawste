@@ -38,8 +38,8 @@ func setupMiddleware(r *gin.Engine) {
 }
 
 func setupPublicRoutes(r *gin.Engine) {
-	r.GET("/", page("page/new"))
-	r.GET("/list", handling.HandleList)
+	r.GET("/", handling.HandlePage("page/new", "fileUpload", config.Config.FileUpload))
+	r.GET("/list", handling.HandlePage("page/list", "pastes", database.GetAllPublicPastes()))
 	r.GET("/about", page("page/about"))
 	r.GET("/guide", page("page/guide"))
 }
@@ -47,12 +47,12 @@ func setupPublicRoutes(r *gin.Engine) {
 func setupPasteRoutes(r *gin.Engine) {
 	pasteGroup := r.Group("/p")
 	{
-		pasteGroup.GET("/:pasteName", handling.HandlePastePage)
+		pasteGroup.GET("/:pasteName", handling.HandlePaste)
 		pasteGroup.GET("/:pasteName/raw", handling.HandlePasteRaw)
-		pasteGroup.GET("/:pasteName/json", handling.HandlePasteJSON)
+		pasteGroup.GET("/:pasteName/json", handling.HandlePasteJson)
 		pasteGroup.DELETE("/:pasteName", handling.HandlePasteDelete)
 		pasteGroup.POST("/", handling.HandleSubmit)
-		pasteGroup.PATCH("/:pasteName", handling.HandleUpdate)
+		pasteGroup.PATCH("/:pasteName", handling.HandleEdit)
 		pasteGroup.GET("/:pasteName/f/:fileName", handling.HandleFile)
 		pasteGroup.GET("/:pasteName/f/:fileName/json", handling.HandleFileJson)
 	}
@@ -75,8 +75,8 @@ func setupEditRoutes(r *gin.Engine) {
 func setupAdminRoutes(r *gin.Engine) {
 	adminGroup := r.Group("/admin")
 	{
-		adminGroup.GET("", handling.HandleAdmin)
-		adminGroup.GET("/json", handling.HandleAdminJSON)
+		adminGroup.GET("", page("page/admin"))
+		adminGroup.GET("/json", handling.HandleAdminJson)
 		adminGroup.POST("/reload-config", config.Config.ReloadConfig)
 	}
 }

@@ -104,15 +104,11 @@
     }
 
     async function fetchPaste(password: string) {
-        const resp = await fetch(
-            `/p/${window?.location?.pathname?.split("/").pop()}/json`,
-            {
-                method: "GET",
-                headers: {
-                    password: password,
-                },
+        const resp = await fetch(location.pathname + "/json", {
+            headers: {
+                password: password,
             },
-        );
+        });
         if (resp.ok) {
             paste = await resp.json();
             newContent = paste.Content;

@@ -73,12 +73,8 @@ func calculateIntFromString(s string) int {
 }
 
 func (ConfigEnv) ReloadConfig(c *gin.Context) {
-	var password PasswordJSON
-	if err := c.Bind(&password); err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"error": "give a password dumbass"})
-		return
-	}
-	if password.Password != Config.AdminPassword {
+	password := c.Request.Header.Get("password")
+	if password == "" || password != Config.AdminPassword {
 		c.JSON(http.StatusUnauthorized, gin.H{"error": "wrong password"})
 		return
 	}

@@ -5,6 +5,8 @@
     import "../styles/file.css";
     import "../styles/paste.css";
 
+    export let fileUpload: boolean;
+
     let selectedExpiration = "1w";
     let selectedBurnAfter = "0";
     let selectedSyntax = "none";
@@ -148,18 +150,25 @@
 
         <textarea placeholder="Pawste away" bind:value={content}></textarea>
         <div class="buttons">
-            <input
-                type="file"
-                multiple
-                on:change={handleAttachFiles}
-                style="display: none;"
-                id="file-input" />
-            <button
-                on:click={() => document.getElementById("file-input").click()}
-                >Attach Files</button>
+            {#if fileUpload}
+                <input
+                    type="file"
+                    multiple
+                    on:change={handleAttachFiles}
+                    style="display: none;"
+                    id="file-input" />
+                <button
+                    on:click={() =>
+                        document.getElementById("file-input").click()}
+                    >Attach Files</button>
+            {/if}
             <button on:click={handleSave}>Save</button>
         </div>
-        <FileList files={attachedFiles} {imageSources} {removeFile} />
+        {#if fileUpload}<FileList
+                files={attachedFiles}
+                {imageSources}
+                {removeFile} />
+        {/if}
     </div>
 </div>
 

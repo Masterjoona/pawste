@@ -1,9 +1,9 @@
 <script lang="ts">
-    import { timeDifference } from "../utils";
+    import { successToast, timeDifference, deletePaste } from "../utils";
     import { Paste } from "../types";
     export let pastes: Paste[];
     export let tableHeaders: string[];
-    export let deletePaste: (pasteName: string) => void = null;
+    export let password: string = "";
 </script>
 
 <table id="pastes-table">
@@ -12,7 +12,7 @@
             <th>{header}</th>
         {/each}
     </tr>
-    {#if pastes === null || pastes.length === 0}
+    {#if pastes === undefined || pastes.length === 0}
         <tr>
             <td colspan="7">No pastes</td>
         </tr>
@@ -37,14 +37,17 @@
                         <a href="/p/{PasteName}">View</a>
                     {/if}
                 </td>
-                {#if deletePaste}
+                {#if password}
                     <td>
                         <button
                             on:click={() =>
                                 (window.location.href = "/e/" + PasteName)}
                             >Edit</button>
-                        <button on:click={() => deletePaste(PasteName)}
-                            >Delete</button>
+                        <button
+                            on:click={() =>
+                                deletePaste(PasteName, password, () =>
+                                    successToast(`Deleted ${PasteName}!`),
+                                )}>Delete</button>
                     </td>
                 {/if}
             </tr>

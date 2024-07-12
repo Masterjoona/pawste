@@ -1,33 +1,20 @@
 <script lang="ts">
     import FileSizeInput from "../lib/ui/FileSizeInput.svelte";
     import Password from "../lib/ui/Password.svelte";
-    import StringInput from "../lib/ui/StringInput.svelte";
+    import ConfigInput from "../lib/ui/ConfigInput.svelte";
     import Switch from "../lib/ui/Switch.svelte";
 
     import { Config, Paste } from "../lib/types";
     import PasteList from "../lib/ui/PasteList.svelte";
-    import { failToast, prettifyFileSize, successToast } from "../lib/utils";
+    import { failToast, prettifyFileSize } from "../lib/utils";
     import "../styles/buttons.css";
 
     export let config: Config;
     export let pastes: Paste[];
     let adminPassword = "";
 
-    async function deletePaste(pasteName: string) {
-        const resp = await fetch(`/p/${pasteName}`, {
-            method: "DELETE",
-            body: JSON.stringify({ password: adminPassword }), // cursed but whatever
-        });
-        if (!resp.ok) {
-            failToast("Failed to delete paste!");
-        } else {
-            successToast(`Deleted ${pasteName}!`);
-        }
-    }
-
     async function fetchConfigAndPastes(password: string) {
         const resp = await fetch(location.pathname + "/json", {
-            method: "GET",
             headers: { password },
         });
         if (resp.ok) {
@@ -45,13 +32,15 @@
         }
     }
 
-    function updateConfigValue(key: string, value: string | boolean) {
-        config = { ...config, [key]: !value };
-    }
-    function updateConfigNumber(key: string, event: Event) {
-        const newValue = parseInt((event.target as HTMLInputElement).value);
-        config = { ...config, [key]: newValue };
-    }
+    const updateConfigValue = (
+        key: string,
+        newValue: string | boolean | number,
+    ) => {
+        config = {
+            ...config,
+            [key]: typeof newValue === "boolean" ? !newValue : newValue,
+        };
+    };
 </script>
 
 {#if !adminPassword}
@@ -91,6 +80,7 @@
         <h3>Pastes</h3>
         <PasteList
             {pastes}
+            password={adminPassword}
             tableHeaders={[
                 "Name",
                 "Expire",
@@ -99,8 +89,7 @@
                 "Views",
                 "",
                 "Actions",
-            ]}
-            {deletePaste} />
+            ]} />
     </div>
 
     <div id="env-vars-section">
@@ -111,54 +100,63 @@
                 <th>Value</th>
                 <th>Toggle</th>
             </tr>
-            {#each Object.entries(config) as [key, value]}
-                {#if typeof value === "boolean"}
-                    <tr>
-                        <td>{key}</td>
-                        <td>{value}</td>
-                        <td>
-                            <Switch
-                                checked={value}
-                                onChange={() =>
-                                    updateConfigValue(key, value)} />
-                        </td>
-                    </tr>
-                {:else if typeof value === "string"}
-                    <tr>
-                        <td>{key}</td>
-                        <td>{value}</td>
-                        <td>
-                            <StringInput
-                                {value}
-                                onInput={(newValue) =>
-                                    updateConfigValue(key, newValue)} />
-                        </td>
-                    </tr>
-                {:else if key === "MaxEncryptionSize" || key === "MaxFileSize"}
-                    <tr>
-                        <td>{key}</td>
-                        <td>
-                            {prettifyFileSize(value)}
-                        </td>
-                        <td
-                            ><FileSizeInput
-                                {value}
-                                onInput={(newValue) =>
-                                    updateConfigNumber(key, newValue)} /></td>
-                    </tr>
-                {:else if typeof value === "number"}
-                    <tr>
-                        <td>{key}</td>
-                        <td>{value}</td>
-                        <td>
-                            <input
-                                type="number"
-                                {value}
-                                on:input={(e) => updateConfigNumber(key, e)} />
-                        </td>
-                    </tr>
-                {/if}
-            {/each}
+            {#if config === undefined}
+                <tr><td colspan="3">Loading...</td></tr>
+            {:else}
+                {#each Object.entries(config) as [key, value]}
+                    {#if typeof value === "boolean"}
+                        <tr>
+                            <td>{key}</td>
+                            <td>{value}</td>
+                            <td>
+                                <Switch
+                                    checked={value}
+                                    onChange={() =>
+                                        updateConfigValue(key, value)} />
+                            </td>
+                        </tr>
+                    {:else if typeof value === "string"}
+                        <tr>
+                            <td>{key}</td>
+                            <td>{value}</td>
+                            <td>
+                                <ConfigInput
+                                    type="string"
+                                    {value}
+                                    onInput={(newValue) =>
+                                        updateConfigValue(key, newValue)} />
+                            </td>
+                        </tr>
+                    {:else if key === "MaxEncryptionSize" || key === "MaxFileSize"}
+                        <tr>
+                            <td>{key}</td>
+                            <td>
+                                {prettifyFileSize(value)}
+                            </td>
+                            <td
+                                ><FileSizeInput
+                                    {value}
+                                    onInput={(newValue) =>
+                                        updateConfigValue(
+                                            key,
+                                            newValue,
+                                        )} /></td>
+                        </tr>
+                    {:else if typeof value === "number"}
+                        <tr>
+                            <td>{key}</td>
+                            <td>{value}</td>
+                            <td>
+                                <ConfigInput
+                                    type="number"
+                                    {value}
+                                    onInput={(newValue) =>
+                                        updateConfigValue(key, newValue)} />
+                            </td>
+                        </tr>
+                    {/if}
+                {/each}
+            {/if}
         </table>
     </div>
 </div>

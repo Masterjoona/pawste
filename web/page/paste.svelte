@@ -6,7 +6,7 @@
     import Properties from "../lib/ui/Properties.svelte";
 
     import { Paste } from "../lib/types";
-    import { failToast, successToast } from "../lib/utils";
+    import { failToast, successToast, deletePaste } from "../lib/utils";
 
     import "../styles/buttons.css";
     import "../styles/file.css";
@@ -17,9 +17,7 @@
     export let paste: Paste;
     export let burnAfter: boolean;
 
-    let password: string;
     let hideContent = needsAuth && paste.Privacy !== "readonly";
-    console.log(needsAuth, hideContent);
     let question = "Enter password:";
 
     question = burnAfter
@@ -28,7 +26,6 @@
 
     async function fetchPaste(password: string) {
         const resp = await fetch(location.pathname + "/json", {
-            method: "GET",
             headers: {
                 password: password,
             },
@@ -41,34 +38,23 @@
         }
     }
 
-    async function deletePaste(password: string) {
-        const resp = await fetch(`/p/${paste.PasteName}`, {
-            method: "DELETE",
-            headers: {
-                "Content-Type": "application/json",
-            },
-            body: JSON.stringify({ password }),
-        });
-        if (!resp.ok) {
-            failToast("Failed to delete paste!");
-        } else {
-            location.href = "/";
-        }
-    }
-
     let onSubmitFunc = fetchPaste;
 
     function handleDelete() {
+        const deleteFunc = async (password: string) => {
+            await deletePaste(paste.PasteName, password, () => {
+                window.location.href = "/";
+            });
+        };
         if (paste.Privacy === "readonly") {
             hideContent = true;
             question = "Password needed to delete paste:";
             onSubmitFunc = async (password) => {
-                await deletePaste(password);
+                await deleteFunc(password);
             };
-        } else {
-            console.log("Deleting paste");
-            deletePaste(password);
+            return;
         }
+        deleteFunc("");
     }
 </script>
 

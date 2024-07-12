@@ -80,6 +80,25 @@ export function prettifyFileSize(size: number) {
     return (size / (1024 * 1024 * 1024)).toFixed(2) + " GB";
 }
 
+export async function deletePaste(
+    pasteName: string,
+    password: string,
+    onSuccess: () => void,
+) {
+    const resp = await fetch(`/p/${pasteName}`, {
+        method: "DELETE",
+        headers: {
+            "Content-Type": "application/json",
+            password,
+        },
+    });
+    if (!resp.ok) {
+        failToast("Failed to delete paste!");
+        return;
+    }
+    onSuccess();
+}
+
 export const successToast = (msg: string) => {
     toast.push(msg, {
         theme: {

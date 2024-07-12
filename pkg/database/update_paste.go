@@ -56,6 +56,7 @@ func updatePasteContent(pasteName, content string) error {
 	stmt, err := tx.Prepare(`
 		update pastes set
 			Content = ?,
+			UrlRedirect = ?,
 			UpdatedAt = strftime('%s', 'now')
 		where PasteName = ?
 	`)
@@ -66,6 +67,7 @@ func updatePasteContent(pasteName, content string) error {
 
 	_, err = stmt.Exec(
 		content,
+		utils.IsContentJustUrl(content),
 		pasteName,
 	)
 	return err

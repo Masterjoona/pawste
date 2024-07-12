@@ -31,6 +31,7 @@ func HandleSubmit(c *gin.Context) {
 	err = database.CreatePaste(paste)
 	if err != nil {
 		println(err.Error())
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "internal server error"})
 		return
 	}
 
@@ -58,17 +59,24 @@ func parseSubmitForm(c *gin.Context) (utils.Submit, error) {
 	}
 
 	submit.Files = form.File["files[]"]
+	if 0 < len(submit.Files) && !config.Config.FileUpload {
+		return utils.Submit{}, errors.New("file upload is disabled")
+	}
 	return submit, nil
 }
 
 func validateSubmit(submit *utils.Submit) error {
 	hasFiles := len(submit.Files) > 0
 	if submit.Text == "" && !hasFiles {
-		return errors.New("text or file is required")
+		return errors.New("text or files is required")
 	}
 	needsAuth := (submit.Privacy == "private" || submit.Privacy == "secret" || submit.Privacy == "readonly")
 	if submit.Password == "" && needsAuth {
 		return errors.New("password is required for private, secret or readonly pastes")
+	}
+
+	if 128 < len(submit.Password) {
+		return errors.New("keep them passwords under sane lengths :)")
 	}
 
 	if !utils.AllowedOption(submit.Privacy, paste.PrivacyOptions) {
@@ -79,7 +87,7 @@ func validateSubmit(submit *utils.Submit) error {
 		submit.Expiration = "1w"
 	}
 
-	if config.Config.MaxContentLength > 0 && len(submit.Text) > config.Config.MaxContentLength {
+	if config.Config.MaxContentLength < len(submit.Text) {
 		return errors.New("content is too long")
 	}
 
