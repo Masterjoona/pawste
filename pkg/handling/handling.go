@@ -130,7 +130,6 @@ func HandleUpdate(c *gin.Context) {
 	}
 
 	queriedPaste.Content = newPaste.Content
-	queriedPaste.UpdatedAt = utils.GetCurrentDate()
 	err = database.UpdatePaste(queriedPaste.PasteName, newPaste)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
@@ -164,6 +163,12 @@ func HandleEdit(c *gin.Context) {
 
 func RedirectHome(c *gin.Context) {
 	c.Redirect(http.StatusFound, "/")
+}
+
+func HandleList(c *gin.Context) {
+	golte.RenderPage(c.Writer, c.Request, "page/list", map[string]any{
+		"pastes": database.GetAllPublicPastes(),
+	})
 }
 
 func HandlePasteRaw(c *gin.Context) {

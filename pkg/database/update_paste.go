@@ -56,7 +56,7 @@ func updatePasteContent(pasteName, content string) error {
 	stmt, err := tx.Prepare(`
 		update pastes set
 			Content = ?,
-			UpdatedAt = ?
+			UpdatedAt = strftime('%s', 'now')
 		where PasteName = ?
 	`)
 	if err != nil {
@@ -66,7 +66,6 @@ func updatePasteContent(pasteName, content string) error {
 
 	_, err = stmt.Exec(
 		content,
-		utils.GetCurrentDate(),
 		pasteName,
 	)
 	return err

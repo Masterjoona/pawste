@@ -5,7 +5,7 @@ go 1.22.5
 require github.com/gin-gonic/gin v1.9.1
 
 require (
-	github.com/dlclark/regexp2 v1.10.0 // indirect
+	github.com/dlclark/regexp2 v1.11.1 // indirect
 	github.com/dop251/goja v0.0.0-20231027120936-b396bb4c349d // indirect
 	github.com/dop251/goja_nodejs v0.0.0-20231022114343-5c1f9037c9ab // indirect
 	github.com/go-sourcemap/sourcemap v2.1.3+incompatible // indirect

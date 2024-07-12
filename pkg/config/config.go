@@ -30,6 +30,7 @@ func (ConfigEnv) InitConfig() {
 		MaxContentLength:      getEnvInt("MAX_CONTENT_LENGTH", "1024 * 1024"),
 		UploadingPassword:     getEnv("UPLOADING_PASSWORD", ""),
 		EternalPaste:          getEnv("ETERNAL_PASTE", "false") == "true",
+		MaxExpiryTime:         ParseDuration(getEnv("MAX_EXPIRY_TIME", "1w")),
 		ReadCount:             getEnv("READ_COUNT", "true") == "true",
 		BurnAfter:             getEnv("BURN_AFTER", "true") == "true",
 		DefaultExpiry:         getEnv("DEFAULT_EXPIRY", "1w"),
@@ -83,4 +84,33 @@ func (ConfigEnv) ReloadConfig(c *gin.Context) {
 	}
 	Config.InitConfig()
 	c.JSON(http.StatusOK, gin.H{"message": "reloaded config"})
+}
+
+func ParseDuration(input string) int {
+	matches := TimeRegex.FindStringSubmatch(input)
+	if len(matches) != 3 {
+		return int(OneWeek)
+	}
+
+	quantity, err := strconv.Atoi(matches[1])
+	if err != nil {
+		return int(OneWeek)
+	}
+
+	unit := matches[2]
+	unitMultipliers := map[string]int{
+		"s": 1,
+		"m": 60,
+		"h": 3600,
+		"d": 86400,
+		"w": 604800,
+		"M": 2592000,
+	}
+
+	multiplier, exists := unitMultipliers[unit]
+	if !exists {
+		return int(OneWeek)
+	}
+
+	return quantity * multiplier
 }

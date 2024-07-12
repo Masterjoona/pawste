@@ -30,3 +30,5 @@ type PasteLists struct {
 	Pastes    []Paste
 	Redirects []Paste
 }
+
+var PrivacyOptions = []string{"public", "unlisted", "readonly", "private", "secret"}

@@ -24,10 +24,10 @@ func SubmitToPaste(submit Submit, pasteName string, isRedirect int) paste.Paste 
 			ContentType: file.Header.Get("Content-Type"),
 		})
 	}
-	todaysDate := GetCurrentDate()
+	todaysDate := time.Now().Unix()
 	return paste.Paste{
 		PasteName:   pasteName,
-		Expire:      humanTimeToSQLTime(submit.Expiration),
+		Expire:      humanTimeToUnix(submit.Expiration),
 		Privacy:     submit.Privacy,
 		IsEncrypted: TernaryInt((submit.Password != ""), 1, 0),
 		ReadCount:   0,
@@ -57,26 +57,11 @@ func ConvertMultipartFile(file *multipart.FileHeader) (string, int, []byte) {
 	return file.Filename, len(fileBlob), fileBlob
 }
 
-func humanTimeToSQLTime(humanTime string) int64 {
-	var duration time.Duration
-	duration = 7 * 24 * time.Hour
-	switch humanTime {
-	case "10min":
-		duration = 10 * time.Minute
-	case "1min":
-		duration = 1 * time.Minute
-	case "1h":
-		duration = 1 * time.Hour
-	case "6h":
-		duration = 6 * time.Hour
-	case "24h":
-		duration = 24 * time.Hour
-	case "72h":
-		duration = 72 * time.Hour
-	case "never":
-		duration = 100 * 365 * 24 * time.Hour // cope if you're still using this in 100 years
+func humanTimeToUnix(humanTime string) int64 {
+	duration := time.Duration(config.ParseDuration(humanTime))
+	if time.Duration(config.Config.MaxExpiryTime) < duration {
+		return time.Now().Add(time.Duration(config.OneWeek)).Unix()
 	}
-
 	return time.Now().Add(duration).Unix()
 }
 
@@ -87,17 +72,13 @@ func IsContentJustUrl(content string) int {
 	return 0
 }
 
-func GetCurrentDate() int64 {
-	return time.Now().Unix()
-}
-
-func NotAllowedPrivacy(x string) bool {
-	for _, item := range []string{"public", "unlisted", "readonly", "private", "secret"} {
-		if item == x {
-			return false
+func AllowedOption(s string, options []string) bool {
+	for _, item := range options {
+		if item == s {
+			return true
 		}
 	}
-	return true
+	return false
 }
 
 func TernaryString(condition bool, trueVal, falseVal string) string {

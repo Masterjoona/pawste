@@ -7,6 +7,7 @@ import (
 
 	"github.com/Masterjoona/pawste/pkg/config"
 	"github.com/Masterjoona/pawste/pkg/database"
+	"github.com/Masterjoona/pawste/pkg/paste"
 	"github.com/Masterjoona/pawste/pkg/utils"
 	"github.com/gin-gonic/gin"
 )
@@ -65,12 +66,12 @@ func validateSubmit(submit *utils.Submit) error {
 	if submit.Text == "" && !hasFiles {
 		return errors.New("text or file is required")
 	}
-	encrypt := (submit.Privacy == "private" || submit.Privacy == "secret")
-	if submit.Password == "" && encrypt {
-		return errors.New("password is required for private or secret pastes")
+	needsAuth := (submit.Privacy == "private" || submit.Privacy == "secret" || submit.Privacy == "readonly")
+	if submit.Password == "" && needsAuth {
+		return errors.New("password is required for private, secret or readonly pastes")
 	}
 
-	if utils.NotAllowedPrivacy(submit.Privacy) {
+	if !utils.AllowedOption(submit.Privacy, paste.PrivacyOptions) {
 		return errors.New("invalid privacy")
 	}
 
@@ -82,7 +83,9 @@ func validateSubmit(submit *utils.Submit) error {
 		return errors.New("content is too long")
 	}
 
-	if !encrypt && hasFiles && config.Config.MaxFileSize > 0 {
+	maxSizeFiles := utils.TernaryInt((needsAuth && submit.Privacy != "readonly"), config.Config.MaxEncryptionSize, config.Config.MaxFileSize)
+
+	if hasFiles {
 		totalSize := 0
 		for _, file := range submit.Files {
 			if file == nil {
@@ -90,22 +93,10 @@ func validateSubmit(submit *utils.Submit) error {
 			}
 			totalSize += int(file.Size)
 		}
-		if totalSize > config.Config.MaxFileSize {
-			return errors.New("file size is too large")
+		if totalSize > maxSizeFiles {
+			return errors.New("files are too large")
 		}
 	}
 
-	if encrypt && hasFiles && config.Config.MaxEncryptionSize > 0 {
-		totalSize := 0
-		for _, file := range submit.Files {
-			if file == nil {
-				continue
-			}
-			totalSize += int(file.Size)
-		}
-		if totalSize > config.Config.MaxEncryptionSize {
-			return errors.New("file size is too large for encryption")
-		}
-	}
 	return nil
 }

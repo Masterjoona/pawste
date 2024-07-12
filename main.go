@@ -7,7 +7,6 @@ import (
 	"github.com/Masterjoona/pawste/pkg/config"
 	"github.com/Masterjoona/pawste/pkg/database"
 	"github.com/Masterjoona/pawste/pkg/handling"
-
 	"github.com/gin-gonic/gin"
 	"github.com/nichady/golte"
 	"github.com/romana/rlog"
@@ -25,56 +24,77 @@ var wrapMiddleware = func(middleware func(http.Handler) http.Handler) func(ctx *
 	}
 }
 
+func page(c string) gin.HandlerFunc {
+	return gin.WrapH(golte.Page(c))
+}
+
+func layout(c string) gin.HandlerFunc {
+	return wrapMiddleware(golte.Layout(c))
+}
+
+func setupMiddleware(r *gin.Engine) {
+	r.Use(wrapMiddleware(build.Golte))
+	r.Use(layout("layout/main"))
+}
+
+func setupPublicRoutes(r *gin.Engine) {
+	r.GET("/", page("page/new"))
+	r.GET("/list", handling.HandleList)
+	r.GET("/about", page("page/about"))
+	r.GET("/guide", page("page/guide"))
+}
+
+func setupPasteRoutes(r *gin.Engine) {
+	pasteGroup := r.Group("/p")
+	{
+		pasteGroup.GET("/:pasteName", handling.HandlePastePage)
+		pasteGroup.GET("/:pasteName/raw", handling.HandlePasteRaw)
+		pasteGroup.GET("/:pasteName/json", handling.HandlePasteJSON)
+		pasteGroup.DELETE("/:pasteName", handling.HandlePasteDelete)
+		pasteGroup.POST("/", handling.HandleSubmit)
+		pasteGroup.PATCH("/:pasteName", handling.HandleUpdate)
+		pasteGroup.GET("/:pasteName/f/:fileName", handling.HandleFile)
+		pasteGroup.GET("/:pasteName/f/:fileName/json", handling.HandleFileJson)
+	}
+}
+
+func setupRedirectRoutes(r *gin.Engine) {
+	redirectGroup := r.Group("/")
+	{
+		redirectGroup.GET("u/:pasteName", handling.Redirect)
+		redirectGroup.GET("u", handling.RedirectHome)
+		redirectGroup.GET("p", handling.RedirectHome)
+		redirectGroup.GET("r", handling.RedirectHome)
+		redirectGroup.GET("e", handling.RedirectHome)
+	}
+}
+
+func setupEditRoutes(r *gin.Engine) {
+	r.GET("/e/:pasteName", handling.HandleEdit)
+}
+func setupAdminRoutes(r *gin.Engine) {
+	adminGroup := r.Group("/admin")
+	{
+		adminGroup.GET("", handling.HandleAdmin)
+		adminGroup.GET("/json", handling.HandleAdminJSON)
+		adminGroup.POST("/reload-config", config.Config.ReloadConfig)
+	}
+}
+
 func main() {
 	config.Config.InitConfig()
 	rlog.Info("Starting Pawste " + config.PawsteVersion)
 	database.CreateOrLoadDatabase()
 
-	page := func(c string) gin.HandlerFunc {
-		return gin.WrapH(golte.Page(c))
-	}
-	layout := func(c string) gin.HandlerFunc {
-		return wrapMiddleware(golte.Layout(c))
-	}
-
 	r := gin.Default()
 
-	r.Use(wrapMiddleware(build.Golte))
-	r.Use(layout("layout/main"))
+	setupMiddleware(r)
 
-	r.GET("/", page("page/new"))
-	r.GET("/list", func(ctx *gin.Context) {
-		golte.RenderPage(ctx.Writer, ctx.Request, "page/list", map[string]any{
-			"pastes": database.GetAllPublicPastes(),
-		})
-	})
-	r.GET("/about", page("page/about"))
-	r.GET("/guide", page("page/guide"))
-
-	r.GET("/p/:pasteName", handling.HandlePastePage)
-	r.POST("/p/:pasteName", handling.HandlePastePage) // for auth
-	r.GET("/p/:pasteName/raw", handling.HandlePasteRaw)
-	r.GET("/p/:pasteName/json", handling.HandlePasteJSON)
-	r.DELETE("/p/:pasteName", handling.HandlePasteDelete)
-	r.POST("/p", handling.HandleSubmit)
-
-	r.GET("/u/:pasteName", handling.Redirect)
-
-	r.GET("/e/:pasteName", handling.HandleEdit)
-
-	r.PATCH("/p/:pasteName", handling.HandleUpdate)
-
-	r.GET("/admin", handling.HandleAdmin)
-	r.GET("/admin/json", handling.HandleAdminJSON)
-	r.POST("/admin/reload-config", config.Config.ReloadConfig)
-
-	r.GET("/p/:pasteName/f/:fileName", handling.HandleFile)
-	r.GET("/p/:pasteName/f/:fileName/json", handling.HandleFileJson)
-
-	r.GET("/p", handling.RedirectHome)
-	r.GET("/u", handling.RedirectHome)
-	r.GET("/r", handling.RedirectHome)
-	r.GET("/e", handling.RedirectHome)
+	setupPublicRoutes(r)
+	setupPasteRoutes(r)
+	setupRedirectRoutes(r)
+	setupEditRoutes(r)
+	setupAdminRoutes(r)
 
 	r.Run(config.Config.Port)
 }
