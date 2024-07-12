@@ -4,6 +4,7 @@ import (
 	"database/sql"
 	"os"
 
+	"github.com/Masterjoona/pawste/pkg/config"
 	_ "github.com/mattn/go-sqlite3"
 	"github.com/romana/rlog"
 )
@@ -40,11 +41,11 @@ func CreateOrLoadDatabase() {
 	);
 	`
 
-	sqldb, err := sql.Open("sqlite3", "./pastes.db")
+	sqldb, err := sql.Open("sqlite3", config.Config.DataDir+"pastes.db")
 	if err != nil {
 		rlog.Critical("Could not open database", err)
 	}
-	if _, err := os.Stat("./pastes.db"); os.IsNotExist(err) {
+	if _, err := os.Stat(config.Config.DataDir + "pastes.db"); os.IsNotExist(err) {
 		_, err := sqldb.Exec(createPasteTable)
 		if err != nil {
 			rlog.Critical("Could not create pastes table", err)
