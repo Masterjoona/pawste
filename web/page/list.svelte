@@ -1,6 +1,8 @@
-<script>
+<script lang="ts">
+    import { Paste } from "../lib/types";
     import PasteList from "../lib/ui/PasteList.svelte";
-    export let pastes;
+
+    export let pastes: Paste[] = [];
     const headers = ["Name", "Expire", "View"];
 </script>
 

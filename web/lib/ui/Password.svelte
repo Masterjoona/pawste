@@ -1,11 +1,12 @@
-<script>
-    import { failToast } from "../utils";
+<script lang="ts">
     import "../../styles/password.css";
-    export let question = "Enter password:";
-    export let onSubmit;
-    let inputPassword;
+    import { failToast } from "../utils";
 
+    export let question = "Enter password:";
+    export let onSubmit: (password: string) => void;
+    let inputPassword: string = "";
     const triedPasswds = [];
+
     function callSubmit() {
         if (inputPassword === "") {
             failToast("Password cannot be empty!");

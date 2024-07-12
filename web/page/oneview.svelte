@@ -1,4 +1,4 @@
-<script>
+<script lang="ts">
     import "../styles/buttons.css";
     import "../styles/paste.css";
 
