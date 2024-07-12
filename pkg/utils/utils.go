@@ -29,7 +29,7 @@ func SubmitToPaste(submit Submit, pasteName string, isRedirect int) paste.Paste 
 		PasteName:   pasteName,
 		Expire:      humanTimeToUnix(submit.Expiration),
 		Privacy:     submit.Privacy,
-		IsEncrypted: TernaryInt((submit.Password != ""), 1, 0),
+		NeedsAuth:   TernaryInt((submit.Password != ""), 1, 0),
 		ReadCount:   0,
 		ReadLast:    todaysDate,
 		BurnAfter:   TernaryInt(config.Config.BurnAfter, submit.BurnAfter, 0),

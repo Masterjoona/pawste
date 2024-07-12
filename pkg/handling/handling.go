@@ -21,13 +21,13 @@ func HandlePastePage(c *gin.Context) {
 		return
 	}
 
-	isEncrypted := queriedPaste.IsEncrypted == 1
+	needsAuth := queriedPaste.NeedsAuth == 1
 	burnAfter := queriedPaste.BurnAfter == 1
-	if isEncrypted {
+	if needsAuth && queriedPaste.Privacy != "readonly" {
 		golte.RenderPage(c.Writer, c.Request, "page/paste", map[string]any{
-			"isEncrypted": true,
-			"paste":       paste.Paste{},
-			"burnAfter":   burnAfter,
+			"needsAuth": true,
+			"paste":     paste.Paste{},
+			"burnAfter": burnAfter,
 		})
 		return
 	}
@@ -38,7 +38,8 @@ func HandlePastePage(c *gin.Context) {
 	}
 	queriedPaste.Files = database.GetFiles(pasteName)
 	golte.RenderPage(c.Writer, c.Request, "page/paste", map[string]any{
-		"paste": queriedPaste,
+		"paste":     queriedPaste,
+		"needsAuth": needsAuth,
 	})
 	database.UpdateReadCount(pasteName)
 }
@@ -51,12 +52,12 @@ func HandlePasteJSON(c *gin.Context) {
 		return
 	}
 	reqPassword := c.Request.Header.Get("password")
-	isEncrypted := paste.IsEncrypted == 1
-	if isEncrypted && !isValidPassword(reqPassword, paste.Password) {
+	needsAuth := paste.NeedsAuth == 1
+	if needsAuth && !isValidPassword(reqPassword, paste.Password) {
 		c.JSON(http.StatusUnauthorized, gin.H{"error": "wrong password"})
 		return
 	}
-	if isEncrypted {
+	if needsAuth && paste.Privacy != "readonly" {
 		paste.Content = paste.DecryptText(reqPassword)
 	}
 
@@ -73,7 +74,7 @@ func HandleUpdate(c *gin.Context) {
 		return
 	}
 	pasteFiles := database.GetFiles(queriedPaste.PasteName)
-	isEncrypted := queriedPaste.Privacy == "private" || queriedPaste.Privacy == "secret"
+	needsAuth := queriedPaste.Privacy == "private" || queriedPaste.Privacy == "secret"
 	var newPaste utils.PasteUpdate
 	if err := c.Bind(&newPaste); err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
@@ -88,7 +89,7 @@ func HandleUpdate(c *gin.Context) {
 
 	newPaste.FilesMultiPart = form.File["files[]"]
 
-	if isEncrypted && queriedPaste.Password != database.HashPassword(newPaste.Password) {
+	if needsAuth && queriedPaste.Password != database.HashPassword(newPaste.Password) {
 		c.JSON(http.StatusUnauthorized, gin.H{"error": "wrong password"})
 		return
 	}
@@ -145,12 +146,12 @@ func HandleEdit(c *gin.Context) {
 		c.Redirect(http.StatusFound, "/")
 		return
 	}
-	if queriedPaste.IsEncrypted == 1 {
+	if queriedPaste.NeedsAuth == 1 {
 		tmpPaste := paste.Paste{}
 		tmpPaste.Files = []paste.File{}
 		golte.RenderPage(c.Writer, c.Request, "page/edit", map[string]any{
-			"isEncrypted": queriedPaste.IsEncrypted == 1,
-			"paste":       tmpPaste,
+			"needsAuth": queriedPaste.NeedsAuth == 1,
+			"paste":     tmpPaste,
 		})
 		return
 	}
@@ -180,12 +181,12 @@ func HandlePasteRaw(c *gin.Context) {
 	}
 
 	reqPassword := c.Request.Header.Get("password")
-	isEncrypted := paste.IsEncrypted == 1
-	if isEncrypted && !isValidPassword(reqPassword, paste.Password) {
+	needsAuth := paste.NeedsAuth == 1
+	if needsAuth && !isValidPassword(reqPassword, paste.Password) {
 		c.JSON(http.StatusUnauthorized, gin.H{"error": "wrong password"})
 		return
 	}
-	if isEncrypted {
+	if needsAuth {
 		paste.Content = paste.DecryptText(reqPassword)
 	}
 
@@ -216,8 +217,8 @@ func HandleFileJson(c *gin.Context) {
 	}
 
 	reqPassword := c.Request.Header.Get("password")
-	isEncrypted := paste.IsEncrypted == 1
-	if isEncrypted && !isValidPassword(reqPassword, paste.Password) {
+	needsAuth := paste.NeedsAuth == 1
+	if needsAuth && paste.Privacy != "readonly" && !isValidPassword(reqPassword, paste.Password) {
 		c.JSON(http.StatusUnauthorized, gin.H{"error": "wrong password"})
 		return
 	}
@@ -239,8 +240,8 @@ func HandleFile(c *gin.Context) {
 
 	reqPassword := c.Request.Header.Get("password")
 
-	isEncrypted := queriedPaste.IsEncrypted == 1
-	if isEncrypted && !isValidPassword(reqPassword, queriedPaste.Password) {
+	encrypted := queriedPaste.NeedsAuth == 1 && queriedPaste.Privacy != "readonly"
+	if encrypted && !isValidPassword(reqPassword, queriedPaste.Password) {
 		c.JSON(http.StatusUnauthorized, gin.H{"error": "wrong password"})
 		return
 	}
@@ -251,7 +252,7 @@ func HandleFile(c *gin.Context) {
 		return
 	}
 	filePath := config.Config.DataDir + "/" + queriedPaste.PasteName + "/" + fileDb.Name
-	if isEncrypted {
+	if encrypted {
 		fileBlob, err := os.ReadFile(filePath)
 		if err != nil {
 			c.JSON(http.StatusInternalServerError, gin.H{"error": "failed to read file"})
@@ -278,7 +279,7 @@ func HandlePasteDelete(c *gin.Context) {
 		return
 	}
 
-	if queriedPaste.IsEncrypted == 1 {
+	if queriedPaste.NeedsAuth == 1 {
 		var deletePasswd config.PasswordJSON
 		if err := c.ShouldBindJSON(&deletePasswd); err != nil {
 			c.JSON(http.StatusBadRequest, gin.H{"error": "password required"})

@@ -13,7 +13,7 @@ type Paste struct {
 	PasteName   string
 	Expire      int64
 	Privacy     string
-	IsEncrypted int
+	NeedsAuth   int
 	ReadCount   int
 	ReadLast    int64
 	BurnAfter   int

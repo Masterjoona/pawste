@@ -103,7 +103,7 @@ func GetPasteByName(pasteName string) (paste.Paste, error) {
 			"PasteName",
 			"Expire",
 			"Privacy",
-			"IsEncrypted",
+			"NeedsAuth",
 			"ReadCount",
 			"ReadLast",
 			"BurnAfter",

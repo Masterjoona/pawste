@@ -17,7 +17,7 @@ func CreateOrLoadDatabase() {
 		PasteName text,
 		Expire integer, 
 		Privacy text, 
-		IsEncrypted integer,
+		NeedsAuth integer,
 		ReadCount integer, 
 		ReadLast integer,
 		BurnAfter integer, 

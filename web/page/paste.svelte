@@ -13,12 +13,13 @@
     import "../styles/password.css";
     import "../styles/paste.css";
 
-    export let isEncrypted: boolean;
+    export let needsAuth: boolean;
     export let paste: Paste;
     export let burnAfter: boolean;
 
     let password: string;
-    let showContent = !isEncrypted;
+    let hideContent = needsAuth && paste.Privacy !== "readonly";
+    console.log(needsAuth, hideContent);
     let question = "Enter password:";
 
     question = burnAfter
@@ -26,31 +27,26 @@
         : question;
 
     async function fetchPaste(password: string) {
-        const resp = await fetch(
-            `/p/${window?.location?.pathname?.split("/").pop()}/json`,
-            {
-                method: "GET",
-                headers: {
-                    password: password,
-                },
+        const resp = await fetch(location.pathname + "/json", {
+            method: "GET",
+            headers: {
+                password: password,
             },
-        );
+        });
         if (resp.ok) {
             paste = await resp.json();
-            showContent = true;
+            hideContent = false;
         } else {
             failToast("Incorrect password!");
         }
     }
 
-    async function deletePaste(pasteName: string) {
-        if (paste.Privacy === "readonly") {
-            showContent = false;
-            isEncrypted = true;
-            question = "Password needed to delete paste:";
-        }
-        const resp = await fetch(`/p/${pasteName}`, {
+    async function deletePaste(password: string) {
+        const resp = await fetch(`/p/${paste.PasteName}`, {
             method: "DELETE",
+            headers: {
+                "Content-Type": "application/json",
+            },
             body: JSON.stringify({ password }),
         });
         if (!resp.ok) {
@@ -59,10 +55,25 @@
             location.href = "/";
         }
     }
+
+    let onSubmitFunc = fetchPaste;
+
+    function handleDelete() {
+        if (paste.Privacy === "readonly") {
+            hideContent = true;
+            question = "Password needed to delete paste:";
+            onSubmitFunc = async (password) => {
+                await deletePaste(password);
+            };
+        } else {
+            console.log("Deleting paste");
+            deletePaste(password);
+        }
+    }
 </script>
 
-{#if isEncrypted && !showContent}
-    <Password {question} onSubmit={fetchPaste} />
+{#if needsAuth && hideContent}
+    <Password {question} onSubmit={onSubmitFunc} />
 {/if}
 
 <div id="container">
@@ -84,9 +95,10 @@
                 on:svelte-copy={() => {
                     successToast("URL copied!");
                 }}>Copy URL</button>
-            <button on:click={() => deletePaste(paste.PasteName)}
-                >Delete</button>
+            <button on:click={handleDelete}>Delete</button>
         </div>
-        <FileList files={paste.Files} pasteName={paste.PasteName} />
+        <FileList
+            files={paste.Files ? paste.Files : []}
+            pasteName={paste.PasteName} />
     </div>
 </div>

@@ -9,10 +9,10 @@
     import "../styles/file.css";
     import "../styles/paste.css";
     export let paste: Paste;
-    export let isEncrypted: boolean;
+    export let needsAuth: boolean;
 
     let pastePassword: string;
-    let showContent = !isEncrypted;
+    let hideContent = needsAuth;
     let removedFiles: string[] = [];
     let newFiles: File[] = [];
     let imageSources = [];
@@ -46,7 +46,7 @@
     function filenamesConflict() {
         for (let file of newFiles) {
             if (
-                paste.Files.some((f) => f.Name === file.name) &&
+                paste.Files?.some((f) => f.Name === file.name) &&
                 !removedFiles.includes(file.name)
             ) {
                 return true;
@@ -62,7 +62,7 @@
     };
 
     const emptyPaste = (noNewFiles: boolean) => {
-        return !paste.Files.length && !paste.Content && noNewFiles;
+        return !paste.Files?.length && !paste.Content && noNewFiles;
     };
 
     async function handleSave() {
@@ -116,14 +116,14 @@
         if (resp.ok) {
             paste = await resp.json();
             newContent = paste.Content;
-            showContent = true;
+            hideContent = false;
         } else {
-            failToast("Something went wrong!");
+            failToast("Wrong password!");
         }
     }
 </script>
 
-{#if isEncrypted && !showContent}
+{#if needsAuth && hideContent}
     <Password {question} onSubmit={fetchPaste} />
 {/if}
 

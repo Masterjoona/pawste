@@ -19,7 +19,7 @@ func CreatePaste(paste paste.Paste) error {
 	defer rollbackAndClose(tx, &err)
 
 	stmt, err := tx.Prepare(`
-		INSERT INTO pastes(PasteName, Expire, Privacy, IsEncrypted, ReadCount, ReadLast, BurnAfter, Content, UrlRedirect, Syntax, Password, CreatedAt, UpdatedAt)
+		INSERT INTO pastes(PasteName, Expire, Privacy, NeedsAuth, ReadCount, ReadLast, BurnAfter, Content, UrlRedirect, Syntax, Password, CreatedAt, UpdatedAt)
 		VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
 	`)
 	if err != nil {
@@ -36,13 +36,13 @@ func CreatePaste(paste paste.Paste) error {
 		}
 	}
 
-	NewPassword := utils.TernaryString(encrypt, HashPassword(paste.Password), "")
+	NewPassword := utils.TernaryString((encrypt || paste.Privacy == "readonly"), HashPassword(paste.Password), "")
 
 	_, err = stmt.Exec(
 		paste.PasteName,
 		paste.Expire,
 		paste.Privacy,
-		paste.IsEncrypted,
+		paste.NeedsAuth,
 		paste.ReadCount,
 		paste.ReadLast,
 		paste.BurnAfter,

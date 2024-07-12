@@ -2,7 +2,7 @@ export interface Paste {
     PasteName: string;
     Expire: number;
     Privacy: string;
-    IsEncrypted: number;
+    NeedsAuth: number;
     ReadCount: number;
     ReadLast: number;
     BurnAfter: number;

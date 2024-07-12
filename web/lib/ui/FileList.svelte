@@ -34,10 +34,10 @@
                         removeFile(dataFromDb ? file.Name : file.name)}
                     >Remove</button>
             {/if}
-            <button
-                on:click={() =>
-                    viewFile(pasteName, dataFromDb ? file.Name : file.name)}
-                >View</button>
+            {#if dataFromDb}
+                <button on:click={() => viewFile(pasteName, file.Name)}
+                    >View</button>
+            {/if}
         </div>
     {/each}
 </div>
