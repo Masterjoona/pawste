@@ -19,7 +19,7 @@ Copy `.env.example` to `.env` and fill in the necessary values.
 ```sh
 git clone https://github.com/Masterjoona/pawste/
 cd pawste
-docker compose build && docker compose up -d
+docker compose up -d --build # for whatever reason building go in docker takes so long...
 ```
 
 

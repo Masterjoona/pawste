@@ -41,7 +41,7 @@ func HandleEditJson(c *gin.Context) {
 		return
 	}
 	pasteFiles := database.GetFiles(queriedPaste.PasteName)
-	needsAuth := queriedPaste.Privacy == "private" || queriedPaste.Privacy == "secret"
+
 	var newPaste utils.PasteUpdate
 	if err := c.Bind(&newPaste); err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
@@ -56,12 +56,13 @@ func HandleEditJson(c *gin.Context) {
 
 	newPaste.FilesMultiPart = form.File["files[]"]
 
+	needsAuth := queriedPaste.Privacy == "private" || queriedPaste.Privacy == "secret"
 	if needsAuth && queriedPaste.Password != database.HashPassword(newPaste.Password) {
 		c.JSON(http.StatusUnauthorized, gin.H{"error": "wrong password"})
 		return
 	}
 
-	if config.Config.MaxContentLength > 0 && len(newPaste.Content) > config.Config.MaxContentLength {
+	if config.Config.MaxContentLength < len(newPaste.Content) {
 		c.JSON(http.StatusBadRequest, gin.H{"error": "content too long"})
 		return
 	}
@@ -97,14 +98,13 @@ func HandleEditJson(c *gin.Context) {
 		return
 	}
 
-	queriedPaste.Content = newPaste.Content
 	err = database.UpdatePaste(queriedPaste.PasteName, newPaste)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 		rlog.Errorf("Failed to update paste: %s", err)
 		return
 	}
-	c.JSON(http.StatusOK, queriedPaste)
+	c.JSON(http.StatusOK, gin.H{"message": "paste updated"})
 }
 
 func HandlePasteDelete(c *gin.Context) {

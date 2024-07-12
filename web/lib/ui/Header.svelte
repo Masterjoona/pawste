@@ -1,5 +1,6 @@
 <center>
     <h1>pawste</h1>
+    <h3>**currently in development expect bugs and data being wiped**</h3>
     <a href="/">new</a>
     <a href="/list">list</a>
     <a href="/about">about</a>
