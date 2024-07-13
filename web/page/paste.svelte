@@ -17,6 +17,7 @@
     export let paste: Paste;
     export let burnAfter: boolean;
 
+    let password: string;
     let hideContent = needsAuth && paste.Privacy !== "readonly";
     let question = "Enter password:";
 
@@ -24,15 +25,16 @@
         ? (question += " (Will be burned after read)")
         : question;
 
-    async function fetchPaste(password: string) {
+    async function fetchPaste(inputPassword: string) {
         const resp = await fetch(location.pathname + "/json", {
             headers: {
-                password: password,
+                password: inputPassword,
             },
         });
         if (resp.ok) {
             paste = await resp.json();
             hideContent = false;
+            password = inputPassword;
         } else {
             failToast("Incorrect password!");
         }
@@ -54,7 +56,7 @@
             };
             return;
         }
-        deleteFunc("");
+        deleteFunc(password);
     }
 </script>
 
