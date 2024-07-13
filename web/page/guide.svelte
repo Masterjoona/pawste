@@ -1,6 +1,4 @@
 <div>
-    <h2>Guide</h2>
-    <p>Options</p>
     <p>
         <b>Expiry</b> is the time the paste will be available for viewing. After
         this time, the paste will be deleted.
@@ -37,8 +35,11 @@
 
 <style>
     div {
+        height: 100%;
         display: flex;
         flex-direction: column;
+        align-items: center;
+        justify-content: center;
     }
     h2,
     p {

@@ -9,6 +9,7 @@
     {#if PublicList}
         <a href="/list">list</a>
     {/if}
+    <a href="/guide">guide</a>
     <a href="/about">about</a>
     <a href="https://github.com/sponsors/Masterjoona/">Sponsor!</a>
 </center>
