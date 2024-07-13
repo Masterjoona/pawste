@@ -1,3 +1,7 @@
+<svelte:head>
+    <title>pawst.eu -- guide</title>
+</svelte:head>
+
 <div>
     <p>
         <b>Expiry</b> is the time the paste will be available for viewing. After
