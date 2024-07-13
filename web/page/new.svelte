@@ -24,22 +24,29 @@
     let attachedFiles: File[] = [];
     let imageSources: (string | null)[] = [];
 
-    const setNewFiles = (files: File[]) => {
-        attachedFiles = files;
+    const addNewFile = (file: File) => {
+        attachedFiles = [...attachedFiles, file];
     };
-
-    const setImageSources = (sources: (string | null)[]) => {
-        imageSources = sources;
+    const addImageSources = (source: string) => {
+        imageSources = [...imageSources, source];
     };
 
     function onFileAttach(event: any) {
-        handleAttachFiles(
-            event,
-            attachedFiles,
-            setNewFiles,
-            imageSources,
-            setImageSources,
+        handleAttachFiles(event, addNewFile, addImageSources);
+    }
+
+    function removeFile(filename: string) {
+        const fileIndex = attachedFiles.findIndex(
+            (file) => file.name === filename,
         );
+        if (fileIndex !== -1) {
+            attachedFiles = attachedFiles.filter(
+                (_, index) => index !== fileIndex,
+            );
+            imageSources = imageSources.filter(
+                (_, index) => index !== fileIndex,
+            );
+        }
     }
 
     function handlePasswordChange(event: any) {
@@ -110,10 +117,6 @@
         }
     }
 
-    function removeFile(filename: string) {
-        attachedFiles = attachedFiles.filter((file) => file.name !== filename);
-    }
-
     function handlePrivacyChange(event: any) {
         selectedPrivacy = event.target.value;
         const passwordField = document.getElementById("password-field");
@@ -128,7 +131,6 @@
         }
     }
 </script>
-
 
 <svelte:head>
     <title>pawst.eu -- new paste</title>

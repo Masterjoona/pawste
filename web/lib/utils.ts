@@ -101,30 +101,22 @@ export async function deletePaste(
 
 export function handleAttachFiles(
     event: any, 
-    newFiles: File[], 
-    setNewFiles: (files: File[]) => void, 
-    imageSources: (string | null)[], 
-    setImageSources: (sources: (string | null)[]) => void
+    pushNewFile: (file: File) => void, 
+    pushImageSource: (source: string) => void
 ) {
     const files = event.target.files;
-    const updatedFiles = [...newFiles];
-    const updatedImageSources = [...imageSources];
 
     for (let file of files) {
-        updatedFiles.push(file);
         if (file.type.startsWith("image/")) {
             const reader = new FileReader();
             reader.onload = (e) => {
-                updatedImageSources.push(e.target?.result as string);
-                setImageSources(updatedImageSources);
+                pushImageSource(e.target?.result as string);
             };
             reader.readAsDataURL(file);
-        } else {
-            updatedImageSources.push(null);
         }
+        pushNewFile(file);
     }
-    
-    setNewFiles(updatedFiles);
+
 }
 
 export const successToast = (msg: string) => {
