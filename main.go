@@ -88,7 +88,7 @@ func setupErrorHandlers(r *gin.Engine) {
 	r.NoRoute(func(c *gin.Context) {
 		err := "Page not found"
 		rlog.Error(err)
-		golte.RenderPage(c.Writer, c.Request, "error", map[string]any{
+		golte.RenderPage(c.Writer, c.Request, "page/error", map[string]any{
 			"error": err,
 		})
 	})
@@ -98,7 +98,7 @@ func setupErrorHandlers(r *gin.Engine) {
 		if len(c.Errors) > 0 {
 			err := c.Errors.Last().Error()
 			rlog.Error(err)
-			golte.RenderPage(c.Writer, c.Request, "error", map[string]any{
+			golte.RenderPage(c.Writer, c.Request, "page/error", map[string]any{
 				"error": err,
 			})
 			c.Abort()
