@@ -71,6 +71,7 @@
                 on:click={() =>
                     (window.location.href = "/e/" + paste.PasteName)}
                 >Edit</button>
+            <button on:click={handleDelete}>Delete</button>
             <button
                 use:copy={paste.Content}
                 on:svelte-copy={() => {
@@ -81,7 +82,6 @@
                 on:svelte-copy={() => {
                     successToast("URL copied!");
                 }}>Copy URL</button>
-            <button on:click={handleDelete}>Delete</button>
         </div>
         <FileList
             files={paste.Files ? paste.Files : []}

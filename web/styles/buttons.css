@@ -1,5 +1,6 @@
 .buttons {
     display: flex;
+    flex-wrap: wrap;
     width: 100%;
     justify-content: space-evenly;
 }
@@ -17,4 +18,10 @@ button {
 
 button:hover {
     background-color: var(--main-color-dark);
+}
+
+@media (max-width: 600px) {
+    .buttons {
+        justify-content: center;
+    }
 }

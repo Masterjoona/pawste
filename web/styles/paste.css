@@ -8,6 +8,7 @@
 }
 
 .card {
+    height: 90%;
     width: 90%;
     display: flex;
     justify-content: center;
