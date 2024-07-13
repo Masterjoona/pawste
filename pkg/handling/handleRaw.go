@@ -51,7 +51,7 @@ func HandleFile(c *gin.Context) {
 		c.JSON(http.StatusNotFound, gin.H{"error": "file not found"})
 		return
 	}
-	filePath := config.Config.DataDir + "/" + queriedPaste.PasteName + "/" + fileDb.Name
+	filePath := config.Vars.DataDir + "/" + queriedPaste.PasteName + "/" + fileDb.Name
 	if encrypted {
 		fileBlob, err := os.ReadFile(filePath)
 		if err != nil {
@@ -66,7 +66,7 @@ func HandleFile(c *gin.Context) {
 		c.Data(http.StatusOK, fileDb.ContentType, fileBytes)
 		return
 	}
-	if config.Config.CountFileUsage {
+	if config.Vars.CountFileUsage {
 		database.UpdateReadCount(queriedPaste.PasteName)
 	}
 	c.File(filePath)

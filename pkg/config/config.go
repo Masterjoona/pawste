@@ -10,7 +10,7 @@ import (
 	"github.com/romana/rlog"
 )
 
-var Config ConfigEnv
+var Vars ConfigEnv
 
 const (
 	PawsteVersion = ""
@@ -18,7 +18,7 @@ const (
 )
 
 func (ConfigEnv) InitConfig() {
-	Config = ConfigEnv{
+	Vars = ConfigEnv{
 		Salt:                  getEnv("SALT", "banana"),
 		Port:                  getEnv("PORT", ":9454"),
 		DataDir:               getEnv("DATA_DIR", "pawste_data/"),
@@ -27,7 +27,7 @@ func (ConfigEnv) InitConfig() {
 		FileUpload:            getEnv("FILE_UPLOAD", "true") == "true",
 		MaxFileSize:           getEnvInt("MAX_FILE_SIZE", "1024 * 1024 * 10"),
 		MaxEncryptionSize:     getEnvInt("MAX_ENCRYPTION_SIZE", "1024 * 1024 * 10"),
-		MaxContentLength:      getEnvInt("MAX_CONTENT_LENGTH", "1024 * 1024"),
+		MaxContentLength:      getEnvInt("MAX_CONTENT_LENGTH", "5000"),
 		UploadingPassword:     getEnv("UPLOADING_PASSWORD", ""),
 		EternalPaste:          getEnv("ETERNAL_PASTE", "false") == "true",
 		MaxExpiryTime:         ParseDuration(getEnv("MAX_EXPIRY_TIME", "1w")),
@@ -40,8 +40,8 @@ func (ConfigEnv) InitConfig() {
 		AnimeGirlMode:         getEnv("ANIME_GIRL_MODE", "false") == "true",
 	}
 
-	if _, err := os.Stat(Config.DataDir); os.IsNotExist(err) {
-		os.Mkdir(Config.DataDir, 0755)
+	if _, err := os.Stat(Vars.DataDir); os.IsNotExist(err) {
+		os.Mkdir(Vars.DataDir, 0755)
 	}
 }
 
@@ -55,6 +55,7 @@ func getEnv(key, fallback string) string {
 
 func getEnvInt(key string, fallback string) int {
 	if value, exists := os.LookupEnv(envPrefix + key); exists {
+		rlog.Info("Using environment variable", envPrefix+key, "with value", value)
 		return calculateIntFromString(value)
 	}
 	return calculateIntFromString(fallback)
@@ -75,11 +76,11 @@ func calculateIntFromString(s string) int {
 
 func (ConfigEnv) ReloadConfig(c *gin.Context) {
 	password := c.Request.Header.Get("password")
-	if password == "" || password != Config.AdminPassword {
+	if password == "" || password != Vars.AdminPassword {
 		c.JSON(http.StatusUnauthorized, gin.H{"error": "wrong password"})
 		return
 	}
-	Config.InitConfig()
+	Vars.InitConfig()
 	c.JSON(http.StatusOK, gin.H{"message": "reloaded config"})
 }
 

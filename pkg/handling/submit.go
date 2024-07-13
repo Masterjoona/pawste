@@ -59,7 +59,7 @@ func parseSubmitForm(c *gin.Context) (utils.Submit, error) {
 	}
 
 	submit.Files = form.File["files[]"]
-	if 0 < len(submit.Files) && !config.Config.FileUpload {
+	if 0 < len(submit.Files) && !config.Vars.FileUpload {
 		return utils.Submit{}, errors.New("file upload is disabled")
 	}
 	return submit, nil
@@ -83,15 +83,15 @@ func validateSubmit(submit *utils.Submit) error {
 		return errors.New("invalid privacy")
 	}
 
-	if !config.Config.EternalPaste && submit.Expiration == "never" {
+	if !config.Vars.EternalPaste && submit.Expiration == "never" {
 		submit.Expiration = "1w"
 	}
 
-	if config.Config.MaxContentLength < len(submit.Text) {
+	if config.Vars.MaxContentLength < len(submit.Text) {
 		return errors.New("content is too long")
 	}
 
-	maxSizeFiles := utils.TernaryInt((needsAuth && submit.Privacy != "readonly"), config.Config.MaxEncryptionSize, config.Config.MaxFileSize)
+	maxSizeFiles := utils.TernaryInt((needsAuth && submit.Privacy != "readonly"), config.Vars.MaxEncryptionSize, config.Vars.MaxFileSize)
 
 	if hasFiles {
 		totalSize := 0

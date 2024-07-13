@@ -104,12 +104,12 @@ func saveFiles(tx *sql.Tx, paste *paste.Paste, encrypt bool) error {
 }
 
 func saveFileToDisk(file *paste.File, pasteName string) error {
-	err := os.MkdirAll(config.Config.DataDir+pasteName, 0755)
+	err := os.MkdirAll(config.Vars.DataDir+pasteName, 0755)
 	if err != nil {
 		return err
 	}
 	return os.WriteFile(
-		config.Config.DataDir+pasteName+"/"+file.Name,
+		config.Vars.DataDir+pasteName+"/"+file.Name,
 		file.Blob,
 		0644,
 	)

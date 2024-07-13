@@ -49,7 +49,7 @@ func removeFiles(pasteName string) error {
 	}
 	//rlog.Info("Removed files from db for paste", pasteName)
 
-	return os.RemoveAll(config.Config.DataDir + pasteName)
+	return os.RemoveAll(config.Vars.DataDir + pasteName)
 }
 
 func DeletePaste(pasteName string) error {

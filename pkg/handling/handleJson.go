@@ -62,7 +62,7 @@ func HandleEditJson(c *gin.Context) {
 		return
 	}
 
-	if config.Config.MaxContentLength < len(newPaste.Content) {
+	if config.Vars.MaxContentLength < len(newPaste.Content) {
 		c.JSON(http.StatusBadRequest, gin.H{"error": "content too long"})
 		return
 	}
@@ -93,7 +93,7 @@ func HandleEditJson(c *gin.Context) {
 		})
 	}
 
-	if config.Config.MaxFileSize > 0 && currentFileSizeTotal > config.Config.MaxFileSize {
+	if config.Vars.MaxFileSize > 0 && currentFileSizeTotal > config.Vars.MaxFileSize {
 		c.JSON(http.StatusBadRequest, gin.H{"error": "file size too big"})
 		return
 	}
@@ -117,7 +117,7 @@ func HandlePasteDelete(c *gin.Context) {
 
 	if queriedPaste.NeedsAuth == 1 {
 		password := c.Request.Header.Get("password")
-		if password == "" || !isValidPassword(password, queriedPaste.Password) && password != config.Config.AdminPassword {
+		if password == "" || !isValidPassword(password, queriedPaste.Password) && password != config.Vars.AdminPassword {
 			c.JSON(http.StatusUnauthorized, gin.H{"error": "wrong password"})
 			return
 		}
@@ -155,9 +155,9 @@ func HandleFileJson(c *gin.Context) {
 
 func HandleAdminJson(c *gin.Context) {
 	passwd := c.Request.Header.Get("password")
-	if passwd == "" || passwd != config.Config.AdminPassword {
+	if passwd == "" || passwd != config.Vars.AdminPassword {
 		c.JSON(http.StatusUnauthorized, gin.H{"error": "wrong password"})
 		return
 	}
-	c.JSON(http.StatusOK, gin.H{"config": config.Config, "pastes": database.GetAllPastes()})
+	c.JSON(http.StatusOK, gin.H{"config": config.Vars, "pastes": database.GetAllPastes()})
 }

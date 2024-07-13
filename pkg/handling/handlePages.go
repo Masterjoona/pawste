@@ -3,6 +3,7 @@ package handling
 import (
 	"net/http"
 
+	"github.com/Masterjoona/pawste/pkg/config"
 	"github.com/Masterjoona/pawste/pkg/database"
 	"github.com/Masterjoona/pawste/pkg/paste"
 	"github.com/gin-gonic/gin"
@@ -28,12 +29,13 @@ func Redirect(c *gin.Context) {
 	c.Redirect(http.StatusFound, paste.Content)
 }
 
-func HandlePage(page, varName string, varValue any) gin.HandlerFunc {
-	return func(c *gin.Context) {
-		golte.RenderPage(c.Writer, c.Request, page, map[string]any{
-			varName: varValue,
-		})
-	}
+func HandleNewPage(c *gin.Context) {
+	golte.RenderPage(c.Writer, c.Request, "page/new", map[string]any{
+		"fileUpload":        config.Vars.FileUpload,
+		"maxFileSize":       config.Vars.MaxFileSize,
+		"MaxEncryptionSize": config.Vars.MaxEncryptionSize,
+		"maxContentLength":  config.Vars.MaxContentLength,
+	})
 }
 
 func HandlePaste(c *gin.Context) {

@@ -46,7 +46,7 @@ func cleanUpExpiredPastes() {
 			tx.Rollback()
 			return
 		}
-		err = os.RemoveAll(config.Config.DataDir + "/" + pasteName)
+		err = os.RemoveAll(config.Vars.DataDir + "/" + pasteName)
 		if err != nil {
 			rlog.Error("Could not delete files for paste with name "+pasteName, err)
 		}

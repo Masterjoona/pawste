@@ -1,11 +1,14 @@
 <script lang="ts">
     import FileList from "../lib/ui/FileList.svelte";
-    import { failToast } from "../lib/utils.js";
+    import { failToast, prettifyFileSize } from "../lib/utils.js";
     import "../styles/buttons.css";
     import "../styles/file.css";
     import "../styles/paste.css";
 
     export let fileUpload: boolean;
+    export let maxFileSize: number;
+    export let MaxEncryptionSize: number;
+    export let maxContentLength: number;
 
     let selectedExpiration = "1w";
     let selectedBurnAfter = "0";
@@ -42,12 +45,34 @@
             return;
         }
 
+        if (maxContentLength < content.length) {
+            failToast(
+                `Content is too long! Max length is ${maxContentLength} characters.`,
+            );
+            return;
+        }
+
         const encrypted =
             selectedPrivacy === "private" || selectedPrivacy === "secret";
 
         if (encrypted && password === "") {
             failToast("You must provide a password for encrypted pastes!");
             return;
+        }
+
+        if (attachedFiles.length > 0) {
+            for (let file of attachedFiles) {
+                if (file.size > (encrypted ? MaxEncryptionSize : maxFileSize)) {
+                    failToast(
+                        `File ${file.name} is too large! Max size is ${
+                            encrypted
+                                ? prettifyFileSize(MaxEncryptionSize)
+                                : prettifyFileSize(maxFileSize)
+                        } bytes.`,
+                    );
+                    return;
+                }
+            }
         }
 
         const formData = new FormData();

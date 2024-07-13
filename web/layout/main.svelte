@@ -11,10 +11,11 @@
     import "../app.css";
 
     export let AnimeGirls: boolean;
+    export let PublicList: boolean;
 </script>
 
 <div id="container">
-    <div id="header"><Header /></div>
+    <div id="header"><Header {PublicList} /></div>
 
     <main>
         <SvelteToast />

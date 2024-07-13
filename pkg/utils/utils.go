@@ -32,7 +32,7 @@ func SubmitToPaste(submit Submit, pasteName string, isRedirect int) paste.Paste 
 		NeedsAuth:   TernaryInt((submit.Password != ""), 1, 0),
 		ReadCount:   0,
 		ReadLast:    todaysDate,
-		BurnAfter:   TernaryInt(config.Config.BurnAfter, submit.BurnAfter, 0),
+		BurnAfter:   TernaryInt(config.Vars.BurnAfter, submit.BurnAfter, 0),
 		Content:     submit.Text,
 		Syntax:      submit.Syntax,
 		Password:    submit.Password,
@@ -59,7 +59,7 @@ func ConvertMultipartFile(file *multipart.FileHeader) (string, int, []byte) {
 
 func humanTimeToUnix(humanTime string) int64 {
 	duration := time.Duration(config.ParseDuration(humanTime))
-	if time.Duration(config.Config.MaxExpiryTime) < duration {
+	if time.Duration(config.Vars.MaxExpiryTime) < duration {
 		return time.Now().Add(time.Duration(config.OneWeek)).Unix()
 	}
 	return time.Now().Add(duration).Unix()

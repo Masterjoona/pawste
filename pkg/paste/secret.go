@@ -14,7 +14,7 @@ import (
 )
 
 func SecurePassword(password string) []byte {
-	salt := config.Config.Salt
+	salt := config.Vars.Salt
 	halfLen := int(math.Ceil(float64(len(password)) / 2.0))
 	return []byte(salt[:halfLen] + password + salt + password[:halfLen])
 }

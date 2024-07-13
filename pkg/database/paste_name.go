@@ -79,7 +79,7 @@ const characters = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ01234567
 
 func CreatePasteName(shorten int) string {
 	r := rand.New(rand.NewSource(time.Now().UnixNano()))
-	if config.Config.ShortPasteNames || (shorten == 1 && config.Config.ShortenRedirectPastes) {
+	if config.Vars.ShortPasteNames || (shorten == 1 && config.Vars.ShortenRedirectPastes) {
 		return createShortPasteName(r)
 	}
 	for {

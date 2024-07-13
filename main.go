@@ -40,12 +40,14 @@ func setupMiddleware(r *gin.Engine) {
 }
 
 func setupPublicRoutes(r *gin.Engine) {
-	r.GET("/", handling.HandlePage("page/new", "fileUpload", config.Config.FileUpload))
-	r.GET("/list", func(c *gin.Context) {
-		golte.RenderPage(c.Writer, c.Request, "page/list", map[string]any{
-			"pastes": database.GetAllPublicPastes(),
+	r.GET("/", handling.HandleNewPage)
+	if config.Vars.PublicList {
+		r.GET("/list", func(c *gin.Context) {
+			golte.RenderPage(c.Writer, c.Request, "page/list", map[string]any{
+				"pastes": database.GetAllPublicPastes(),
+			})
 		})
-	})
+	}
 	r.GET("/about", page("page/about"))
 	r.GET("/guide", page("page/guide"))
 }
@@ -83,12 +85,12 @@ func setupAdminRoutes(r *gin.Engine) {
 	{
 		adminGroup.GET("", page("page/admin"))
 		adminGroup.GET("/json", handling.HandleAdminJson)
-		adminGroup.POST("/reload-config", config.Config.ReloadConfig)
+		adminGroup.POST("/reload-config", config.Vars.ReloadConfig)
 	}
 }
 
 func main() {
-	config.Config.InitConfig()
+	config.Vars.InitConfig()
 	rlog.Info("Starting Pawste " + config.PawsteVersion)
 	database.CreateOrLoadDatabase()
 
@@ -102,5 +104,5 @@ func main() {
 	setupEditRoutes(r)
 	setupAdminRoutes(r)
 
-	r.Run(config.Config.Port)
+	r.Run(config.Vars.Port)
 }

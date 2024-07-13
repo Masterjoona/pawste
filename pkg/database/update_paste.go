@@ -11,8 +11,13 @@ import (
 )
 
 func UpdateReadCount(pasteName string) {
+	amount := 1
+	if !config.Vars.ReadCount {
+		amount = 0
+	}
 	_, err := PasteDB.Exec(
-		"update pastes set ReadCount = ReadCount + 1, ReadLast = strftime('%s', 'now') where PasteName = ?",
+		"update pastes set ReadCount = ReadCount + ?, ReadLast = strftime('%s', 'now') where PasteName = ?",
+		amount,
 		pasteName,
 	)
 	if err != nil {
@@ -98,7 +103,7 @@ func updatePasteFiles(pasteName string, newPaste utils.PasteUpdate) error {
 	}
 
 	if len(newPaste.Files) > 0 {
-		err = os.MkdirAll(config.Config.DataDir+pasteName, 0755)
+		err = os.MkdirAll(config.Vars.DataDir+pasteName, 0755)
 		if err != nil {
 			return err
 		}
@@ -131,7 +136,7 @@ func deleteFile(tx *sql.Tx, pasteName, fileName string) error {
 		return err
 	}
 
-	return os.Remove(config.Config.DataDir + pasteName + "/" + fileName)
+	return os.Remove(config.Vars.DataDir + pasteName + "/" + fileName)
 }
 
 func insertFile(tx *sql.Tx, pasteName string, file paste.File) error {
@@ -156,7 +161,7 @@ func insertFile(tx *sql.Tx, pasteName string, file paste.File) error {
 	}
 
 	return os.WriteFile(
-		config.Config.DataDir+pasteName+"/"+file.Name,
+		config.Vars.DataDir+pasteName+"/"+file.Name,
 		file.Blob,
 		0644,
 	)
