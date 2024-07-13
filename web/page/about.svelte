@@ -11,7 +11,7 @@
         >! The backend is done by
         <a href="https://masterjoona.dev" target="_blank">Joona</a>
         and is written in Go and the frontend is done in Svelte by
-        <a href="https://taro.tf/" target="_blank">Taro</a>.
+        <a href="https://taro.tf/about" target="_blank">Taro</a>.
     </p>
     <p>
         Send us an email at <a href="mailto:team@pawst.eu">team@pawst.eu</a>!
