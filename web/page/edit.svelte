@@ -19,31 +19,30 @@
     let newContent = paste.Content;
     const question = "Password needed to edit";
 
-    const setNewFiles = (files: File[]) => {
-        newFiles = files;
+    const addNewFile = (file: File) => {
+        newFiles = [...newFiles, file];
     };
-
-    const setImageSources = (sources: (string | null)[]) => {
-        imageSources = sources;
+    const addImageSources = (source: string) => {
+        imageSources = [...imageSources, source];
     };
 
     function onFileAttach(event: any) {
-        handleAttachFiles(
-            event,
-            newFiles,
-            setNewFiles,
-            imageSources,
-            setImageSources,
-        );
+        handleAttachFiles(event, addNewFile, addImageSources);
+    }
+
+    function removeNewFile(filename: string) {
+        const fileIndex = newFiles.findIndex((file) => file.name === filename);
+        if (fileIndex !== -1) {
+            newFiles = newFiles.filter((_, index) => index !== fileIndex);
+            imageSources = imageSources.filter(
+                (_, index) => index !== fileIndex,
+            );
+        }
     }
 
     function removeOldFile(filename: string) {
         removedFiles = [...removedFiles, filename];
         paste.Files = paste.Files.filter((file) => file.Name !== filename);
-    }
-
-    function removeNewFile(filename: string) {
-        newFiles = newFiles.filter((file) => file.name !== filename);
     }
 
     function filenamesConflict() {
