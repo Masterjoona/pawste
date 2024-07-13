@@ -3,6 +3,7 @@ js/speed-highlight
 node_modules
 pawste
 pkg/build/*
+build
 .svelte-kit
 .DS_Store
 *.upx

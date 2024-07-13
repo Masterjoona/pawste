@@ -29,14 +29,8 @@ func page(c string) gin.HandlerFunc {
 	return gin.WrapH(golte.Page(c))
 }
 
-/*
-	func layout(c string) gin.HandlerFunc {
-		return wrapMiddleware(golte.Layout(c))
-	}
-*/
 func setupMiddleware(r *gin.Engine) {
 	r.Use(wrapMiddleware(build.Golte))
-	//r.Use(layout("layout/main"))
 }
 
 func setupPublicRoutes(r *gin.Engine) {
@@ -80,6 +74,7 @@ func setupRedirectRoutes(r *gin.Engine) {
 func setupEditRoutes(r *gin.Engine) {
 	r.GET("/e/:pasteName", handling.HandleEdit)
 }
+
 func setupAdminRoutes(r *gin.Engine) {
 	adminGroup := r.Group("/admin")
 	{
@@ -87,6 +82,28 @@ func setupAdminRoutes(r *gin.Engine) {
 		adminGroup.GET("/json", handling.HandleAdminJson)
 		adminGroup.POST("/reload-config", config.Vars.ReloadConfig)
 	}
+}
+
+func setupErrorHandlers(r *gin.Engine) {
+	r.NoRoute(func(c *gin.Context) {
+		err := "Page not found"
+		rlog.Error(err)
+		golte.RenderPage(c.Writer, c.Request, "error", map[string]any{
+			"error": err,
+		})
+	})
+
+	r.Use(func(c *gin.Context) {
+		c.Next()
+		if len(c.Errors) > 0 {
+			err := c.Errors.Last().Error()
+			rlog.Error(err)
+			golte.RenderPage(c.Writer, c.Request, "error", map[string]any{
+				"error": err,
+			})
+			c.Abort()
+		}
+	})
 }
 
 func main() {
@@ -97,6 +114,7 @@ func main() {
 	r := gin.Default()
 
 	setupMiddleware(r)
+	setupErrorHandlers(r)
 
 	setupPublicRoutes(r)
 	setupPasteRoutes(r)
