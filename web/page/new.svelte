@@ -1,6 +1,10 @@
 <script lang="ts">
     import FileList from "../lib/ui/FileList.svelte";
-    import { failToast, prettifyFileSize } from "../lib/utils.js";
+    import {
+        failToast,
+        prettifyFileSize,
+        handleAttachFiles,
+    } from "../lib/utils.js";
     import "../styles/buttons.css";
     import "../styles/file.css";
     import "../styles/paste.css";
@@ -15,24 +19,27 @@
     let selectedSyntax = "none";
     let selectedPrivacy = "public";
     let content = "";
-    let attachedFiles = [];
-    let imageSources = [];
     let password = "";
 
-    function handleAttachFiles(event: any) {
-        const files = event.target.files;
-        for (let file of files) {
-            attachedFiles = [...attachedFiles, file];
-            if (file.type.startsWith("image/")) {
-                const reader = new FileReader();
-                reader.onload = (e) => {
-                    imageSources = [...imageSources, e.target.result];
-                };
-                reader.readAsDataURL(file);
-            } else {
-                imageSources = [...imageSources, null];
-            }
-        }
+    let attachedFiles: File[] = [];
+    let imageSources: (string | null)[] = [];
+
+    const setNewFiles = (files: File[]) => {
+        attachedFiles = files;
+    };
+
+    const setImageSources = (sources: (string | null)[]) => {
+        imageSources = sources;
+    };
+
+    function onFileAttach(event: any) {
+        handleAttachFiles(
+            event,
+            attachedFiles,
+            setNewFiles,
+            imageSources,
+            setImageSources,
+        );
     }
 
     function handlePasswordChange(event: any) {
@@ -106,6 +113,7 @@
     function removeFile(filename: string) {
         attachedFiles = attachedFiles.filter((file) => file.name !== filename);
     }
+
     function handlePrivacyChange(event: any) {
         selectedPrivacy = event.target.value;
         const passwordField = document.getElementById("password-field");
@@ -179,7 +187,7 @@
                 <input
                     type="file"
                     multiple
-                    on:change={handleAttachFiles}
+                    on:change={onFileAttach}
                     style="display: none;"
                     id="file-input" />
                 <button

@@ -99,6 +99,34 @@ export async function deletePaste(
     onSuccess();
 }
 
+export function handleAttachFiles(
+    event: any, 
+    newFiles: File[], 
+    setNewFiles: (files: File[]) => void, 
+    imageSources: (string | null)[], 
+    setImageSources: (sources: (string | null)[]) => void
+) {
+    const files = event.target.files;
+    const updatedFiles = [...newFiles];
+    const updatedImageSources = [...imageSources];
+
+    for (let file of files) {
+        updatedFiles.push(file);
+        if (file.type.startsWith("image/")) {
+            const reader = new FileReader();
+            reader.onload = (e) => {
+                updatedImageSources.push(e.target?.result as string);
+                setImageSources(updatedImageSources);
+            };
+            reader.readAsDataURL(file);
+        } else {
+            updatedImageSources.push(null);
+        }
+    }
+    
+    setNewFiles(updatedFiles);
+}
+
 export const successToast = (msg: string) => {
     toast.push(msg, {
         theme: {

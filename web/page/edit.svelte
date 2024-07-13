@@ -4,7 +4,7 @@
     import Properties from "../lib/ui/Properties.svelte";
 
     import { Paste } from "../lib/types";
-    import { failToast } from "../lib/utils";
+    import { failToast, handleAttachFiles } from "../lib/utils";
     import "../styles/buttons.css";
     import "../styles/file.css";
     import "../styles/paste.css";
@@ -15,30 +15,33 @@
     let hideContent = needsAuth;
     let removedFiles: string[] = [];
     let newFiles: File[] = [];
-    let imageSources = [];
+    let imageSources: (string | null)[] = [];
     let newContent = paste.Content;
     const question = "Password needed to edit";
 
-    function handleAttachFiles(event: any) {
-        const files = event.target.files;
-        for (let file of files) {
-            newFiles = [...newFiles, file];
-            if (file.type.startsWith("image/")) {
-                const reader = new FileReader();
-                reader.onload = (e) => {
-                    imageSources = [...imageSources, e.target.result];
-                };
-                reader.readAsDataURL(file);
-            } else {
-                imageSources = [...imageSources, null];
-            }
-        }
+    const setNewFiles = (files: File[]) => {
+        newFiles = files;
+    };
+
+    const setImageSources = (sources: (string | null)[]) => {
+        imageSources = sources;
+    };
+
+    function onFileAttach(event: any) {
+        handleAttachFiles(
+            event,
+            newFiles,
+            setNewFiles,
+            imageSources,
+            setImageSources,
+        );
     }
 
     function removeOldFile(filename: string) {
         removedFiles = [...removedFiles, filename];
         paste.Files = paste.Files.filter((file) => file.Name !== filename);
     }
+
     function removeNewFile(filename: string) {
         newFiles = newFiles.filter((file) => file.name !== filename);
     }
@@ -131,7 +134,7 @@
             <input
                 type="file"
                 multiple
-                on:change={handleAttachFiles}
+                on:change={onFileAttach}
                 style="display: none;"
                 id="file-input" />
             <button
