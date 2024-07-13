@@ -129,6 +129,10 @@
     }
 </script>
 
+
+<svelte:head>
+    <title>pawst.eu -- new paste</title>
+</svelte:head>
 <div id="container">
     <div class="card">
         <div class="options">

@@ -1,3 +1,7 @@
+<svelte:head>
+    <title>pawst.eu -- about</title>
+</svelte:head>
+
 <div>
     <h2>About us ♡</h2>
     <p>

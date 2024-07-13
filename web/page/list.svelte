@@ -6,6 +6,10 @@
     const headers = ["Name", "Expire", "View"];
 </script>
 
+<svelte:head>
+    <title>pawst.eu -- paste list</title>
+</svelte:head>
+
 <div id="spacemaker"></div>
 <div id="container">
     <PasteList {pastes} tableHeaders={headers} />
