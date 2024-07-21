@@ -1,0 +1,1 @@
+<Password {question} onSubmit={onSubmitFunc} />

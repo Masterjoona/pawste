@@ -34,10 +34,13 @@ func HandleSubmit(c *gin.Context) {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": "internal server error"})
 		return
 	}
+	for i := range paste.Files {
+		paste.Files[i].Blob = nil
+	}
 
-	c.JSON(http.StatusOK, gin.H{
-		"pasteName": pasteName,
-	})
+	c.JSON(http.StatusOK,
+		paste,
+	)
 }
 
 func parseSubmitForm(c *gin.Context) (utils.Submit, error) {

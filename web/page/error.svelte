@@ -1,12 +1,11 @@
-<script>
-    export let error;
+<script lang="ts">
+    export let error: string;
 </script>
 
 <div class="error-container">
     <p class="error-title">{error} &gt;w&lt;</p>
     <a class="error-details" href="/">Take me back to safety</a>
 </div>
-
 
 <style>
     .error-container {

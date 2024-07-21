@@ -116,7 +116,6 @@ export function handleAttachFiles(
         }
         pushNewFile(file);
     }
-
 }
 
 export const successToast = (msg: string) => {

@@ -45,7 +45,6 @@
         align-items: center;
         justify-content: center;
     }
-    h2,
     p {
         text-align: center;
         width: 76.6%;

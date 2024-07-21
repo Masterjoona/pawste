@@ -8,6 +8,7 @@ import (
 	"github.com/Masterjoona/pawste/pkg/database"
 	"github.com/Masterjoona/pawste/pkg/paste"
 	"github.com/gin-gonic/gin"
+	"github.com/nichady/golte"
 )
 
 func HandlePasteRaw(c *gin.Context) {
@@ -41,6 +42,14 @@ func HandleFile(c *gin.Context) {
 
 	reqPassword := c.Request.Header.Get("password")
 	encrypted := queriedPaste.NeedsAuth == 1 && queriedPaste.Privacy != "readonly"
+	if reqPassword == "" && encrypted {
+		golte.RenderPage(c.Writer, c.Request, "page/auth_file", nil)
+		return
+	}
+	handleFileRaw(c, reqPassword, encrypted, queriedPaste)
+}
+
+func handleFileRaw(c *gin.Context, reqPassword string, encrypted bool, queriedPaste paste.Paste) {
 	if encrypted && !isValidPassword(reqPassword, queriedPaste.Password) {
 		c.JSON(http.StatusUnauthorized, gin.H{"error": "wrong password"})
 		return

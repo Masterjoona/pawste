@@ -102,7 +102,7 @@
         }
 
         const response = await (
-            await fetch("/p", {
+            await fetch("/p/new", {
                 method: "POST",
                 body: formData,
             })

@@ -1,12 +1,18 @@
 <script lang="ts">
     import { copy } from "svelte-copy";
+    import { url } from "golte/stores";
 
     import FileList from "../lib/ui/FileList.svelte";
     import Password from "../lib/ui/Password.svelte";
     import Properties from "../lib/ui/Properties.svelte";
 
     import { Paste } from "../lib/types";
-    import { failToast, successToast, deletePaste } from "../lib/utils";
+    import {
+        failToast,
+        successToast,
+        deletePaste,
+        prettifyFileSize,
+    } from "../lib/utils";
 
     import "../styles/buttons.css";
     import "../styles/file.css";
@@ -59,6 +65,25 @@
         deleteFunc(password);
     }
 </script>
+
+<svelte:head>
+    <title>pawst.eu -- {paste.PasteName}</title>
+    <meta property="og:title" content={paste.PasteName} />
+    <meta name="og:site_name" content="pawst.eu" />
+    <meta name="twitter:site_name" content="pawst.eu" />
+    {#if paste.Files !== null && paste.Files.length > 0}
+        <meta
+            name="description"
+            content={prettifyFileSize(paste.Files[0].Size)} />
+        <meta name="twitter:card" content="summary_large_image" />
+        <meta
+            property="og:image"
+            content={$url.origin +
+                $url.pathname +
+                "/f/" +
+                paste.Files[0].Name} />
+    {/if}
+</svelte:head>
 
 {#if needsAuth && hideContent}
     <Password {question} onSubmit={onSubmitFunc} />

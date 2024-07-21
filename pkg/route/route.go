@@ -53,7 +53,7 @@ func SetupPasteRoutes(r *gin.Engine) {
 		pasteGroup.GET("/:pasteName/raw", handling.HandlePasteRaw)
 		pasteGroup.GET("/:pasteName/json", handling.HandlePasteJson)
 		pasteGroup.DELETE("/:pasteName", handling.HandlePasteDelete)
-		pasteGroup.POST("/", handling.HandleSubmit)
+		pasteGroup.POST("/new", handling.HandleSubmit)
 		pasteGroup.PATCH("/:pasteName", handling.HandleEditJson)
 		pasteGroup.GET("/:pasteName/f/:fileName", handling.HandleFile)
 		pasteGroup.GET("/:pasteName/f/:fileName/json", handling.HandleFileJson)
