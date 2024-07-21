@@ -29,10 +29,10 @@ func SubmitToPaste(submit Submit, pasteName string, isRedirect int) paste.Paste 
 		PasteName:   pasteName,
 		Expire:      humanTimeToUnix(submit.Expiration),
 		Privacy:     submit.Privacy,
-		NeedsAuth:   TernaryInt((submit.Password != ""), 1, 0),
+		NeedsAuth:   Ternary((submit.Password == ""), 0, 1).(int),
 		ReadCount:   0,
 		ReadLast:    todaysDate,
-		BurnAfter:   TernaryInt(config.Vars.BurnAfter, submit.BurnAfter, 0),
+		BurnAfter:   Ternary(config.Vars.BurnAfter, submit.BurnAfter, 0).(int),
 		Content:     submit.Text,
 		Syntax:      submit.Syntax,
 		Password:    submit.Password,
@@ -58,6 +58,9 @@ func ConvertMultipartFile(file *multipart.FileHeader) (string, int, []byte) {
 }
 
 func humanTimeToUnix(humanTime string) int64 {
+	if humanTime == "never" {
+		return -1
+	}
 	duration := time.Duration(config.ParseDuration(humanTime))
 	if time.Duration(config.Vars.MaxExpiryTime) < duration {
 		return time.Now().Add(time.Duration(config.OneWeek)).Unix()
@@ -81,14 +84,7 @@ func AllowedOption(s string, options []string) bool {
 	return false
 }
 
-func TernaryString(condition bool, trueVal, falseVal string) string {
-	if condition {
-		return trueVal
-	}
-	return falseVal
-}
-
-func TernaryInt(condition bool, trueVal, falseVal int) int {
+func Ternary(condition bool, trueVal, falseVal any) any {
 	if condition {
 		return trueVal
 	}

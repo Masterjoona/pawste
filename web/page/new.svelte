@@ -96,7 +96,6 @@
         formData.append("privacy", selectedPrivacy);
         formData.append("content", content);
         formData.append("password", password);
-        console.log(attachedFiles);
         for (let file of attachedFiles) {
             formData.append("files[]", file);
         }
@@ -110,11 +109,8 @@
 
         if (response?.error) {
             failToast(response?.error);
-        } else {
-            setTimeout(() => {
-                window.location.href = `/p/${response.pasteName}`;
-            }, 500);
         }
+        window.location.href = `/p/${response.PasteName}`;
     }
 
     function handlePrivacyChange(event: any) {

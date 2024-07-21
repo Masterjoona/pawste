@@ -46,7 +46,7 @@ func HandleSubmit(c *gin.Context) {
 func parseSubmitForm(c *gin.Context) (utils.Submit, error) {
 	var submit utils.Submit
 	submit.Text = c.PostForm("content")
-	submit.Expiration = c.PostForm("expiration")
+	submit.Expiration = c.PostForm("expire")
 	submit.Password = c.PostForm("password")
 	submit.Syntax = c.PostForm("syntax")
 	submit.Privacy = c.PostForm("privacy")
@@ -94,7 +94,7 @@ func validateSubmit(submit *utils.Submit) error {
 		return errors.New("content is too long")
 	}
 
-	maxSizeFiles := utils.TernaryInt((needsAuth && submit.Privacy != "readonly"), config.Vars.MaxEncryptionSize, config.Vars.MaxFileSize)
+	maxSizeFiles := utils.Ternary((needsAuth && submit.Privacy != "readonly"), config.Vars.MaxEncryptionSize, config.Vars.MaxFileSize).(int)
 
 	if hasFiles {
 		totalSize := 0

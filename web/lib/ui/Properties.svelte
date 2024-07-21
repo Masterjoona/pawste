@@ -10,7 +10,7 @@
     <div class="icon-container">
         <p>{paste.ReadCount} <i class="fa-solid fa-eye"></i></p>
         <p>
-            Read last {timeDifference(paste.ReadLast)}
+            {timeDifference(paste.ReadLast, "Read last")}
         </p>
         {#if paste.BurnAfter !== 0}
             <p>
@@ -22,7 +22,7 @@
             <i class="fa-solid fa-file-lines"></i>
         </p>
         <p>
-            Expires in {timeDifference(paste.Expire)}
+            {timeDifference(paste.Expire, "Expires in")}
             <i class="fa-solid fa-clock"></i>
         </p>
     </div>

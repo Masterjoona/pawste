@@ -10,7 +10,7 @@ import (
 
 func cleanUpExpiredPastes() {
 	pastes, err := PasteDB.Query(
-		"select PasteName from pastes where Expire < strftime('%s', 'now') or BurnAfter <= ReadCount and BurnAfter > 0",
+		"select PasteName from pastes where Expire < strftime('%s', 'now') and 0 < Expire or BurnAfter <= ReadCount and BurnAfter > 0",
 	)
 	if err != nil {
 		rlog.Error("Could not clean up expired pastes", err)

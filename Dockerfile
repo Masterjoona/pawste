@@ -11,7 +11,7 @@ COPY ./web /app/web
 
 FROM base AS build
 RUN --mount=type=cache,id=pnpm,target=/pnpm/store pnpm install --prod
-RUN pnpm dlx golte
+RUN pnpm run build
 
 FROM golang:1.22.5-alpine AS go-build
 

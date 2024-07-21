@@ -30,7 +30,8 @@ export function isFileDb(file: FileType): file is FileDb {
     return (file as FileDb)?.Name !== undefined;
 }
 
-export function timeDifference(timestamp: number) {
+export function timeDifference(timestamp: number, prepend: string = "") {
+    if (timestamp === -1) return "never";
     timestamp *= 1000;
 
     const now = new Date();
@@ -69,7 +70,7 @@ export function timeDifference(timestamp: number) {
 
     const suffix = diff > 0 ? "" : "ago";
 
-    return `${timeValue} ${timeUnit} ${suffix}`;
+    return `${prepend} ${timeValue} ${timeUnit} ${suffix}`;
 }
 
 export function prettifyFileSize(size: number) {

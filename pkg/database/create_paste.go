@@ -36,7 +36,7 @@ func CreatePaste(paste paste.Paste) error {
 		}
 	}
 
-	NewPassword := utils.TernaryString((encrypt || paste.Privacy == "readonly"), HashPassword(paste.Password), "")
+	NewPassword := utils.Ternary((encrypt || paste.Privacy == "readonly"), HashPassword(paste.Password), "")
 
 	_, err = stmt.Exec(
 		paste.PasteName,

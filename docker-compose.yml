@@ -10,3 +10,4 @@ services:
             - "9454:9454"
         volumes:
             - ./pawste_data:/app/pawste_data
+        user: "${UID}:${GID}"
