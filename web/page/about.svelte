@@ -1,5 +1,5 @@
 <svelte:head>
-    <title>pawst.eu -- about</title>
+    <title>pawste -- about</title>
 </svelte:head>
 
 <div>

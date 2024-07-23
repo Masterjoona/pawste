@@ -1,17 +1,22 @@
 # pawste
 
-This is my attempt at making a featureful, easy-to-use and configurable pastebin, **pawste**!
+This is my attempt at making pastebin, **pawste**!
 
 ### Public instance: [pawst.eu](https://pawst.eu)
 
-Or if you're savvy enough, you can host your own instance of pawste! 
-
+Or if you're savvy enough, you can host your own instance of pawste!
 
 ## Features
 
-lots
+-   single binary
+-   encryption (server side, soon on client too)
+-   configurable file uploads
+-   url shortening/redirection
+-   public, private, editable pastes
+-   readcounts and burn after n reads
 
 ## Hosting your own instance
+
 Copy `.env.example` to `.env` and fill in the necessary values.
 
 ### Docker
@@ -19,17 +24,15 @@ Copy `.env.example` to `.env` and fill in the necessary values.
 ```sh
 git clone https://github.com/Masterjoona/pawste/
 cd pawste
-UID=${UID} GID=${GID} docker compose up -d --build 
+UID=${UID} GID=${GID} docker compose up -d --build
 # for whatever reason building go in docker takes so long...
-# set uid and gid for you to delete files and stuff
+# set uid and gid for you to delete files and stuff on host
 ```
-
 
 ### Manual
-Build the project
-> [!NOTE]  
-> Assumming you have Go installed and pnpm i'ed
+
 ```sh
-make build 
+pnpm run build && go build
 ```
-Then make a service file for it and run it!
+
+Then make a service file for it and run it with systemd or something.

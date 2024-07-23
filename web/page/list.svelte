@@ -7,7 +7,7 @@
 </script>
 
 <svelte:head>
-    <title>pawst.eu -- paste list</title>
+    <title>pawste -- paste list</title>
 </svelte:head>
 
 <div id="spacemaker"></div>

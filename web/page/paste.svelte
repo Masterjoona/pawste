@@ -67,10 +67,10 @@
 </script>
 
 <svelte:head>
-    <title>pawst.eu -- {paste.PasteName}</title>
+    <title>pawste -- {paste.PasteName}</title>
     <meta property="og:title" content={paste.PasteName} />
-    <meta name="og:site_name" content="pawst.eu" />
-    <meta name="twitter:site_name" content="pawst.eu" />
+    <meta name="og:site_name" content="pawste" />
+    <meta name="twitter:site_name" content="pawste" />
     {#if paste.Files !== null && paste.Files.length > 0}
         <meta
             name="description"
