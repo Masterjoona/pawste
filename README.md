@@ -14,10 +14,11 @@ Or if you're savvy enough, you can host your own instance of pawste!
 -   url shortening/redirection
 -   public, private, editable pastes
 -   readcounts and burn after n reads
+-   works with sharex ([examples](examples/))
 
 ## Hosting your own instance
 
-Copy `.env.example` to `.env` and fill in the necessary values.
+Copy `.env.example` to `.env` and configure it to your liking.
 
 ### Docker
 
@@ -35,4 +36,4 @@ UID=${UID} GID=${GID} docker compose up -d --build
 pnpm run build && go build
 ```
 
-Then make a service file for it and run it with systemd or something.
+Then make a [service file](examples/pawste.service) for it and run it with systemd or something.

@@ -1,0 +1,15 @@
+{
+  "Version": "15.0.0",
+  "Name": "pawste text",
+  "DestinationType": "TextUploader",
+  "RequestMethod": "POST",
+  "RequestURL": "https://pawst.eu/p/new",
+  "Body": "MultipartFormData",
+  "Arguments": {
+    "expire": "1w",
+    "burnafter": "0",
+    "privacy": "unlisted",
+    "content": "{input}"
+  },
+  "URL": "https://pawst.eu/p/{json:PasteName}"
+}
