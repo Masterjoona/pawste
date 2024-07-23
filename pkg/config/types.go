@@ -3,6 +3,8 @@ package config
 import (
 	"regexp"
 	"time"
+
+	"math/rand"
 )
 
 type ConfigEnv struct {
@@ -17,7 +19,7 @@ type ConfigEnv struct {
 	MaxContentLength      int
 	UploadingPassword     string
 	EternalPaste          bool
-	MaxExpiryTime         int
+	MaxExpiryTime         string
 	ReadCount             bool
 	BurnAfter             bool
 	DefaultExpiry         string
@@ -30,3 +32,5 @@ type ConfigEnv struct {
 var TimeRegex = regexp.MustCompile(`^(\d+)([smhdwMy])$`)
 
 const OneWeek = time.Hour * 24 * 7
+
+var RandomSource = rand.New(rand.NewSource(time.Now().UnixNano()))

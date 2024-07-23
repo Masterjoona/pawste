@@ -10,6 +10,7 @@ import (
 	"github.com/Masterjoona/pawste/pkg/paste"
 	"github.com/Masterjoona/pawste/pkg/utils"
 	"github.com/gin-gonic/gin"
+	"github.com/romana/rlog"
 )
 
 func HandleSubmit(c *gin.Context) {
@@ -27,10 +28,14 @@ func HandleSubmit(c *gin.Context) {
 	isRedirect := utils.IsContentJustUrl(submit.Text)
 	pasteName := database.CreatePasteName(isRedirect)
 
-	paste := utils.SubmitToPaste(submit, pasteName, isRedirect)
+	paste, err := utils.SubmitToPaste(submit, pasteName, isRedirect)
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "internal server error"})
+		return
+	}
 	err = database.CreatePaste(paste)
 	if err != nil {
-		println(err.Error())
+		rlog.Error("Error creating paste", err)
 		c.JSON(http.StatusInternalServerError, gin.H{"error": "internal server error"})
 		return
 	}

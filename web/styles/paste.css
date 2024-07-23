@@ -46,7 +46,7 @@
 
 textarea {
     width: 99%;
-    height: 200px;
+    height: 80%;
     font-family: var(--code-font);
     background-color: #1b1b22;
     color: white;

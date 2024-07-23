@@ -5,6 +5,7 @@ import (
 	"os"
 	"strconv"
 	"strings"
+	"time"
 
 	"github.com/gin-gonic/gin"
 	"github.com/romana/rlog"
@@ -30,7 +31,7 @@ func (ConfigEnv) InitConfig() {
 		MaxContentLength:      getEnvInt("MAX_CONTENT_LENGTH", "5000"),
 		UploadingPassword:     getEnv("UPLOADING_PASSWORD", ""),
 		EternalPaste:          getEnv("ETERNAL_PASTE", "false") == "true",
-		MaxExpiryTime:         ParseDuration(getEnv("MAX_EXPIRY_TIME", "1w")),
+		MaxExpiryTime:         getEnv("MAX_EXPIRY_TIME", "1w"),
 		ReadCount:             getEnv("READ_COUNT", "true") == "true",
 		BurnAfter:             getEnv("BURN_AFTER", "true") == "true",
 		DefaultExpiry:         getEnv("DEFAULT_EXPIRY", "1w"),
@@ -84,15 +85,17 @@ func (ConfigEnv) ReloadConfig(c *gin.Context) {
 	c.JSON(http.StatusOK, gin.H{"message": "reloaded config"})
 }
 
-func ParseDuration(input string) int {
+func ParseDuration(input string) time.Duration {
 	matches := TimeRegex.FindStringSubmatch(input)
 	if len(matches) != 3 {
-		return int(OneWeek)
+		rlog.Debug("Invalid duration:", input)
+		return time.Duration(OneWeek)
 	}
 
 	quantity, err := strconv.Atoi(matches[1])
 	if err != nil {
-		return int(OneWeek)
+		rlog.Debug("Invalid duration:", input)
+		return time.Duration(OneWeek)
 	}
 
 	unit := matches[2]
@@ -107,8 +110,9 @@ func ParseDuration(input string) int {
 
 	multiplier, exists := unitMultipliers[unit]
 	if !exists {
-		return int(OneWeek)
+		rlog.Debug("Invalid duration:", input)
+		return time.Duration(OneWeek)
 	}
 
-	return quantity * multiplier
+	return time.Duration(quantity*multiplier) * time.Second
 }

@@ -25,7 +25,12 @@ func HandlePasteJson(c *gin.Context) {
 		return
 	}
 	if needsAuth && paste.Privacy != "readonly" {
-		paste.Content = paste.DecryptText(reqPassword)
+		paste.Content, err = paste.DecryptText(reqPassword)
+		if err != nil {
+			c.JSON(http.StatusInternalServerError, gin.H{"error": "internal server error"})
+			rlog.Error("Failed to decrypt paste:", err)
+			return
+		}
 	}
 
 	paste.Files = database.GetFiles(pasteName)
@@ -84,7 +89,11 @@ func HandleEditJson(c *gin.Context) {
 	}
 	for _, file := range newPaste.FilesMultiPart {
 		currentFileSizeTotal += int(file.Size)
-		fileName, fileSize, fileBlob := utils.ConvertMultipartFile(file)
+		fileName, fileSize, fileBlob, err := utils.ConvertMultipartFile(file)
+		if err != nil {
+			c.JSON(http.StatusBadRequest, gin.H{"error": "internal server error"})
+			return
+		}
 		newPaste.Files = append(newPaste.Files, paste.File{
 			Name:        fileName,
 			Size:        fileSize,
@@ -101,7 +110,7 @@ func HandleEditJson(c *gin.Context) {
 	err = database.UpdatePaste(queriedPaste.PasteName, newPaste)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
-		rlog.Errorf("Failed to update paste: %s", err)
+		rlog.Error("Failed to update paste:", err)
 		return
 	}
 	c.JSON(http.StatusOK, gin.H{"message": "paste updated"})
@@ -124,6 +133,7 @@ func HandlePasteDelete(c *gin.Context) {
 	}
 
 	if err := database.DeletePaste(pasteName); err != nil {
+		rlog.Error("Failed to delete paste:", err)
 		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 		return
 	}

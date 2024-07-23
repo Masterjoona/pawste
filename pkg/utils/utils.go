@@ -8,15 +8,19 @@ import (
 
 	"github.com/Masterjoona/pawste/pkg/config"
 	"github.com/Masterjoona/pawste/pkg/paste"
+	"github.com/romana/rlog"
 )
 
-func SubmitToPaste(submit Submit, pasteName string, isRedirect int) paste.Paste {
+func SubmitToPaste(submit Submit, pasteName string, isRedirect int) (paste.Paste, error) {
 	var files []paste.File
 	for _, file := range submit.Files {
 		if file == nil {
 			continue
 		}
-		fileName, fileSize, fileBlob := ConvertMultipartFile(file)
+		fileName, fileSize, fileBlob, err := ConvertMultipartFile(file)
+		if err != nil {
+			return paste.Paste{}, err
+		}
 		files = append(files, paste.File{
 			Name:        fileName,
 			Size:        fileSize,
@@ -40,29 +44,31 @@ func SubmitToPaste(submit Submit, pasteName string, isRedirect int) paste.Paste 
 		UrlRedirect: isRedirect,
 		CreatedAt:   todaysDate,
 		UpdatedAt:   todaysDate,
-	}
+	}, nil
 }
 
-func ConvertMultipartFile(file *multipart.FileHeader) (string, int, []byte) {
+func ConvertMultipartFile(file *multipart.FileHeader) (string, int, []byte, error) {
 	src, err := file.Open()
 	if err != nil {
-		panic(err)
+		rlog.Error("Could not open multipart file", err)
+		return "", 0, nil, err
 	}
 	defer src.Close()
 
 	fileBlob, err := io.ReadAll(src)
 	if err != nil {
-		panic(err)
+		rlog.Error("Could not read multipart file", err)
+		return "", 0, nil, err
 	}
-	return file.Filename, len(fileBlob), fileBlob
+	return file.Filename, len(fileBlob), fileBlob, nil
 }
 
 func humanTimeToUnix(humanTime string) int64 {
 	if humanTime == "never" {
 		return -1
 	}
-	duration := time.Duration(config.ParseDuration(humanTime))
-	if time.Duration(config.Vars.MaxExpiryTime) < duration {
+	duration := config.ParseDuration(humanTime)
+	if config.ParseDuration(config.Vars.MaxExpiryTime) < duration {
 		return time.Now().Add(time.Duration(config.OneWeek)).Unix()
 	}
 	return time.Now().Add(duration).Unix()

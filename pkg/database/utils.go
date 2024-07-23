@@ -7,6 +7,7 @@ import (
 
 	"github.com/Masterjoona/pawste/pkg/paste"
 	_ "github.com/mattn/go-sqlite3"
+	"github.com/romana/rlog"
 )
 
 func MakePastePointers(paste *paste.Paste, scanVariables []string) []interface{} {
@@ -32,7 +33,8 @@ func pasteExists(name string) bool {
 	err := PasteDB.QueryRow("select exists(select 1 from pastes where PasteName = ?)", name).
 		Scan(&exists)
 	if err != nil {
-		panic(err)
+		rlog.Error("Could not check if paste exists", err)
+		return false
 	}
 	return exists
 }

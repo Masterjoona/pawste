@@ -11,8 +11,9 @@
 
     export let fileUpload: boolean;
     export let maxFileSize: number;
-    export let MaxEncryptionSize: number;
+    export let maxEncryptionSize: number;
     export let maxContentLength: number;
+    export let uploadPassword: boolean;
 
     let selectedExpiration = "1w";
     let selectedBurnAfter = "0";
@@ -20,6 +21,7 @@
     let selectedPrivacy = "public";
     let content = "";
     let password = "";
+    let uploadPasswordInput = "";
 
     let attachedFiles: File[] = [];
     let imageSources: (string | null)[] = [];
@@ -76,11 +78,11 @@
 
         if (attachedFiles.length > 0) {
             for (let file of attachedFiles) {
-                if (file.size > (encrypted ? MaxEncryptionSize : maxFileSize)) {
+                if (file.size > (encrypted ? maxEncryptionSize : maxFileSize)) {
                     failToast(
                         `File ${file.name} is too large! Max size is ${
                             encrypted
-                                ? prettifyFileSize(MaxEncryptionSize)
+                                ? prettifyFileSize(maxEncryptionSize)
                                 : prettifyFileSize(maxFileSize)
                         } bytes.`,
                     );
@@ -197,12 +199,17 @@
                         document.getElementById("file-input").click()}
                     >Attach Files</button>
             {/if}
+            {#if uploadPassword}
+                <input
+                    type="password"
+                    id="upload-password"
+                    placeholder="Upload password"
+                    bind:value={uploadPasswordInput} />
+            {/if}
             <button on:click={handleSave}>Save</button>
         </div>
-        {#if fileUpload}<FileList
-                files={attachedFiles}
-                {imageSources}
-                {removeFile} />
+        {#if fileUpload}
+            <FileList files={attachedFiles} {imageSources} {removeFile} />
         {/if}
     </div>
 </div>
@@ -241,7 +248,8 @@
         display: none;
     }
 
-    #password {
+    #password,
+    #upload-password {
         width: 40%;
         padding: 5px;
         border-radius: 5px;
@@ -250,6 +258,10 @@
         color: white;
         font-family: var(--main-font);
         font-size: var(--font-size);
+    }
+
+    #upload-password {
+        width: auto;
     }
 
     @media (min-width: 600px) {

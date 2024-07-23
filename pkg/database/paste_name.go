@@ -1,9 +1,7 @@
 package database
 
 import (
-	"math/rand"
 	"strings"
-	"time"
 
 	"github.com/Masterjoona/pawste/pkg/config"
 )
@@ -78,14 +76,13 @@ var AnimalNames = []string{
 const characters = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789"
 
 func CreatePasteName(shorten int) string {
-	r := rand.New(rand.NewSource(time.Now().UnixNano()))
 	if config.Vars.ShortPasteNames || (shorten == 1 && config.Vars.ShortenRedirectPastes) {
-		return createShortPasteName(r)
+		return createShortPasteName()
 	}
 	for {
 		var name strings.Builder
 		for i := 0; i < 3; i++ {
-			name.WriteString(AnimalNames[r.Intn(len(AnimalNames))])
+			name.WriteString(AnimalNames[config.RandomSource.Intn(len(AnimalNames))])
 			name.WriteString("-")
 		}
 		trimmedName := name.String()[:name.Len()-1]
@@ -95,11 +92,11 @@ func CreatePasteName(shorten int) string {
 	}
 }
 
-func createShortPasteName(r *rand.Rand) string {
+func createShortPasteName() string {
 	for {
 		var name strings.Builder
 		for i := 0; i < 6; i++ {
-			name.WriteByte(characters[r.Intn(len(characters))])
+			name.WriteByte(characters[config.RandomSource.Intn(len(characters))])
 		}
 		trimmedName := name.String()
 		if !pasteExists(trimmedName) {

@@ -6,6 +6,7 @@ import (
 
 	"github.com/Masterjoona/pawste/pkg/paste"
 	_ "github.com/mattn/go-sqlite3"
+	"github.com/romana/rlog"
 )
 
 func queryPastes(addQuery string, valueArgs []string, scanVariables []string) []paste.Paste {
@@ -22,7 +23,8 @@ func queryPastes(addQuery string, valueArgs []string, scanVariables []string) []
 	)
 
 	if err != nil {
-		panic(err)
+		rlog.Error("Could not query pastes", err)
+		return nil
 	}
 	defer rows.Close()
 	var pastes []paste.Paste
@@ -30,12 +32,14 @@ func queryPastes(addQuery string, valueArgs []string, scanVariables []string) []
 	for rows.Next() {
 		var paste paste.Paste
 		if err := rows.Scan(MakePastePointers(&paste, scanVariables)...); err != nil {
-			panic(err)
+			rlog.Error("Could not scan paste", err)
+			continue
 		}
 		pastes = append(pastes, paste)
 	}
 	if err := rows.Err(); err != nil {
-		panic(err)
+		rlog.Error("Could not scan pastes", err)
+		return nil
 	}
 	return pastes
 }

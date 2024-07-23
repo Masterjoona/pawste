@@ -109,10 +109,10 @@ func (p *Paste) EncryptText(password string) error {
 	return nil
 }
 
-func (p *Paste) DecryptText(password string) string {
+func (p *Paste) DecryptText(password string) (string, error) {
 	ciphertext, err := hex.DecodeString(p.Content)
 	if err != nil {
-		panic(err)
+		return "", err
 	}
 
 	key := deriveKey(password)
@@ -121,25 +121,25 @@ func (p *Paste) DecryptText(password string) string {
 
 	nonce, err := hex.DecodeString(str)
 	if err != nil {
-		panic(err)
+		return "", err
 	}
 
 	dk := pbkdf2.Key(key, nonce, 4096, 32, sha256.New)
 
 	block, err := aes.NewCipher(dk)
 	if err != nil {
-		panic(err)
+		return "", err
 	}
 
 	aesgcm, err := cipher.NewGCM(block)
 	if err != nil {
-		panic(err)
+		return "", err
 	}
 
 	plaintext, err := aesgcm.Open(nil, nonce, ciphertext[:len(ciphertext)-12], nil)
 	if err != nil {
-		panic(err)
+		return "", err
 	}
 
-	return string(plaintext)
+	return string(plaintext), nil
 }

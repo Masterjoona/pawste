@@ -5,4 +5,4 @@ clean:
 	rm $(binary_name)
 
 rundocker:
-	docker compose up -d --build
+	UID=${UID} GID=${GID} docker compose up -d --build
