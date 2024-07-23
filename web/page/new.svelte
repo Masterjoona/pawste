@@ -76,6 +76,11 @@
             return;
         }
 
+        if (uploadPassword && uploadPasswordInput === "") {
+            failToast("You must provide an upload password!");
+            return;
+        }
+
         if (attachedFiles.length > 0) {
             for (let file of attachedFiles) {
                 if (file.size > (encrypted ? maxEncryptionSize : maxFileSize)) {
@@ -84,7 +89,7 @@
                             encrypted
                                 ? prettifyFileSize(maxEncryptionSize)
                                 : prettifyFileSize(maxFileSize)
-                        } bytes.`,
+                        }`,
                     );
                     return;
                 }
@@ -98,6 +103,7 @@
         formData.append("privacy", selectedPrivacy);
         formData.append("content", content);
         formData.append("password", password);
+        formData.append("upload_password", uploadPasswordInput);
         for (let file of attachedFiles) {
             formData.append("files[]", file);
         }

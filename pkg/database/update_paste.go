@@ -78,7 +78,7 @@ func updatePasteContent(pasteName, content string) error {
 	return err
 }
 
-func updatePasteFiles(pasteName string, newPaste utils.PasteUpdate) error {
+func updatePasteFiles(pasteName string, newPaste paste.PasteUpdate) error {
 	tx, err := PasteDB.Begin()
 	if err != nil {
 		return err
@@ -167,7 +167,7 @@ func insertFile(tx *sql.Tx, pasteName string, file paste.File) error {
 	)
 }
 
-func UpdatePaste(pasteName string, newPaste utils.PasteUpdate) error {
+func UpdatePaste(pasteName string, newPaste paste.PasteUpdate) error {
 	err := updatePasteContent(pasteName, newPaste.Content)
 	if err != nil {
 		return err

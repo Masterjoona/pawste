@@ -6,7 +6,6 @@ import (
 	"github.com/Masterjoona/pawste/pkg/config"
 	"github.com/Masterjoona/pawste/pkg/database"
 	"github.com/Masterjoona/pawste/pkg/paste"
-	"github.com/Masterjoona/pawste/pkg/utils"
 	"github.com/gin-gonic/gin"
 	"github.com/romana/rlog"
 )
@@ -47,7 +46,7 @@ func HandleEditJson(c *gin.Context) {
 	}
 	pasteFiles := database.GetFiles(queriedPaste.PasteName)
 
-	var newPaste utils.PasteUpdate
+	var newPaste paste.PasteUpdate
 	if err := c.Bind(&newPaste); err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
@@ -89,7 +88,7 @@ func HandleEditJson(c *gin.Context) {
 	}
 	for _, file := range newPaste.FilesMultiPart {
 		currentFileSizeTotal += int(file.Size)
-		fileName, fileSize, fileBlob, err := utils.ConvertMultipartFile(file)
+		fileName, fileSize, fileBlob, err := convertMultipartFile(file)
 		if err != nil {
 			c.JSON(http.StatusBadRequest, gin.H{"error": "internal server error"})
 			return
