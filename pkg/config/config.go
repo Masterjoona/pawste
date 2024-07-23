@@ -29,7 +29,7 @@ func (ConfigEnv) InitConfig() {
 		MaxFileSize:           getEnvInt("MAX_FILE_SIZE", "1024 * 1024 * 10"),
 		MaxEncryptionSize:     getEnvInt("MAX_ENCRYPTION_SIZE", "1024 * 1024 * 10"),
 		MaxContentLength:      getEnvInt("MAX_CONTENT_LENGTH", "5000"),
-		UploadingPassword:     getEnv("UPLOADING_PASSWORD", ""),
+		FileUploadingPassword: getEnv("FILE_UPLOADING_PASSWORD", ""),
 		EternalPaste:          getEnv("ETERNAL_PASTE", "false") == "true",
 		MaxExpiryTime:         getEnv("MAX_EXPIRY_TIME", "1w"),
 		ReadCount:             getEnv("READ_COUNT", "true") == "true",

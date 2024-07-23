@@ -136,7 +136,7 @@ func validateSubmit(submit *Submit) error {
 		return errors.New("file uploads are disabled")
 	}
 
-	if config.Vars.UploadingPassword != "" && submit.uploadPassword == "" || (submit.uploadPassword != config.Vars.UploadingPassword) {
+	if config.Vars.FileUploadingPassword != "" && submit.uploadPassword == "" || (submit.uploadPassword != config.Vars.FileUploadingPassword) {
 		return errors.New("invalid upload password")
 	}
 

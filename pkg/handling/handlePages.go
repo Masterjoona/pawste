@@ -32,11 +32,11 @@ func Redirect(c *gin.Context) {
 
 func HandleNewPage(c *gin.Context) {
 	golte.RenderPage(c.Writer, c.Request, "page/new", map[string]any{
-		"fileUpload":        config.Vars.FileUpload,
-		"maxFileSize":       config.Vars.MaxFileSize,
-		"maxEncryptionSize": config.Vars.MaxEncryptionSize,
-		"maxContentLength":  config.Vars.MaxContentLength,
-		"uploadPassword":    utils.Ternary(config.Vars.UploadingPassword == "", "false", "true"),
+		"fileUpload":         config.Vars.FileUpload,
+		"maxFileSize":        config.Vars.MaxFileSize,
+		"maxEncryptionSize":  config.Vars.MaxEncryptionSize,
+		"maxContentLength":   config.Vars.MaxContentLength,
+		"fileUploadPassword": utils.Ternary(config.Vars.FileUploadingPassword == "", "false", "true"),
 	})
 }
 

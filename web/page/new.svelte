@@ -13,7 +13,7 @@
     export let maxFileSize: number;
     export let maxEncryptionSize: number;
     export let maxContentLength: number;
-    export let uploadPassword: boolean;
+    export let fileUploadPassword: boolean;
 
     let selectedExpiration = "1w";
     let selectedBurnAfter = "0";
@@ -76,7 +76,11 @@
             return;
         }
 
-        if (uploadPassword && uploadPasswordInput === "") {
+        if (
+            fileUploadPassword &&
+            uploadPasswordInput === "" &&
+            attachedFiles.length > 0
+        ) {
             failToast("You must provide an upload password!");
             return;
         }
@@ -205,11 +209,11 @@
                         document.getElementById("file-input").click()}
                     >Attach Files</button>
             {/if}
-            {#if uploadPassword}
+            {#if fileUploadPassword && attachedFiles.length > 0}
                 <input
                     type="password"
                     id="upload-password"
-                    placeholder="Upload password"
+                    placeholder="File upload password"
                     bind:value={uploadPasswordInput} />
             {/if}
             <button on:click={handleSave}>Save</button>

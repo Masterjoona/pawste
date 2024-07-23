@@ -17,7 +17,7 @@ type ConfigEnv struct {
 	MaxFileSize           int
 	MaxEncryptionSize     int
 	MaxContentLength      int
-	UploadingPassword     string
+	FileUploadingPassword string
 	EternalPaste          bool
 	MaxExpiryTime         string
 	ReadCount             bool
