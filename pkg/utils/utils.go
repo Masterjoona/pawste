@@ -25,7 +25,7 @@ func IsContentJustUrl(content string) int {
 	return 0
 }
 
-func Ternary(condition bool, trueVal, falseVal any) any {
+func Ternary[T any](condition bool, trueVal, falseVal T) T {
 	if condition {
 		return trueVal
 	}

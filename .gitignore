@@ -10,3 +10,4 @@ build
 pawste_data
 *.png
 .env
+.env.dev
