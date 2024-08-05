@@ -100,13 +100,17 @@
     <div class="card">
         <Properties {paste} />
         {#if paste.Content}
-            {#await highlightCode(paste.Content, paste.Syntax)}
-                <p>Loading...</p>
-            {:then highlighted}
-                {@html highlighted}
-            {:catch _}
+            {#if paste.Syntax === "none"}
                 <textarea readonly>{paste.Content}</textarea>
-            {/await}
+            {:else}
+                {#await highlightCode(paste.Content, paste.Syntax)}
+                    <p>Loading...</p>
+                {:then highlighted}
+                    {@html highlighted}
+                {:catch _}
+                    <textarea readonly>{paste.Content}</textarea>
+                {/await}
+            {/if}
         {/if}
         <div class="buttons">
             <button
