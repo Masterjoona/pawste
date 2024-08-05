@@ -3,7 +3,7 @@ Description=
 
 [Service]
 Type=exec
-Restart=always
+#Restart=always
 ExecStartPre=pnpm run build && go build
 ExecStart=%h/pawste/pawste
 WorkingDirectory=%h/pawste

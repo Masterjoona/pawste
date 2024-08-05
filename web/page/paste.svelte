@@ -1,6 +1,7 @@
 <script lang="ts">
     import { copy } from "svelte-copy";
     import { url } from "golte/stores";
+    import { codeToHtml } from "shiki";
 
     import FileList from "../lib/ui/FileList.svelte";
     import Password from "../lib/ui/Password.svelte";
@@ -64,6 +65,12 @@
         }
         deleteFunc(password);
     }
+
+    const highlightCode = async (code: string, lang: string) =>
+        await codeToHtml(code, {
+            lang,
+            theme: "nord",
+        });
 </script>
 
 <svelte:head>
@@ -89,10 +96,18 @@
     <Password {question} onSubmit={onSubmitFunc} />
 {/if}
 
-<div id="container">
+<div id="paste-container">
     <div class="card">
         <Properties {paste} />
-        <textarea readonly>{paste.Content}</textarea>
+        {#if paste.Content}
+            {#await highlightCode(paste.Content, paste.Syntax)}
+                <p>Loading...</p>
+            {:then highlighted}
+                {@html highlighted}
+            {:catch _}
+                <textarea readonly>{paste.Content}</textarea>
+            {/await}
+        {/if}
         <div class="buttons">
             <button
                 on:click={() =>
@@ -115,3 +130,14 @@
             pasteName={paste.PasteName} />
     </div>
 </div>
+
+<style>
+    :global(pre) {
+        padding: 20px;
+        border-radius: 10px;
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        border: 1px solid #ccc;
+        margin: 20px;
+        max-width: 95%;
+    }
+</style>

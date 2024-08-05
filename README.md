@@ -25,9 +25,8 @@ Copy `.env.example` to `.env` and configure it to your liking.
 ```sh
 git clone https://github.com/Masterjoona/pawste/
 cd pawste
-UID=${UID} GID=${GID} docker compose up -d --build
+docker compose up -d --build
 # for whatever reason building go in docker takes so long...
-# set uid and gid for you to delete files and stuff on host
 ```
 
 ### Manual

@@ -149,8 +149,12 @@ func validateSubmit(submit *Submit) error {
 		return errors.New("keep them passwords under sane lengths :)")
 	}
 
-	if !utils.AllowedOption(submit.Privacy, paste.PrivacyOptions) {
+	if !paste.PrivacyMap.Contains(submit.Privacy) {
 		return errors.New("invalid privacy")
+	}
+
+	if !paste.SyntaxMap.Contains(submit.Syntax) {
+		return errors.New("invalid syntax")
 	}
 
 	if !config.Vars.EternalPaste && submit.Expiration == "never" {

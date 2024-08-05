@@ -25,15 +25,6 @@ func IsContentJustUrl(content string) int {
 	return 0
 }
 
-func AllowedOption(s string, options []string) bool {
-	for _, item := range options {
-		if item == s {
-			return true
-		}
-	}
-	return false
-}
-
 func Ternary(condition bool, trueVal, falseVal any) any {
 	if condition {
 		return trueVal

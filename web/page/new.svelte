@@ -1,4 +1,7 @@
 <script lang="ts">
+    import { bundledLanguagesInfo } from "shiki";
+    console.log(bundledLanguagesInfo);
+
     import FileList from "../lib/ui/FileList.svelte";
     import {
         failToast,
@@ -143,7 +146,7 @@
 <svelte:head>
     <title>pawste -- new paste</title>
 </svelte:head>
-<div id="container">
+<div id="new-paste-container">
     <div class="card">
         <div class="options">
             <div>
@@ -171,6 +174,9 @@
                 <label for="syntax">Syntax:</label>
                 <select id="syntax" bind:value={selectedSyntax}>
                     <option value="none">None</option>
+                    {#each bundledLanguagesInfo as lang}
+                        <option value={lang.id}>{lang.name}</option>
+                    {/each}
                 </select>
             </div>
             <div>
@@ -228,7 +234,6 @@
     .options {
         display: flex;
         justify-content: space-evenly;
-        flex-direction: column;
         gap: 10px;
         margin-bottom: 10px;
     }
@@ -272,17 +277,5 @@
 
     #upload-password {
         width: auto;
-    }
-
-    @media (min-width: 600px) {
-        .options {
-            flex-direction: row;
-            flex-wrap: wrap;
-            gap: 20px;
-        }
-
-        textarea {
-            height: 400px;
-        }
     }
 </style>

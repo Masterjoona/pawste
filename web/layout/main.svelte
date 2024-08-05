@@ -24,7 +24,7 @@
     </main>
 
     <div>
-        {#if !AnimeGirls}
+        {#if AnimeGirls}
             <Animegirl />
         {/if}
         <Footer />

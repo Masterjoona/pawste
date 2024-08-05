@@ -16,7 +16,12 @@ var wrapMiddleware = func(middleware func(http.Handler) http.Handler) func(ctx *
 	return func(ctx *gin.Context) {
 		middleware(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 			ctx.Request = r
-			golte.AddLayout(r, "layout/main", map[string]any{"AnimeGirls": "false"})
+			golte.AddLayout(r, "layout/main",
+				map[string]any{
+					"AnimeGirls": config.Vars.AnimeGirlMode,
+					"PublicList": config.Vars.PublicList,
+				},
+			)
 			ctx.Next()
 		})).ServeHTTP(ctx.Writer, ctx.Request)
 		if golte.GetRenderContext(ctx.Request) == nil {
