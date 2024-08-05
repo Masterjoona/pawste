@@ -35,6 +35,9 @@ func page(c string) gin.HandlerFunc {
 }
 
 func SetupMiddleware(r *gin.Engine) {
+	r.Use(gin.LoggerWithConfig(gin.LoggerConfig{
+		SkipPaths: []string{"/golte_"},
+	}))
 	r.Use(wrapMiddleware(build.Golte))
 }
 

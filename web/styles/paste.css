@@ -8,8 +8,8 @@
 }
 
 .card {
+    margin-top: 2%;
     height: 90%;
-    width: 90%;
     display: flex;
     justify-content: center;
     flex-direction: column;
@@ -45,7 +45,7 @@
 
 textarea {
     width: 99%;
-    height: 80%;
+    height: 50vh;
     font-family: var(--code-font);
     background-color: #1b1b22;
     color: white;
