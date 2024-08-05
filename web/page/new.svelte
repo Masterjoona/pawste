@@ -278,4 +278,12 @@
     #upload-password {
         width: auto;
     }
+
+    @media (min-width: 600px) {
+        .options {
+            flex-direction: row;
+            flex-wrap: wrap;
+            gap: 20px;
+        }
+    }
 </style>
