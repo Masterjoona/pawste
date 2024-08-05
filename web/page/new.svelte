@@ -256,6 +256,7 @@
         border-radius: 5px;
         font-family: var(--main-font);
         font-size: var(--font-size);
+        max-width: 9vw;
     }
 
     #password-field {
@@ -279,7 +280,7 @@
         width: auto;
     }
 
-    @media (min-width: 600px) {
+    @media (max-width: 600px) {
         .options {
             flex-direction: row;
             flex-wrap: wrap;
