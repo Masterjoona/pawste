@@ -8,7 +8,7 @@ Or if you're savvy enough, you can host your own instance of pawste!
 
 ## Features
 
--   single binary
+-   single binary (fat ass one at that, upx it or smth)
 -   encryption (server side, soon on client too)
 -   configurable file uploads
 -   url shortening/redirection
