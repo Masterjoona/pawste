@@ -73,10 +73,10 @@ func submitToPaste(submit Submit, pasteName string, isRedirect int) (paste.Paste
 		PasteName:   pasteName,
 		Expire:      utils.HumanTimeToUnix(submit.Expiration),
 		Privacy:     submit.Privacy,
-		NeedsAuth:   utils.Ternary((submit.Password == ""), 0, 1).(int),
+		NeedsAuth:   utils.Ternary((submit.Password == ""), 0, 1),
 		ReadCount:   0,
 		ReadLast:    todaysDate,
-		BurnAfter:   utils.Ternary(config.Vars.BurnAfter, submit.BurnAfter, 0).(int),
+		BurnAfter:   utils.Ternary(config.Vars.BurnAfter, submit.BurnAfter, 0),
 		Content:     submit.Text,
 		Syntax:      submit.Syntax,
 		Password:    submit.Password,
@@ -165,7 +165,7 @@ func validateSubmit(submit *Submit) error {
 		return errors.New("content is too long")
 	}
 
-	maxSizeFiles := utils.Ternary((needsAuth && submit.Privacy != "readonly"), config.Vars.MaxEncryptionSize, config.Vars.MaxFileSize).(int)
+	maxSizeFiles := utils.Ternary((needsAuth && submit.Privacy != "readonly"), config.Vars.MaxEncryptionSize, config.Vars.MaxFileSize)
 
 	if hasFiles {
 		totalSize := 0
