@@ -1,0 +1,27 @@
+.buttons {
+    display: flex;
+    flex-wrap: wrap;
+    width: 100%;
+    justify-content: space-evenly;
+}
+
+button {
+    background-color: var(--main-color);
+    color: white;
+    border: none;
+    padding: 10px 10px;
+    border-radius: 5px;
+    cursor: pointer;
+    font-family: var(--main-font);
+    font-size: var(--font-size);
+}
+
+button:hover {
+    background-color: var(--main-color-dark);
+}
+
+@media (max-width: 600px) {
+    .buttons {
+        justify-content: center;
+    }
+}

@@ -1,6 +1,11 @@
 node_modules
+Dockerfile*
+docker-compose*
+.dockerignore
 .git
 .gitignore
-*.md
-build
+README.md
+LICENSE
 .vscode
+Makefile
+.env

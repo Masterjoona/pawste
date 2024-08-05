@@ -1,45 +1,36 @@
-FROM node:20 AS node-builder
+FROM node:20-slim AS base
+
 ENV PNPM_HOME="/pnpm"
 ENV PATH="$PNPM_HOME:$PATH"
 RUN corepack enable
+WORKDIR /app
+COPY package.json pnpm-lock.yaml ./
+COPY golte.config.ts ./
+COPY svelte.config.js ./
+COPY ./web /app/web
+
+FROM base AS build
+RUN --mount=type=cache,id=pnpm,target=/pnpm/store pnpm install --prod
+RUN pnpm run build
+
+FROM golang:1.22.5-alpine AS go-build
 
 WORKDIR /app
-
-COPY package.json ./
-COPY pnpm-lock.yaml ./
-
-RUN pnpm install
-
-COPY ./web ./web
-
-RUN npx golte dev
-
-FROM golang:1.22.4 AS go-builder
-
-WORKDIR /app
-
-COPY --from=node-builder /app/build ./build
-
 ENV GOCACHE=/root/.cache/go-build
+ENV CGO_ENABLED=1
 
+RUN apk add gcc musl-dev
+
+COPY --from=build /app/pkg/build /app/pkg/build
+COPY ./pkg /app/pkg/
+COPY main.go ./
 COPY go.mod go.sum ./
 
-RUN go mod download
-
-COPY . .
-
-RUN --mount=type=cache,target="/root/.cache/go-build" go build -ldflags "-s -w"
+RUN --mount=type=cache,target="/root/.cache/go-build" go build -o pawste "-ldflags=-s -w"
 
 FROM alpine:latest
 
-RUN apk --no-cache add ca-certificates
+WORKDIR /app
+COPY --from=go-build /app/pawste /app/pawste
 
-WORKDIR /root/
-
-COPY --from=go-builder /app/pawste /root/pawste
-COPY --from=go-builder /app/build /root/build
-COPY ./web /root/web
-
-EXPOSE 9454
-
-CMD ["/root/pawste"]
+ENTRYPOINT [ "./pawste" ] 
