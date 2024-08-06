@@ -29,5 +29,10 @@
     "devDependencies": {
         "prettier": "^3.3.2",
         "prettier-plugin-svelte": "^3.2.5"
+    },
+    "pnpm": {
+        "patchedDependencies": {
+            "golte@0.0.4": "patches/golte@0.0.4.patch"
+        }
     }
 }

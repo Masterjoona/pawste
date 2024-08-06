@@ -4,6 +4,11 @@ settings:
   autoInstallPeers: true
   excludeLinksFromLockfile: false
 
+patchedDependencies:
+  golte@0.0.4:
+    hash: h6mnzv4x6k4mo2tph5ceknyrzq
+    path: patches/golte@0.0.4.patch
+
 importers:
 
   .:
@@ -34,7 +39,7 @@ importers:
         version: 0.9.5(svelte@4.2.18)
       golte:
         specifier: ^0.0.4
-        version: 0.0.4(rollup@4.18.0)(svelte@4.2.18)
+        version: 0.0.4(patch_hash=h6mnzv4x6k4mo2tph5ceknyrzq)(rollup@4.18.0)(svelte@4.2.18)
       shiki:
         specifier: ^1.12.1
         version: 1.12.1
@@ -1236,7 +1241,7 @@ snapshots:
 
   globrex@0.1.2: {}
 
-  golte@0.0.4(rollup@4.18.0)(svelte@4.2.18):
+  golte@0.0.4(patch_hash=h6mnzv4x6k4mo2tph5ceknyrzq)(rollup@4.18.0)(svelte@4.2.18):
     dependencies:
       '@rollup/plugin-replace': 5.0.7(rollup@4.18.0)
       '@sveltejs/vite-plugin-svelte': 3.1.1(svelte@4.2.18)(vite@5.3.1)
