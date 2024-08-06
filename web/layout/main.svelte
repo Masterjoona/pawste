@@ -2,7 +2,7 @@
     import { SvelteToast } from "@zerodevx/svelte-toast";
 
     import Animegirl from "../lib/ui/Animegirl.svelte";
-    import Footer from "../lib/ui/Footer.svelte";
+    //import Footer from "../lib/ui/Footer.svelte";
     import Header from "../lib/ui/Header.svelte";
 
     import "@fontsource-variable/fira-code";
@@ -27,7 +27,6 @@
         {#if AnimeGirls}
             <Animegirl />
         {/if}
-        <Footer />
     </div>
 </div>
 

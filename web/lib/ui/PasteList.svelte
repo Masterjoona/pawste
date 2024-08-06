@@ -1,6 +1,6 @@
 <script lang="ts">
     import { successToast, timeDifference, deletePaste } from "../utils";
-    import { Paste } from "../types";
+    import type { Paste } from "../types";
     export let pastes: Paste[];
     export let tableHeaders: string[];
     export let password: string = "";

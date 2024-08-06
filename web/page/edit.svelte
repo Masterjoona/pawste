@@ -3,11 +3,13 @@
     import Password from "../lib/ui/Password.svelte";
     import Properties from "../lib/ui/Properties.svelte";
 
-    import { Paste } from "../lib/types";
+    import type { Paste } from "../lib/types";
     import { failToast, handleAttachFiles } from "../lib/utils";
+
     import "../styles/buttons.css";
     import "../styles/file.css";
     import "../styles/paste.css";
+
     export let paste: Paste;
     export let needsAuth: boolean;
 
@@ -106,11 +108,14 @@
     }
 
     async function fetchPaste(password: string) {
-        const resp = await fetch(location.pathname + "/json", {
-            headers: {
-                password: password,
+        const resp = await fetch(
+            location.pathname.replace("/e/", "/p/") + "/json",
+            {
+                headers: {
+                    password: password,
+                },
             },
-        });
+        );
         if (resp.ok) {
             paste = await resp.json();
             newContent = paste.Content;
@@ -125,7 +130,7 @@
     <Password {question} onSubmit={fetchPaste} />
 {/if}
 
-<div id="container">
+<div id="edit-container">
     <div class="card">
         <Properties {paste} />
         <textarea bind:value={newContent}></textarea>

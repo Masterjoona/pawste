@@ -1,5 +1,5 @@
 <script lang="ts">
-    import { Paste } from "../lib/types";
+    import type { Paste } from "../lib/types";
     import PasteList from "../lib/ui/PasteList.svelte";
 
     export let pastes: Paste[] = [];

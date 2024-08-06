@@ -1,5 +1,5 @@
 <script lang="ts">
-    import { Paste } from "../types";
+    import type { Paste } from "../types";
     import { timeDifference } from "../utils";
     export let paste: Paste;
 </script>

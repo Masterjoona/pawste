@@ -7,7 +7,7 @@
     import Password from "../lib/ui/Password.svelte";
     import Properties from "../lib/ui/Properties.svelte";
 
-    import { Paste } from "../lib/types";
+    import type { Paste } from "../lib/types";
     import {
         failToast,
         successToast,

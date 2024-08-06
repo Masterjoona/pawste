@@ -4,7 +4,7 @@
     import ConfigInput from "../lib/ui/ConfigInput.svelte";
     import Switch from "../lib/ui/Switch.svelte";
 
-    import { Config, Paste } from "../lib/types";
+    import type { Config, Paste } from "../lib/types";
     import PasteList from "../lib/ui/PasteList.svelte";
     import { failToast, prettifyFileSize } from "../lib/utils";
     import "../styles/buttons.css";

@@ -1,6 +1,6 @@
 <script lang="ts">
     import "../../styles/file.css";
-    import { FileType } from "../types";
+    import type { FileType } from "../types";
     import {
         prettifyFileSize,
         truncateFilename,
