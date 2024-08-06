@@ -1,6 +1,5 @@
 <script lang="ts">
     import { bundledLanguagesInfo } from "shiki";
-    console.log(bundledLanguagesInfo);
 
     import FileList from "../lib/ui/FileList.svelte";
     import {

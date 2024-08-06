@@ -7,7 +7,7 @@ build
 .svelte-kit
 .DS_Store
 *.upx
-pawste_data
+pawste_data*
 *.png
 .env
 .env.dev

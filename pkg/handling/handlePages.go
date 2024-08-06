@@ -36,7 +36,7 @@ func HandleNewPage(c *gin.Context) {
 		"maxFileSize":        config.Vars.MaxFileSize,
 		"maxEncryptionSize":  config.Vars.MaxEncryptionSize,
 		"maxContentLength":   config.Vars.MaxContentLength,
-		"fileUploadPassword": utils.Ternary(config.Vars.FileUploadingPassword == "", "false", "true"),
+		"fileUploadPassword": utils.Ternary(config.Vars.FileUploadingPassword == "", false, true),
 	})
 }
 

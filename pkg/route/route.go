@@ -1,6 +1,7 @@
 package route
 
 import (
+	"io/fs"
 	"net/http"
 
 	"github.com/Masterjoona/pawste/pkg/build"
@@ -35,10 +36,23 @@ func page(c string) gin.HandlerFunc {
 }
 
 func SetupMiddleware(r *gin.Engine) {
+	var skipGolteFiles = []string{}
+	fs.WalkDir(build.Fsys, "client/golte_", func(path string, d fs.DirEntry, err error) error {
+		if err != nil {
+			rlog.Error(err)
+			return err
+		}
+		if d.IsDir() {
+			return nil
+		}
+		skipGolteFiles = append(skipGolteFiles, path[6:])
+		return nil
+	})
 	r.Use(gin.LoggerWithConfig(gin.LoggerConfig{
-		SkipPaths: []string{"/golte_"},
+		SkipPaths: skipGolteFiles,
 	}))
 	r.Use(wrapMiddleware(build.Golte))
+
 }
 
 func SetupPublicRoutes(r *gin.Engine) {

@@ -118,11 +118,13 @@
                     (window.location.href = "/e/" + paste.PasteName)}
                 >Edit</button>
             <button on:click={handleDelete}>Delete</button>
-            <button
-                use:copy={paste.Content}
-                on:svelte-copy={() => {
-                    successToast("Text copied!");
-                }}>Copy Text</button>
+            {#if paste.Content}
+                <button
+                    use:copy={paste.Content}
+                    on:svelte-copy={() => {
+                        successToast("Text copied!");
+                    }}>Copy Text</button>
+            {/if}
             <button
                 use:copy={window?.location?.href}
                 on:svelte-copy={() => {

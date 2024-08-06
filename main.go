@@ -13,7 +13,7 @@ func main() {
 	rlog.Info("Starting Pawste " + config.PawsteVersion)
 	database.CreateOrLoadDatabase()
 
-	r := gin.Default()
+	r := gin.New()
 
 	route.SetupMiddleware(r)
 	route.SetupErrorHandlers(r)
