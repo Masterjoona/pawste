@@ -2,7 +2,6 @@ package route
 
 import (
 	_ "embed"
-	"fmt"
 	"io/fs"
 	"net/http"
 
@@ -15,7 +14,7 @@ import (
 	"github.com/romana/rlog"
 )
 
-// go:embed favicon.ico
+//go:embed favicon.ico
 var favicon []byte
 
 var wrapMiddleware = func(middleware func(http.Handler) http.Handler) func(ctx *gin.Context) {
@@ -41,7 +40,7 @@ func page(c string) gin.HandlerFunc {
 }
 
 func SetupMiddleware(r *gin.Engine) {
-	var skipGolteFiles = []string{}
+	var skipAssetFiles = []string{"/favicon"}
 	fs.WalkDir(build.Fsys, "client/golte_", func(path string, d fs.DirEntry, err error) error {
 		if err != nil {
 			rlog.Error(err)
@@ -50,11 +49,11 @@ func SetupMiddleware(r *gin.Engine) {
 		if d.IsDir() {
 			return nil
 		}
-		skipGolteFiles = append(skipGolteFiles, path[6:])
+		skipAssetFiles = append(skipAssetFiles, path[6:])
 		return nil
 	})
 	r.Use(gin.LoggerWithConfig(gin.LoggerConfig{
-		SkipPaths: skipGolteFiles,
+		SkipPaths: skipAssetFiles,
 	}))
 	r.Use(wrapMiddleware(build.Golte))
 
@@ -72,11 +71,7 @@ func SetupPublicRoutes(r *gin.Engine) {
 	r.GET("/about", page("page/about"))
 	r.GET("/guide", page("page/guide"))
 	r.GET("/favicon", func(c *gin.Context) {
-		fmt.Println(favicon)
 		c.Data(http.StatusOK, "image/x-icon", favicon)
-	})
-	r.GET("/hello", func(c *gin.Context) {
-		c.String(http.StatusOK, "Hello, World!")
 	})
 }
 
