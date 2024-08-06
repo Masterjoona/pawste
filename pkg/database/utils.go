@@ -5,9 +5,11 @@ import (
 	"fmt"
 	"reflect"
 
+	"github.com/Masterjoona/pawste/pkg/config"
 	"github.com/Masterjoona/pawste/pkg/paste"
 	_ "github.com/mattn/go-sqlite3"
 	"github.com/romana/rlog"
+	"golang.org/x/crypto/pbkdf2"
 )
 
 func MakePastePointers(paste *paste.Paste, scanVariables []string) []interface{} {
@@ -40,7 +42,6 @@ func pasteExists(name string) bool {
 }
 
 func HashPassword(password string) string {
-	hash := sha256.New()
-	hash.Write(paste.SecurePassword(password))
-	return fmt.Sprintf("%x", hash.Sum(nil))
+	hash := pbkdf2.Key([]byte(password), []byte(config.Vars.Salt), 10000, 32, sha256.New)
+	return fmt.Sprintf("%x", hash)
 }
