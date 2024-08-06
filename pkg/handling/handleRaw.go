@@ -48,10 +48,22 @@ func HandleFile(c *gin.Context) {
 
 	reqPassword := c.Request.Header.Get("password")
 	encrypted := queriedPaste.NeedsAuth == 1 && queriedPaste.Privacy != "readonly"
-	if reqPassword == "" && encrypted {
+	if encrypted && reqPassword == "" {
 		golte.RenderPage(c.Writer, c.Request, "page/auth_file", nil)
 		return
 	}
+	handleFileRaw(c, reqPassword, encrypted, queriedPaste)
+}
+
+func HandleFilePost(c *gin.Context) {
+	queriedPaste, err := database.GetPasteByName(c.Param("pasteName"))
+	if err != nil {
+		c.JSON(http.StatusNotFound, gin.H{"error": "paste not found"})
+		return
+	}
+
+	reqPassword := c.Request.Header.Get("password")
+	encrypted := queriedPaste.NeedsAuth == 1 && queriedPaste.Privacy != "readonly"
 	handleFileRaw(c, reqPassword, encrypted, queriedPaste)
 }
 

@@ -1,6 +1,8 @@
 package route
 
 import (
+	_ "embed"
+	"fmt"
 	"io/fs"
 	"net/http"
 
@@ -12,6 +14,9 @@ import (
 	"github.com/nichady/golte"
 	"github.com/romana/rlog"
 )
+
+// go:embed favicon.ico
+var favicon []byte
 
 var wrapMiddleware = func(middleware func(http.Handler) http.Handler) func(ctx *gin.Context) {
 	return func(ctx *gin.Context) {
@@ -66,6 +71,13 @@ func SetupPublicRoutes(r *gin.Engine) {
 	}
 	r.GET("/about", page("page/about"))
 	r.GET("/guide", page("page/guide"))
+	r.GET("/favicon", func(c *gin.Context) {
+		fmt.Println(favicon)
+		c.Data(http.StatusOK, "image/x-icon", favicon)
+	})
+	r.GET("/hello", func(c *gin.Context) {
+		c.String(http.StatusOK, "Hello, World!")
+	})
 }
 
 func SetupPasteRoutes(r *gin.Engine) {
@@ -78,6 +90,7 @@ func SetupPasteRoutes(r *gin.Engine) {
 		pasteGroup.POST("/new", handling.HandleSubmit)
 		pasteGroup.PATCH("/:pasteName", handling.HandleEditJson)
 		pasteGroup.GET("/:pasteName/f/:fileName", handling.HandleFile)
+		pasteGroup.POST("/:pasteName/f/:fileName", handling.HandleFilePost)
 		pasteGroup.GET("/:pasteName/f/:fileName/json", handling.HandleFileJson)
 	}
 }
