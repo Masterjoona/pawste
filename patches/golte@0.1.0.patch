@@ -1,8 +1,8 @@
 diff --git a/js/cli/templates.js b/js/cli/templates.js
-index 9413194d959682ebc532fe47d8c5625c02ba1865..3177447f029aec7188afdc9c552bce1133367829 100644
+index 9413194d959682ebc532fe47d8c5625c02ba1865..bc99070fb258006036ab7d3d32ea444bc8e2969a 100644
 --- a/js/cli/templates.js
 +++ b/js/cli/templates.js
-@@ -9,11 +9,10 @@ import (
+@@ -9,10 +9,10 @@ import (
  )
  
  //go:embed */**
@@ -14,5 +14,4 @@ index 9413194d959682ebc532fe47d8c5625c02ba1865..3177447f029aec7188afdc9c552bce11
 +var Golte = golte.New(Fsys)
  	`;
  }
--;
- //# sourceMappingURL=templates.js.map
+ ;
