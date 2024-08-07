@@ -3,6 +3,7 @@ package database
 import (
 	"database/sql"
 	"os"
+	"time"
 
 	"github.com/Masterjoona/pawste/pkg/config"
 	_ "github.com/mattn/go-sqlite3"
@@ -59,4 +60,9 @@ func CreateOrLoadDatabase() {
 		rlog.Info("Loaded existing database")
 	}
 	PasteDB = sqldb
+
+	go func() {
+		cleanUpExpiredPastes()
+		time.Sleep(1 * time.Hour)
+	}()
 }

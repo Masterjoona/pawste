@@ -114,17 +114,27 @@
             formData.append("files[]", file);
         }
 
-        const response = await (
-            await fetch("/p/new", {
-                method: "POST",
-                body: formData,
-            })
-        ).json();
+        const saveButton = document.getElementById("save-button");
 
-        if (response?.error) {
-            failToast(response?.error);
-        }
-        window.location.href = `/p/${response.PasteName}`;
+        const xhr = new XMLHttpRequest();
+        xhr.open("POST", "/p/new");
+        xhr.upload.addEventListener("progress", (event) => {
+            if (event.lengthComputable) {
+                const progress = Math.round((event.loaded / event.total) * 100);
+                saveButton.textContent = `Uploading... ${progress}%`;
+            }
+        });
+
+        xhr.onload = async () => {
+            const response = JSON.parse(xhr.responseText);
+            if (response?.error) {
+                failToast(response.error);
+            } else {
+                window.location.href = `/p/${response.PasteName}`;
+            }
+        };
+
+        xhr.send(formData);
     }
 
     function handlePrivacyChange(event: any) {
@@ -221,7 +231,7 @@
                     placeholder="File upload password"
                     bind:value={uploadPasswordInput} />
             {/if}
-            <button on:click={handleSave}>Save</button>
+            <button id="save-button" on:click={handleSave}>Save</button>
         </div>
         {#if fileUpload}
             <FileList files={attachedFiles} {imageSources} {removeFile} />

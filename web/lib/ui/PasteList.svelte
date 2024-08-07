@@ -33,21 +33,18 @@
                 <td>
                     {#if UrlRedirect === 1}
                         <a href="/u/{PasteName}">Go to URL</a>
-                    {:else}
-                        <a href="/p/{PasteName}">View</a>
                     {/if}
+                    <a href="/p/{PasteName}">View</a>
                 </td>
                 {#if password}
                     <td>
                         <button
                             on:click={() =>
-                                (window.location.href = "/e/" + PasteName)}
-                            >Edit</button>
-                        <button
-                            on:click={() =>
                                 deletePaste(PasteName, password, () =>
                                     successToast(`Deleted ${PasteName}!`),
-                                )}>Delete</button>
+                                )}
+                            >Delete
+                        </button>
                     </td>
                 {/if}
             </tr>
