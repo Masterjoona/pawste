@@ -6,6 +6,7 @@
         failToast,
         prettifyFileSize,
         handleAttachFiles,
+        savePaste,
     } from "../lib/utils.js";
     import "../styles/buttons.css";
     import "../styles/file.css";
@@ -115,26 +116,7 @@
         }
 
         const saveButton = document.getElementById("save-button");
-
-        const xhr = new XMLHttpRequest();
-        xhr.open("POST", "/p/new");
-        xhr.upload.addEventListener("progress", (event) => {
-            if (event.lengthComputable) {
-                const progress = Math.round((event.loaded / event.total) * 100);
-                saveButton.textContent = `Uploading... ${progress}%`;
-            }
-        });
-
-        xhr.onload = async () => {
-            const response = JSON.parse(xhr.responseText);
-            if (response?.error) {
-                failToast(response.error);
-            } else {
-                window.location.href = `/p/${response.PasteName}`;
-            }
-        };
-
-        xhr.send(formData);
+        savePaste("POST", formData, "/p/new", saveButton);
     }
 
     function handlePrivacyChange(event: any) {

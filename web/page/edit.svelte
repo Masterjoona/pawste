@@ -4,7 +4,7 @@
     import Properties from "../lib/ui/Properties.svelte";
 
     import type { Paste } from "../lib/types";
-    import { failToast, handleAttachFiles } from "../lib/utils";
+    import { failToast, handleAttachFiles, savePaste } from "../lib/utils";
 
     import "../styles/buttons.css";
     import "../styles/file.css";
@@ -95,16 +95,9 @@
         });
         formData.append("password", pastePassword);
 
-        const resp = await fetch(`/p/${paste.PasteName}`, {
-            method: "PATCH",
-            body: formData,
-        });
-
-        if (!resp.ok) {
-            failToast("Failed to save!");
-        } else {
-            location.href = `/p/${paste.PasteName}`;
-        }
+        const saveButton = document.getElementById("save-button");
+        const url = `/p/${paste.PasteName}`;
+        savePaste("PATCH", formData, url, saveButton);
     }
 
     async function fetchPaste(password: string) {
@@ -144,7 +137,7 @@
             <button
                 on:click={() => document.getElementById("file-input").click()}
                 >Attach Files</button>
-            <button on:click={handleSave}>Save</button>
+            <button id="save-button" on:click={handleSave}>Save</button>
         </div>
         <p>Current Files:</p>
         {#if paste.Files}

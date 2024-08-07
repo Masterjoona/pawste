@@ -1,5 +1,5 @@
 import { toast } from "@zerodevx/svelte-toast";
-import { FileDb, FileType } from "./types";
+import { FileDb, FileType, Paste } from "./types";
 
 export function truncateFilename(filename: string, maxLength = 30) {
     const extIndex = filename.lastIndexOf(".");
@@ -101,8 +101,8 @@ export async function deletePaste(
 }
 
 export function handleAttachFiles(
-    event: any, 
-    pushNewFile: (file: File) => void, 
+    event: any,
+    pushNewFile: (file: File) => void,
     pushImageSource: (source: string) => void
 ) {
     const files = event.target.files;
@@ -117,6 +117,30 @@ export function handleAttachFiles(
         }
         pushNewFile(file);
     }
+}
+
+export async function savePaste(method: "PATCH" | "POST", formData: FormData, endpoint: string, saveButton: HTMLElement) {
+    const xhr = new XMLHttpRequest();
+    xhr.open(method, endpoint);
+    xhr.upload.addEventListener("progress", (event) => {
+        if (event.lengthComputable) {
+            const progress = Math.round((event.loaded / event.total) * 100);
+            saveButton.textContent = `Uploading... ${progress}%`;
+        }
+    });
+
+    xhr.onload = async () => {
+        const resp = JSON.parse(xhr.responseText) as Paste | { error: string } | { message: string };
+        if ("error" in resp) {
+            failToast(resp.error);
+        } else if ("message" in resp) {
+            window.location.href = window.location.href.replace("/e/", "/p/")
+        } else {
+            window.location.href = `/p/${resp.PasteName}`;
+        }
+    };
+
+    xhr.send(formData);
 }
 
 export const successToast = (msg: string) => {
