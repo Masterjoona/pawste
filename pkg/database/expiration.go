@@ -56,5 +56,5 @@ func cleanUpExpiredPastes() {
 		return
 	}
 
-	config.Logger.Info("Expired pastes cleaned up successfully")
+	config.Logger.Debug("Expired pastes cleaned up successfully")
 }
