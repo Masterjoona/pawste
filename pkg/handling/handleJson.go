@@ -7,7 +7,6 @@ import (
 	"github.com/Masterjoona/pawste/pkg/database"
 	"github.com/Masterjoona/pawste/pkg/paste"
 	"github.com/gin-gonic/gin"
-	"github.com/romana/rlog"
 )
 
 func HandlePasteJson(c *gin.Context) {
@@ -27,7 +26,7 @@ func HandlePasteJson(c *gin.Context) {
 		paste.Content, err = paste.DecryptText(reqPassword)
 		if err != nil {
 			c.JSON(http.StatusInternalServerError, gin.H{"error": "internal server error"})
-			rlog.Error("Failed to decrypt paste:", err)
+			config.Logger.Error("Failed to decrypt paste:", err)
 			return
 		}
 	}
@@ -109,7 +108,7 @@ func HandleEditJson(c *gin.Context) {
 	err = database.UpdatePaste(queriedPaste.PasteName, newPaste)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
-		rlog.Error("Failed to update paste:", err)
+		config.Logger.Error("Failed to update paste:", err)
 		return
 	}
 	c.JSON(http.StatusOK, gin.H{"message": "paste updated"})
@@ -132,7 +131,7 @@ func HandlePasteDelete(c *gin.Context) {
 	}
 
 	if err := database.DeletePaste(pasteName); err != nil {
-		rlog.Error("Failed to delete paste:", err)
+		config.Logger.Error("Failed to delete paste:", err)
 		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 		return
 	}

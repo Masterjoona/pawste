@@ -2,8 +2,9 @@ package route
 
 import (
 	_ "embed"
-	"io/fs"
 	"net/http"
+	"regexp"
+	"time"
 
 	"github.com/Masterjoona/pawste/pkg/build"
 	"github.com/Masterjoona/pawste/pkg/config"
@@ -11,7 +12,8 @@ import (
 	"github.com/Masterjoona/pawste/pkg/handling"
 	"github.com/gin-gonic/gin"
 	"github.com/nichady/golte"
-	"github.com/romana/rlog"
+
+	ginzap "github.com/gin-contrib/zap"
 )
 
 //go:embed favicon.ico
@@ -40,23 +42,14 @@ func page(c string) gin.HandlerFunc {
 }
 
 func SetupMiddleware(r *gin.Engine) {
-	var skipAssetFiles = []string{"/favicon"}
-	fs.WalkDir(build.Fsys, "client/golte_", func(path string, d fs.DirEntry, err error) error {
-		if err != nil {
-			rlog.Error(err)
-			return err
-		}
-		if d.IsDir() {
-			return nil
-		}
-		skipAssetFiles = append(skipAssetFiles, path[6:])
-		return nil
-	})
-	r.Use(gin.LoggerWithConfig(gin.LoggerConfig{
-		SkipPaths: skipAssetFiles,
+	var golteRegex = regexp.MustCompile(`/golte_/(?:entries|chunks|assets)/.{1,60}|/favicon`)
+	r.Use(ginzap.GinzapWithConfig(config.Logger.Desugar(), &ginzap.Config{
+		UTC:             true,
+		TimeFormat:      time.RFC3339,
+		SkipPathRegexps: []*regexp.Regexp{golteRegex},
 	}))
+	r.Use(ginzap.RecoveryWithZap(config.Logger.Desugar(), true))
 	r.Use(wrapMiddleware(build.Golte))
-
 }
 
 func SetupPublicRoutes(r *gin.Engine) {
@@ -85,7 +78,6 @@ func SetupPasteRoutes(r *gin.Engine) {
 		pasteGroup.POST("/new", handling.HandleSubmit)
 		pasteGroup.PATCH("/:pasteName", handling.HandleEditJson)
 		pasteGroup.GET("/:pasteName/f/:fileName", handling.HandleFile)
-		pasteGroup.POST("/:pasteName/f/:fileName", handling.HandleFilePost)
 		pasteGroup.GET("/:pasteName/f/:fileName/json", handling.HandleFileJson)
 	}
 }
@@ -117,7 +109,7 @@ func SetupAdminRoutes(r *gin.Engine) {
 func SetupErrorHandlers(r *gin.Engine) {
 	r.NoRoute(func(c *gin.Context) {
 		err := "Page not found"
-		rlog.Error(err)
+		config.Logger.Error(err)
 		golte.RenderPage(c.Writer, c.Request, "page/error", map[string]any{
 			"error": err,
 		})
@@ -127,7 +119,7 @@ func SetupErrorHandlers(r *gin.Engine) {
 		c.Next()
 		if len(c.Errors) > 0 {
 			err := c.Errors.Last().Error()
-			rlog.Error(err)
+			config.Logger.Error(err)
 			golte.RenderPage(c.Writer, c.Request, "page/error", map[string]any{
 				"error": err,
 			})

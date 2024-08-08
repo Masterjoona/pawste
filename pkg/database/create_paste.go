@@ -8,7 +8,6 @@ import (
 	"github.com/Masterjoona/pawste/pkg/paste"
 	"github.com/Masterjoona/pawste/pkg/utils"
 	_ "github.com/mattn/go-sqlite3"
-	"github.com/romana/rlog"
 )
 
 func CreatePaste(paste paste.Paste) error {
@@ -71,13 +70,13 @@ func saveFiles(tx *sql.Tx, paste *paste.Paste, encrypt bool) error {
 		if encrypt {
 			err := file.Encrypt(paste.Password)
 			if err != nil {
-				rlog.Error("Failed to encrypt file:", err)
+				config.Logger.Error("Failed to encrypt file:", err)
 				return err
 			}
 		}
 		err := saveFileToDisk(&file, paste.PasteName)
 		if err != nil {
-			rlog.Error("Failed to save file to disk:", err)
+			config.Logger.Error("Failed to save file to disk:", err)
 			return err
 		}
 
@@ -118,7 +117,7 @@ func saveFileToDisk(file *paste.File, pasteName string) error {
 func rollbackAndClose(tx *sql.Tx, err *error) {
 	if *err != nil {
 		if rollbackErr := tx.Rollback(); rollbackErr != nil {
-			rlog.Error("Failed to rollback transaction:", rollbackErr)
+			config.Logger.Error("Failed to rollback transaction:", rollbackErr)
 		}
 		return
 	}

@@ -4,14 +4,12 @@ import (
 	"errors"
 	"strings"
 
+	"github.com/Masterjoona/pawste/pkg/config"
 	"github.com/Masterjoona/pawste/pkg/paste"
 	_ "github.com/mattn/go-sqlite3"
-	"github.com/romana/rlog"
 )
 
 func queryFiles(addQuery string, valueArgs []string, scanVariables []string) []paste.File {
-	cleanUpExpiredPastes()
-
 	valueInterfaces := make([]interface{}, len(valueArgs))
 	for i, v := range valueArgs {
 		valueInterfaces[i] = v
@@ -23,7 +21,7 @@ func queryFiles(addQuery string, valueArgs []string, scanVariables []string) []p
 	)
 
 	if err != nil {
-		rlog.Error("Could not query files", err)
+		config.Logger.Error("Could not query files", err)
 		return nil
 	}
 	defer rows.Close()
@@ -32,13 +30,13 @@ func queryFiles(addQuery string, valueArgs []string, scanVariables []string) []p
 	for rows.Next() {
 		var file paste.File
 		if err := rows.Scan(MakeFilePointers(&file, scanVariables)...); err != nil {
-			rlog.Error("Could not scan file", err)
+			config.Logger.Error("Could not scan file", err)
 			continue
 		}
 		files = append(files, file)
 	}
 	if err := rows.Err(); err != nil {
-		rlog.Error("Could not scan files", err)
+		config.Logger.Error("Could not scan files", err)
 		return nil
 	}
 	return files

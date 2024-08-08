@@ -8,10 +8,13 @@ import (
 	"time"
 
 	"github.com/gin-gonic/gin"
-	"github.com/romana/rlog"
+	prettyconsole "github.com/thessem/zap-prettyconsole"
+	"go.uber.org/zap"
+	"go.uber.org/zap/zapcore"
 )
 
 var Vars ConfigEnv
+var Logger *zap.SugaredLogger
 
 const (
 	PawsteVersion = ""
@@ -39,16 +42,18 @@ func (ConfigEnv) InitConfig() {
 		ShortenRedirectPastes: getEnv("SHORTEN_REDIRECT_PASTES", "false") == "true",
 		CountFileUsage:        getEnv("COUNT_FILE_USAGE", "true") == "true",
 		AnimeGirlMode:         getEnv("ANIME_GIRL_MODE", "false") == "true",
+		LogLevel:              getEnv("LOG_LEVEL", "info"),
 	}
 
 	if _, err := os.Stat(Vars.DataDir); os.IsNotExist(err) {
 		os.Mkdir(Vars.DataDir, 0755)
 	}
+	parseLogger()
 }
 
 func getEnv(key, fallback string) string {
 	if value, exists := os.LookupEnv(envPrefix + key); exists {
-		rlog.Info("Using environment variable", envPrefix+key, "with value", value)
+		println("Using environment variable", envPrefix+key, "with value", value)
 		return value
 	}
 	return fallback
@@ -56,7 +61,7 @@ func getEnv(key, fallback string) string {
 
 func getEnvInt(key string, fallback string) int {
 	if value, exists := os.LookupEnv(envPrefix + key); exists {
-		rlog.Info("Using environment variable", envPrefix+key, "with value", value)
+		println("Using environment variable", envPrefix+key, "with value", value)
 		return calculateIntFromString(value)
 	}
 	return calculateIntFromString(fallback)
@@ -88,13 +93,13 @@ func (ConfigEnv) ReloadConfig(c *gin.Context) {
 func ParseDuration(input string) time.Duration {
 	matches := TimeRegex.FindStringSubmatch(input)
 	if len(matches) != 3 {
-		rlog.Debug("Invalid duration:", input)
+		Logger.Debug("Invalid duration:", input)
 		return time.Duration(OneWeek)
 	}
 
 	quantity, err := strconv.Atoi(matches[1])
 	if err != nil {
-		rlog.Debug("Invalid duration:", input)
+		Logger.Debug("Invalid duration:", input)
 		return time.Duration(OneWeek)
 	}
 
@@ -110,9 +115,19 @@ func ParseDuration(input string) time.Duration {
 
 	multiplier, exists := unitMultipliers[unit]
 	if !exists {
-		rlog.Debug("Invalid duration:", input)
+		Logger.Debug("Invalid duration:", input)
 		return time.Duration(OneWeek)
 	}
 
 	return time.Duration(quantity*multiplier) * time.Second
+}
+
+func parseLogger() {
+	var logLevel zapcore.Level
+	err := logLevel.UnmarshalText([]byte(Vars.LogLevel))
+	if err != nil {
+		println("Invalid log level:", Vars.LogLevel)
+		logLevel = zap.InfoLevel
+	}
+	Logger = prettyconsole.NewLogger(logLevel).Sugar()
 }

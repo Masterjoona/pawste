@@ -9,7 +9,6 @@ import (
 	"github.com/Masterjoona/pawste/pkg/paste"
 	"github.com/gin-gonic/gin"
 	"github.com/nichady/golte"
-	"github.com/romana/rlog"
 )
 
 func HandlePasteRaw(c *gin.Context) {
@@ -30,7 +29,7 @@ func HandlePasteRaw(c *gin.Context) {
 		paste.Content, err = paste.DecryptText(reqPassword)
 		if err != nil {
 			c.String(http.StatusInternalServerError, "Failed to decrypt paste")
-			rlog.Error("Failed to decrypt paste:", err)
+			config.Logger.Error("Failed to decrypt paste:", err)
 			return
 		}
 	}
@@ -55,18 +54,6 @@ func HandleFile(c *gin.Context) {
 	handleFileRaw(c, reqPassword, encrypted, queriedPaste)
 }
 
-func HandleFilePost(c *gin.Context) {
-	queriedPaste, err := database.GetPasteByName(c.Param("pasteName"))
-	if err != nil {
-		c.JSON(http.StatusNotFound, gin.H{"error": "paste not found"})
-		return
-	}
-
-	reqPassword := c.Request.Header.Get("password")
-	encrypted := queriedPaste.NeedsAuth == 1 && queriedPaste.Privacy != "readonly"
-	handleFileRaw(c, reqPassword, encrypted, queriedPaste)
-}
-
 func handleFileRaw(c *gin.Context, reqPassword string, encrypted bool, queriedPaste paste.Paste) {
 	if encrypted && !isValidPassword(reqPassword, queriedPaste.Password) {
 		c.JSON(http.StatusUnauthorized, gin.H{"error": "wrong password"})
@@ -82,13 +69,13 @@ func handleFileRaw(c *gin.Context, reqPassword string, encrypted bool, queriedPa
 	if encrypted {
 		fileBlob, err := os.ReadFile(filePath)
 		if err != nil {
-			rlog.Error("Failed to read file", err)
+			config.Logger.Error("Failed to read file", err)
 			c.JSON(http.StatusInternalServerError, gin.H{"error": "failed to read file"})
 			return
 		}
 		fileBytes, err := paste.Decrypt(reqPassword, fileBlob)
 		if err != nil {
-			rlog.Error("Failed to decrypt file", err)
+			config.Logger.Error("Failed to decrypt file", err)
 			c.JSON(http.StatusInternalServerError, gin.H{"error": "failed to decrypt file"})
 			return
 		}

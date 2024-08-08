@@ -13,7 +13,6 @@ import (
 	"github.com/Masterjoona/pawste/pkg/paste"
 	"github.com/Masterjoona/pawste/pkg/utils"
 	"github.com/gin-gonic/gin"
-	"github.com/romana/rlog"
 )
 
 func HandleSubmit(c *gin.Context) {
@@ -38,7 +37,7 @@ func HandleSubmit(c *gin.Context) {
 	}
 	err = database.CreatePaste(paste)
 	if err != nil {
-		rlog.Error("Error creating paste", err)
+		config.Logger.Error("Error creating paste", err)
 		c.JSON(http.StatusInternalServerError, gin.H{"error": "internal server error"})
 		return
 	}
@@ -90,14 +89,14 @@ func submitToPaste(submit Submit, pasteName string, isRedirect int) (paste.Paste
 func convertMultipartFile(file *multipart.FileHeader) (string, int, []byte, error) {
 	src, err := file.Open()
 	if err != nil {
-		rlog.Error("Could not open multipart file", err)
+		config.Logger.Error("Could not open multipart file", err)
 		return "", 0, nil, err
 	}
 	defer src.Close()
 
 	fileBlob, err := io.ReadAll(src)
 	if err != nil {
-		rlog.Error("Could not read multipart file", err)
+		config.Logger.Error("Could not read multipart file", err)
 		return "", 0, nil, err
 	}
 	return file.Filename, len(fileBlob), fileBlob, nil

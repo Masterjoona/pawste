@@ -5,12 +5,11 @@ import (
 	"github.com/Masterjoona/pawste/pkg/database"
 	"github.com/Masterjoona/pawste/pkg/route"
 	"github.com/gin-gonic/gin"
-	"github.com/romana/rlog"
 )
 
 func main() {
 	config.Vars.InitConfig()
-	rlog.Info("Starting Pawste " + config.PawsteVersion)
+	config.Logger.Info("Starting Pawste " + config.PawsteVersion)
 	database.CreateOrLoadDatabase()
 
 	r := gin.New()

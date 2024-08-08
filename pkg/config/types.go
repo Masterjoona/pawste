@@ -27,6 +27,7 @@ type ConfigEnv struct {
 	ShortenRedirectPastes bool
 	CountFileUsage        bool
 	AnimeGirlMode         bool
+	LogLevel              string
 }
 
 var TimeRegex = regexp.MustCompile(`^(\d+)([smhdwMy])$`)

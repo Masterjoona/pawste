@@ -8,7 +8,6 @@ import (
 	"github.com/Masterjoona/pawste/pkg/config"
 	"github.com/Masterjoona/pawste/pkg/paste"
 	_ "github.com/mattn/go-sqlite3"
-	"github.com/romana/rlog"
 	"golang.org/x/crypto/pbkdf2"
 )
 
@@ -35,7 +34,7 @@ func pasteExists(name string) bool {
 	err := PasteDB.QueryRow("select exists(select 1 from pastes where PasteName = ?)", name).
 		Scan(&exists)
 	if err != nil {
-		rlog.Error("Could not check if paste exists", err)
+		config.Logger.Error("Could not check if paste exists", err)
 		return false
 	}
 	return exists
