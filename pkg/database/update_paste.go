@@ -41,7 +41,7 @@ func burnIfNeeded(pasteName string) {
 	}
 }
 
-func updatePasteContent(pasteName, content string) error {
+func updatePasteContent(pasteName, password, content string) error {
 	tx, err := PasteDB.Begin()
 	if err != nil {
 		return err
@@ -69,6 +69,13 @@ func updatePasteContent(pasteName, content string) error {
 	}
 	defer stmt.Close()
 
+	if password != "" {
+		content, err = paste.EncryptText(password, content)
+		if err != nil {
+			return err
+		}
+	}
+
 	_, err = stmt.Exec(
 		content,
 		utils.IsContentJustUrl(content),
@@ -77,7 +84,7 @@ func updatePasteContent(pasteName, content string) error {
 	return err
 }
 
-func updatePasteFiles(pasteName string, newPaste paste.PasteUpdate) error {
+func updatePasteFiles(pasteName, password string, newPaste paste.PasteUpdate) error {
 	tx, err := PasteDB.Begin()
 	if err != nil {
 		return err
@@ -109,7 +116,7 @@ func updatePasteFiles(pasteName string, newPaste paste.PasteUpdate) error {
 	}
 
 	for _, file := range newPaste.Files {
-		err = insertFile(tx, pasteName, file)
+		err = insertFile(tx, pasteName, password, file)
 		if err != nil {
 			return err
 		}
@@ -138,7 +145,7 @@ func deleteFile(tx *sql.Tx, pasteName, fileName string) error {
 	return os.Remove(config.Vars.DataDir + pasteName + "/" + fileName)
 }
 
-func insertFile(tx *sql.Tx, pasteName string, file paste.File) error {
+func insertFile(tx *sql.Tx, pasteName, password string, file paste.File) error {
 	stmt, err := tx.Prepare(`
 		insert into files(PasteName, Name, Size, ContentType)
 		values (?, ?, ?, ?)
@@ -150,13 +157,20 @@ func insertFile(tx *sql.Tx, pasteName string, file paste.File) error {
 
 	_, err = stmt.Exec(
 		pasteName,
-		file.Name,
+		utils.Ternary(config.Vars.AnonymiseFileNames, createShortFileName(pasteName), file.Name),
 		file.Size,
 		file.ContentType,
 	)
 
 	if err != nil {
 		return err
+	}
+
+	if password != "" {
+		err = paste.Encrypt(password, &file.Blob)
+		if err != nil {
+			return err
+		}
 	}
 
 	return os.WriteFile(
@@ -166,11 +180,11 @@ func insertFile(tx *sql.Tx, pasteName string, file paste.File) error {
 	)
 }
 
-func UpdatePaste(pasteName string, newPaste paste.PasteUpdate) error {
-	err := updatePasteContent(pasteName, newPaste.Content)
+func UpdatePaste(pasteName, password string, newPaste paste.PasteUpdate) error {
+	err := updatePasteContent(pasteName, password, newPaste.Content)
 	if err != nil {
 		return err
 	}
 
-	return updatePasteFiles(pasteName, newPaste)
+	return updatePasteFiles(pasteName, password, newPaste)
 }

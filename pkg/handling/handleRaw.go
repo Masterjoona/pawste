@@ -13,20 +13,21 @@ import (
 
 func HandlePasteRaw(c *gin.Context) {
 	pasteName := c.Param("pasteName")
-	paste, err := database.GetPasteByName(pasteName)
+	queriedPaste, err := database.GetPasteByName(pasteName)
 	if err != nil {
 		c.String(http.StatusNotFound, "Paste not found")
 		return
 	}
 
 	reqPassword := c.Request.Header.Get("password")
-	needsAuth := paste.NeedsAuth == 1 && paste.Privacy != "readonly"
-	if needsAuth && !isValidPassword(reqPassword, paste.Password) {
-		c.JSON(http.StatusUnauthorized, gin.H{"error": "wrong password"})
-		return
-	}
+	needsAuth := queriedPaste.NeedsAuth == 1 && queriedPaste.Privacy != "readonly"
 	if needsAuth {
-		paste.Content, err = paste.DecryptText(reqPassword)
+		if !isValidPassword(reqPassword, queriedPaste.Password) {
+			c.JSON(http.StatusUnauthorized, gin.H{"error": "wrong password"})
+			return
+		}
+
+		queriedPaste.Content, err = paste.DecryptText(reqPassword, queriedPaste.Content)
 		if err != nil {
 			c.String(http.StatusInternalServerError, "Failed to decrypt paste")
 			config.Logger.Error("Failed to decrypt paste:", err)
@@ -35,7 +36,7 @@ func HandlePasteRaw(c *gin.Context) {
 	}
 
 	database.UpdateReadCount(pasteName)
-	c.String(http.StatusOK, paste.Content)
+	c.String(http.StatusOK, queriedPaste.Content)
 }
 
 func HandleFile(c *gin.Context) {

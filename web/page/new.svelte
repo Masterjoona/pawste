@@ -7,7 +7,7 @@
         prettifyFileSize,
         handleAttachFiles,
         savePaste,
-    } from "../lib/utils.js";
+    } from "../lib/utils";
     import "../styles/buttons.css";
     import "../styles/file.css";
     import "../styles/paste.css";
@@ -25,6 +25,7 @@
     let content = "";
     let password = "";
     let uploadPasswordInput = "";
+    let saveButtonDisabled = false;
 
     let attachedFiles: File[] = [];
     let imageSources: (string | null)[] = [];
@@ -103,6 +104,8 @@
             }
         }
 
+        saveButtonDisabled = true;
+
         const formData = new FormData();
         formData.append("expire", selectedExpiration);
         formData.append("burnafter", selectedBurnAfter);
@@ -111,12 +114,14 @@
         formData.append("content", content);
         formData.append("password", password);
         formData.append("upload_password", uploadPasswordInput);
+
         for (let file of attachedFiles) {
             formData.append("files[]", file);
         }
 
         const saveButton = document.getElementById("save-button");
         savePaste("POST", formData, "/p/new", saveButton);
+        saveButtonDisabled = false;
     }
 
     function handlePrivacyChange(event: any) {
@@ -213,7 +218,12 @@
                     placeholder="File upload password"
                     bind:value={uploadPasswordInput} />
             {/if}
-            <button id="save-button" on:click={handleSave}>Save</button>
+            <button
+                id="save-button"
+                on:click={handleSave}
+                disabled={saveButtonDisabled}>
+                Save
+            </button>
         </div>
         {#if fileUpload}
             <FileList files={attachedFiles} {imageSources} {removeFile} />

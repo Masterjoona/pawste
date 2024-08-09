@@ -8,8 +8,8 @@ Or if you're savvy enough, you can host your own instance of pawste!
 
 ## Features
 
--   single binary (fat ass one at that, upx it or smth)
--   encryption (server side, soon on client too)
+-   single binary (fat ass one at that (shiki insanity), upx it or smth)
+-   encryption (server side, ~~soon on client too~~ horror)
 -   configurable file uploads
 -   url shortening/redirection
 -   public, private, editable pastes
@@ -32,7 +32,7 @@ docker compose up -d --build
 ### Manual
 
 ```sh
-pnpm run build && go build
+pnpm build && go build
 ```
 
 Then make a [service file](examples/pawste.service) for it and run it with systemd or something.

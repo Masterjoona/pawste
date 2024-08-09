@@ -6,24 +6,25 @@ import (
 	"github.com/Masterjoona/pawste/pkg/config"
 	"github.com/Masterjoona/pawste/pkg/database"
 	"github.com/Masterjoona/pawste/pkg/paste"
+	"github.com/Masterjoona/pawste/pkg/utils"
 	"github.com/gin-gonic/gin"
 )
 
 func HandlePasteJson(c *gin.Context) {
 	pasteName := c.Param("pasteName")
-	paste, err := database.GetPasteByName(pasteName)
+	queriedPaste, err := database.GetPasteByName(pasteName)
 	if err != nil {
 		c.JSON(http.StatusNotFound, gin.H{"error": "paste not found"})
 		return
 	}
 	reqPassword := c.Request.Header.Get("password")
-	needsAuth := paste.NeedsAuth == 1
-	if needsAuth && !isValidPassword(reqPassword, paste.Password) {
+	needsAuth := queriedPaste.NeedsAuth == 1
+	if needsAuth && !isValidPassword(reqPassword, queriedPaste.Password) {
 		c.JSON(http.StatusUnauthorized, gin.H{"error": "wrong password"})
 		return
 	}
-	if needsAuth && paste.Privacy != "readonly" {
-		paste.Content, err = paste.DecryptText(reqPassword)
+	if needsAuth && queriedPaste.Privacy != "readonly" {
+		queriedPaste.Content, err = paste.DecryptText(reqPassword, queriedPaste.Content)
 		if err != nil {
 			c.JSON(http.StatusInternalServerError, gin.H{"error": "internal server error"})
 			config.Logger.Error("Failed to decrypt paste:", err)
@@ -31,10 +32,10 @@ func HandlePasteJson(c *gin.Context) {
 		}
 	}
 
-	paste.Files = database.GetFiles(pasteName)
+	queriedPaste.Files = database.GetFiles(pasteName)
 
 	database.UpdateReadCount(pasteName)
-	c.JSON(http.StatusOK, paste)
+	c.JSON(http.StatusOK, queriedPaste)
 }
 
 func HandleEditJson(c *gin.Context) {
@@ -87,7 +88,7 @@ func HandleEditJson(c *gin.Context) {
 	}
 	for _, file := range newPaste.FilesMultiPart {
 		currentFileSizeTotal += int(file.Size)
-		fileName, fileSize, fileBlob, err := convertMultipartFile(file)
+		fileName, fileSize, fileBlob, err := paste.ConvertMultipartFile(file)
 		if err != nil {
 			c.JSON(http.StatusBadRequest, gin.H{"error": "internal server error"})
 			return
@@ -105,7 +106,9 @@ func HandleEditJson(c *gin.Context) {
 		return
 	}
 
-	err = database.UpdatePaste(queriedPaste.PasteName, newPaste)
+	needsEncryption := queriedPaste.NeedsAuth == 1 && queriedPaste.Privacy != "readonly"
+
+	err = database.UpdatePaste(queriedPaste.PasteName, utils.Ternary(needsEncryption, newPaste.Password, ""), newPaste)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 		config.Logger.Error("Failed to update paste:", err)

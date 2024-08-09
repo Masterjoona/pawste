@@ -5,7 +5,6 @@ ENV PATH="$PNPM_HOME:$PATH"
 RUN corepack enable
 WORKDIR /app
 COPY package.json pnpm-lock.yaml ./
-COPY patches ./patches
 COPY golte.config.ts ./
 COPY svelte.config.js ./
 COPY ./web /app/web

@@ -30,6 +30,17 @@ type Paste struct {
 	UpdatedAt   int64
 }
 
+type Submit struct {
+	Text           string
+	Expiration     string
+	BurnAfter      int
+	Password       string
+	UploadPassword string
+	Syntax         string
+	Privacy        string
+	Files          []*multipart.FileHeader
+}
+
 type PasteLists struct {
 	Pastes    []Paste
 	Redirects []Paste

@@ -10,7 +10,7 @@ import (
 	_ "github.com/mattn/go-sqlite3"
 )
 
-func CreatePaste(paste paste.Paste) error {
+func CreatePaste(newPaste paste.Paste) error {
 	tx, err := PasteDB.Begin()
 	if err != nil {
 		return err
@@ -26,38 +26,38 @@ func CreatePaste(paste paste.Paste) error {
 	}
 	defer stmt.Close()
 
-	encrypt := (paste.Privacy == "private" || paste.Privacy == "secret") &&
-		paste.Password != ""
+	encrypt := (newPaste.Privacy == "private" || newPaste.Privacy == "secret") &&
+		newPaste.Password != ""
 	if encrypt {
-		err = paste.EncryptText(paste.Password)
+		newPaste.Content, err = paste.EncryptText(newPaste.Password, newPaste.Content)
 		if err != nil {
 			return err
 		}
 	}
 
-	NewPassword := utils.Ternary((encrypt || paste.Privacy == "readonly"), HashPassword(paste.Password), "")
+	NewPassword := utils.Ternary((encrypt || newPaste.Privacy == "readonly"), HashPassword(newPaste.Password), "")
 
 	_, err = stmt.Exec(
-		paste.PasteName,
-		paste.Expire,
-		paste.Privacy,
-		paste.NeedsAuth,
-		paste.ReadCount,
-		paste.ReadLast,
-		paste.BurnAfter,
-		paste.Content,
-		paste.UrlRedirect,
-		paste.Syntax,
+		newPaste.PasteName,
+		newPaste.Expire,
+		newPaste.Privacy,
+		newPaste.NeedsAuth,
+		newPaste.ReadCount,
+		newPaste.ReadLast,
+		newPaste.BurnAfter,
+		newPaste.Content,
+		newPaste.UrlRedirect,
+		newPaste.Syntax,
 		NewPassword,
-		paste.CreatedAt,
-		paste.UpdatedAt,
+		newPaste.CreatedAt,
+		newPaste.UpdatedAt,
 	)
 
 	if err != nil {
 		return err
 	}
 
-	err = saveFiles(tx, &paste, encrypt)
+	err = saveFiles(tx, &newPaste, encrypt)
 	if err != nil {
 		return err
 	}
@@ -65,16 +65,19 @@ func CreatePaste(paste paste.Paste) error {
 	return tx.Commit()
 }
 
-func saveFiles(tx *sql.Tx, paste *paste.Paste, encrypt bool) error {
-	for _, file := range paste.Files {
+func saveFiles(tx *sql.Tx, newPaste *paste.Paste, encrypt bool) error {
+	for _, file := range newPaste.Files {
+		if config.Vars.AnonymiseFileNames {
+			file.Name = createShortFileName(newPaste.PasteName) // we dont have collision problems
+		}
 		if encrypt {
-			err := file.Encrypt(paste.Password)
+			err := paste.Encrypt(newPaste.Password, &file.Blob)
 			if err != nil {
 				config.Logger.Error("Failed to encrypt file:", err)
 				return err
 			}
 		}
-		err := saveFileToDisk(&file, paste.PasteName)
+		err := saveFileToDisk(&file, newPaste.PasteName)
 		if err != nil {
 			config.Logger.Error("Failed to save file to disk:", err)
 			return err
@@ -90,7 +93,7 @@ func saveFiles(tx *sql.Tx, paste *paste.Paste, encrypt bool) error {
 		defer stmt.Close()
 
 		_, err = stmt.Exec(
-			paste.PasteName,
+			newPaste.PasteName,
 			file.Name,
 			file.Size,
 			file.ContentType,

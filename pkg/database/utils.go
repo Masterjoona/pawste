@@ -29,15 +29,22 @@ func MakeFilePointers(paste *paste.File, scanVariables []string) []interface{} {
 	return filePointers
 }
 
-func pasteExists(name string) bool {
+func exists(query string, args ...interface{}) bool {
 	var exists bool
-	err := PasteDB.QueryRow("select exists(select 1 from pastes where PasteName = ?)", name).
-		Scan(&exists)
+	err := PasteDB.QueryRow(query, args...).Scan(&exists)
 	if err != nil {
-		config.Logger.Error("Could not check if paste exists", err)
+		config.Logger.Error("Could not check if exists", err)
 		return false
 	}
 	return exists
+}
+
+func pasteExists(name string) bool {
+	return exists("select exists(select 1 from pastes where PasteName = ?)", name)
+}
+
+func fileExists(pasteName, name string) bool {
+	return exists("select exists(select 1 from files where PasteName = ? and Name = ?)", pasteName, name)
 }
 
 func HashPassword(password string) string {

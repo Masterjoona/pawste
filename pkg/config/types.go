@@ -28,6 +28,7 @@ type ConfigEnv struct {
 	CountFileUsage        bool
 	AnimeGirlMode         bool
 	LogLevel              string
+	AnonymiseFileNames    bool
 }
 
 var TimeRegex = regexp.MustCompile(`^(\d+)([smhdwMy])$`)

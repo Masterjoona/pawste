@@ -24,7 +24,7 @@ func deriveKey(password string) []byte {
 	return hash[:]
 }
 
-func (f *File) Encrypt(password string) error {
+func Encrypt(password string, blob *[]byte) error {
 	key := deriveKey(password)
 	nonce := make([]byte, 12)
 
@@ -44,8 +44,9 @@ func (f *File) Encrypt(password string) error {
 		return err
 	}
 
-	f.Blob = aesgcm.Seal(f.Blob[:0], nonce, f.Blob, nil)
-	f.Blob = append(f.Blob, nonce...)
+	*blob = aesgcm.Seal((*blob)[:0], nonce, *blob, nil)
+	*blob = append(*blob, nonce...)
+
 	return nil
 }
 
@@ -82,35 +83,34 @@ func Decrypt(password string, fileBlob []byte) ([]byte, error) {
 	return fileBlob[:len(decryptedFileBytes)], nil
 }
 
-func (p *Paste) EncryptText(password string) error {
+func EncryptText(password, content string) (string, error) {
 	key := deriveKey(password)
 	nonce := make([]byte, 12)
 
 	if _, err := io.ReadFull(rand.Reader, nonce); err != nil {
-		return err
+		return "", err
 	}
 
 	dk := pbkdf2.Key(key, nonce, 4096, 32, sha256.New)
 
 	block, err := aes.NewCipher(dk)
 	if err != nil {
-		return err
+		return "", err
 	}
 
 	aesgcm, err := cipher.NewGCM(block)
 	if err != nil {
-		return err
+		return "", err
 	}
 
-	ciphertext := aesgcm.Seal(nil, nonce, []byte(p.Content), nil)
+	ciphertext := aesgcm.Seal(nil, nonce, []byte(content), nil)
 	ciphertext = append(ciphertext, nonce...)
 
-	p.Content = hex.EncodeToString(ciphertext)
-	return nil
+	return hex.EncodeToString(ciphertext), nil
 }
 
-func (p *Paste) DecryptText(password string) (string, error) {
-	ciphertext, err := hex.DecodeString(p.Content)
+func DecryptText(password, content string) (string, error) {
+	ciphertext, err := hex.DecodeString(content)
 	if err != nil {
 		return "", err
 	}
