@@ -185,7 +185,6 @@
                     <option value="unlisted">Unlisted</option>
                     <option value="readonly">Read-only</option>
                     <option value="private">Private</option>
-                    <option value="secret">Secret</option>
                 </select>
             </div>
             <div id="password-field">

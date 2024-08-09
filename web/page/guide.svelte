@@ -30,10 +30,6 @@
             <b>Private</b> - A password is needed to view and edit the paste. The
             paste is encrypted on server.
         </li>
-        <li>
-            <b>Secret</b> - A password is needed to view and edit the paste. The
-            paste is encrypted on client and on server.
-        </li>
     </ul>
 </div>
 
