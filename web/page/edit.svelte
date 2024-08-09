@@ -113,6 +113,7 @@
             paste = await resp.json();
             newContent = paste.Content;
             hideContent = false;
+            pastePassword = password;
         } else {
             failToast("Wrong password!");
         }
