@@ -155,9 +155,16 @@ func insertFile(tx *sql.Tx, pasteName, password string, file paste.File) error {
 	}
 	defer stmt.Close()
 
+	if config.Vars.AnonymiseFileNames {
+		file.Name = createShortFileName(pasteName)
+	}
+	if config.Vars.NormalizeFilenames {
+		file.Name = utils.NormalizeFilename(file.Name)
+	}
+
 	_, err = stmt.Exec(
 		pasteName,
-		utils.Ternary(config.Vars.AnonymiseFileNames, createShortFileName(pasteName), file.Name),
+		file.Name,
 		file.Size,
 		file.ContentType,
 	)

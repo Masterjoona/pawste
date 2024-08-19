@@ -29,6 +29,7 @@ type ConfigEnv struct {
 	AnimeGirlMode         bool
 	LogLevel              string
 	AnonymiseFileNames    bool
+	NormalizeFilenames    bool
 }
 
 var TimeRegex = regexp.MustCompile(`^(\d+)([smhdwMy])$`)

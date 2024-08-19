@@ -44,6 +44,7 @@ func (ConfigEnv) InitConfig() {
 		AnimeGirlMode:         getEnv("ANIME_GIRL_MODE", "false") == "true",
 		LogLevel:              getEnv("LOG_LEVEL", "info"),
 		AnonymiseFileNames:    getEnv("ANONYMISE_FILE_NAMES", "false") == "true",
+		NormalizeFilenames:    getEnv("NORMALIZE_FILE_NAMES", "false") == "true",
 	}
 
 	if _, err := os.Stat(Vars.DataDir); os.IsNotExist(err) {

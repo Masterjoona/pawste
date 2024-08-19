@@ -3,6 +3,11 @@ package utils
 import (
 	"regexp"
 	"time"
+	"unicode"
+
+	"golang.org/x/text/runes"
+	"golang.org/x/text/transform"
+	"golang.org/x/text/unicode/norm"
 
 	"github.com/Masterjoona/pawste/pkg/config"
 )
@@ -30,4 +35,14 @@ func Ternary[T any](condition bool, trueVal, falseVal T) T {
 		return trueVal
 	}
 	return falseVal
+}
+
+var stripRegex = regexp.MustCompile(`[^a-zA-Z0-9._-]+`)
+var trans = transform.Chain(norm.NFD, runes.Remove(runes.In(unicode.Mn)), norm.NFC)
+
+func NormalizeFilename(str string) string {
+	//return stripRegex.ReplaceAllString(str, "")
+	t, _, _ := transform.String(trans, str)
+	t = stripRegex.ReplaceAllString(t, "")
+	return t
 }

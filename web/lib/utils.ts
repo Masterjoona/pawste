@@ -21,11 +21,6 @@ export function truncateFilename(filename: string, maxLength = 30) {
         ext
     );
 }
-
-export function viewFile(pastename: string, filename: string) {
-    window.open("/p/" + pastename + "/f/" + filename);
-}
-
 export function isFileDb(file: FileType): file is FileDb {
     return (file as FileDb)?.Name !== undefined;
 }

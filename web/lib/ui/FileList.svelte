@@ -35,8 +35,8 @@
                     >Remove</button>
             {/if}
             {#if dataFromDb}
-                <button on:click={() => viewFile(pasteName, file.Name)}
-                    >View</button>
+                <a href={`/p/${pasteName}/f/${file.Name}`}
+                    >View</a>
             {/if}
         </div>
     {/each}

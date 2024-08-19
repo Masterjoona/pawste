@@ -70,6 +70,9 @@ func saveFiles(tx *sql.Tx, newPaste *paste.Paste, encrypt bool) error {
 		if config.Vars.AnonymiseFileNames {
 			file.Name = createShortFileName(newPaste.PasteName) // we dont have collision problems
 		}
+		if config.Vars.NormalizeFilenames {
+			file.Name = utils.NormalizeFilename(file.Name)
+		}
 		if encrypt {
 			err := paste.Encrypt(newPaste.Password, &file.Blob)
 			if err != nil {
