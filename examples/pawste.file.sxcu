@@ -1,0 +1,16 @@
+{
+  "Version": "15.0.0",
+  "Name": "pawste image/file",
+  "DestinationType": "ImageUploader, FileUploader",
+  "RequestMethod": "POST",
+  "RequestURL": "https://pawst.eu/p/new",
+  "Body": "MultipartFormData",
+  "Arguments": {
+    "expire": "1w",
+    "burnafter": "0",
+    "privacy": "unlisted",
+    "content": "{input}"
+  },
+  "FileFormName": "files[]",
+  "URL": "https://pawst.eu/p/{json:PasteName}"
+}

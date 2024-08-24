@@ -1,0 +1,13 @@
+[Unit]
+Description=
+
+[Service]
+Type=exec
+#Restart=always
+ExecStartPre=pnpm run build && go build
+ExecStart=%h/pawste/pawste
+WorkingDirectory=%h/pawste
+EnvironmentFile=%h/pawste/.env
+
+[Install]
+WantedBy=default.target

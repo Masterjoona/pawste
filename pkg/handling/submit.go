@@ -1,0 +1,125 @@
+package handling
+
+import (
+	"errors"
+	"net/http"
+	"strconv"
+
+	"github.com/Masterjoona/pawste/pkg/config"
+	"github.com/Masterjoona/pawste/pkg/database"
+	"github.com/Masterjoona/pawste/pkg/paste"
+	"github.com/Masterjoona/pawste/pkg/utils"
+	"github.com/gin-gonic/gin"
+)
+
+func HandleSubmit(c *gin.Context) {
+	submit, err := parseSubmitForm(c)
+	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		return
+	}
+
+	if err = validateSubmit(&submit); err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		return
+	}
+
+	isRedirect := utils.IsContentJustUrl(submit.Text)
+
+	paste, err := database.SubmitToPaste(submit, isRedirect)
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "internal server error"})
+		return
+	}
+	err = database.CreatePaste(paste)
+	if err != nil {
+		config.Logger.Error("Error creating paste", err)
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "internal server error"})
+		return
+	}
+	for i := range paste.Files {
+		paste.Files[i].Blob = nil
+	}
+
+	c.JSON(http.StatusOK, paste)
+}
+
+func parseSubmitForm(c *gin.Context) (paste.Submit, error) {
+	var submit paste.Submit
+	submit.Text = c.PostForm("content")
+	submit.Expiration = c.PostForm("expire")
+	submit.Password = c.PostForm("password")
+	submit.UploadPassword = c.PostForm("upload_password")
+	submit.Syntax = c.PostForm("syntax")
+	submit.Privacy = c.PostForm("privacy")
+	burnAfterInt, err := strconv.Atoi(c.PostForm("burnafter"))
+	if err != nil {
+		return paste.Submit{}, errors.New("burnafter must be an integer")
+	}
+	submit.BurnAfter = burnAfterInt
+
+	form, err := c.MultipartForm()
+	if err != nil {
+		return paste.Submit{}, errors.New("form error: " + err.Error())
+	}
+
+	submit.Files = form.File["files[]"]
+	return submit, nil
+}
+
+func validateSubmit(submit *paste.Submit) error {
+	hasFiles := len(submit.Files) > 0
+	if submit.Text == "" && !hasFiles {
+		return errors.New("text or files is required")
+	}
+
+	if 0 < len(submit.Files) && !config.Vars.FileUpload {
+		return errors.New("file uploads are disabled")
+	}
+
+	if config.Vars.FileUploadingPassword != "" && submit.UploadPassword == "" || (submit.UploadPassword != config.Vars.FileUploadingPassword) {
+		return errors.New("invalid upload password")
+	}
+
+	needsAuth := (submit.Privacy == "private" || submit.Privacy == "secret" || submit.Privacy == "readonly")
+	if submit.Password == "" && needsAuth {
+		return errors.New("password is required for private, secret or readonly pastes")
+	}
+
+	if 128 < len(submit.Password) {
+		return errors.New("keep them passwords under sane lengths :)")
+	}
+
+	if !paste.PrivacyMap.Contains(submit.Privacy) {
+		return errors.New("invalid privacy")
+	}
+
+	if !paste.SyntaxMap.Contains(submit.Syntax) {
+		return errors.New("invalid syntax")
+	}
+
+	if !config.Vars.EternalPaste && submit.Expiration == "never" {
+		submit.Expiration = "1w"
+	}
+
+	if config.Vars.MaxContentLength < len(submit.Text) {
+		return errors.New("content is too long")
+	}
+
+	maxSizeFiles := utils.Ternary((needsAuth && submit.Privacy != "readonly"), config.Vars.MaxEncryptionSize, config.Vars.MaxFileSize)
+
+	if hasFiles {
+		totalSize := 0
+		for _, file := range submit.Files {
+			if file == nil {
+				continue
+			}
+			totalSize += int(file.Size)
+		}
+		if totalSize > maxSizeFiles {
+			return errors.New("files are too large")
+		}
+	}
+
+	return nil
+}
